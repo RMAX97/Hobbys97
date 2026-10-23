@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#008080">
+<title>Hobbys97</title>
+<link rel="icon" id="favicon">
+<style>
+:root{
+  --teal:#008080;--face:#c0c0c0;--light:#dfdfdf;--white:#fff;--shadow:#808080;--dark:#0a0a0a;
+  --navy:#000080;--blue:#1084d0;--text:#000;
+  --raised:inset -1px -1px var(--dark),inset 1px 1px var(--white),inset -2px -2px var(--shadow),inset 2px 2px var(--light);
+  --sunken:inset -1px -1px var(--white),inset 1px 1px var(--shadow),inset -2px -2px var(--light),inset 2px 2px var(--dark);
+  --pressed:inset -1px -1px var(--white),inset 1px 1px var(--dark),inset -2px -2px var(--light),inset 2px 2px var(--shadow);
+  --tb:30px;
+  font-family:Tahoma,"MS Sans Serif","Microsoft Sans Serif",Geneva,Arial,sans-serif;font-size:11px;
+  -webkit-font-smoothing:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--teal);color:var(--text);-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+img,canvas{image-rendering:pixelated}
+button{font:inherit;color:inherit}
+:focus-visible{outline:1px dotted #000;outline-offset:-4px}
+
+/* ---------- Bureau ---------- */
+#desktop{position:fixed;inset:0 0 calc(var(--tb) + env(safe-area-inset-bottom,0px)) 0;padding:calc(6px + env(safe-area-inset-top,0px)) 4px 4px calc(4px + env(safe-area-inset-left,0px))}
+.icons{display:grid;grid-auto-flow:column;grid-template-rows:repeat(auto-fill,76px);grid-auto-columns:78px;height:100%;gap:0}
+.dicon{display:flex;flex-direction:column;align-items:center;gap:4px;width:78px;padding:2px 0;border:0;background:none;cursor:default}
+.dicon img{width:32px;height:32px}
+.dicon span{color:#fff;padding:1px 2px;line-height:1.25;text-align:center;border:1px dotted transparent}
+.dicon.sel img{filter:brightness(.55) sepia(1) hue-rotate(190deg) saturate(6)}
+.dicon.sel span{background:var(--navy);border-color:#ff0}
+.dicon:focus-visible{outline:none}
+.dicon:focus-visible span{border-color:#fff}
+
+/* ---------- Fenêtres ---------- */
+.win{position:absolute;display:flex;flex-direction:column;background:var(--face);box-shadow:var(--raised);padding:3px;min-width:240px;min-height:160px}
+.win.max{left:0!important;top:0!important;width:100%!important;height:100%!important}
+.win[hidden]{display:none}
+.tbar{display:flex;align-items:center;gap:4px;height:20px;padding:0 2px 0 3px;background:linear-gradient(90deg,var(--shadow),#b5b5b5);color:var(--light);font-weight:bold;cursor:default;touch-action:none;flex:none}
+.win.active .tbar{background:linear-gradient(90deg,var(--navy),var(--blue));color:#fff}
+.tbar img{width:16px;height:16px}
+.tbar b{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbtn{width:18px;height:16px;padding:0;border:0;background:var(--face);box-shadow:var(--raised);display:grid;place-items:center;flex:none}
+.tbtn:active{box-shadow:var(--pressed)}
+.tbtn svg{display:block}
+.tbtn.x{margin-left:2px}
+.menubar{display:flex;gap:0;padding:2px 0;flex:none}
+.menubar span{padding:1px 6px}
+.menubar u{text-decoration:underline}
+.wbody{position:relative;flex:1;box-shadow:var(--sunken);padding:2px;background:#fff;min-height:0}
+.wbody iframe{display:block;width:100%;height:100%;border:0;background:#fff}
+.wbody .loading{position:absolute;inset:2px;display:grid;place-items:center;color:var(--shadow);pointer-events:none}
+.grip{position:absolute;right:2px;bottom:2px;width:14px;height:14px;cursor:nwse-resize;touch-action:none;
+  background:linear-gradient(135deg,transparent 0 45%,var(--white) 45% 52%,var(--shadow) 52% 60%,transparent 60% 66%,var(--white) 66% 73%,var(--shadow) 73% 81%,transparent 81%)}
+.win.max .grip{display:none}
+.shield{position:absolute;inset:0;display:none}
+body.dragging .shield{display:block}
+body.dragging{cursor:default}
+
+/* ---------- Barre des tâches ---------- */
+#taskbar{position:fixed;left:0;right:0;bottom:0;height:calc(var(--tb) + env(safe-area-inset-bottom,0px));padding:4px 2px env(safe-area-inset-bottom,0px) calc(2px + env(safe-area-inset-left,0px));display:flex;align-items:flex-start;gap:4px;background:var(--face);box-shadow:inset 0 1px var(--light),inset 0 2px var(--white);z-index:9000}
+#taskbar>*{height:22px}
+.start{display:flex;align-items:center;gap:3px;padding:0 5px 0 3px;border:0;background:var(--face);box-shadow:var(--raised);font-weight:bold;flex:none}
+.start img{width:16px;height:16px}
+.start[aria-expanded="true"]{box-shadow:var(--pressed);padding:1px 4px 0 4px}
+.sep{width:2px;flex:none;box-shadow:inset 1px 0 var(--shadow),inset -1px 0 var(--white);margin:0 1px}
+.tasks{display:flex;gap:3px;flex:1;min-width:0;overflow:hidden}
+.task{display:flex;align-items:center;gap:4px;min-width:0;max-width:160px;flex:1 1 160px;padding:0 6px 0 4px;border:0;background:var(--face);box-shadow:var(--raised);text-align:left}
+.task img{width:16px;height:16px;flex:none}
+.task span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.task.on{box-shadow:var(--pressed);font-weight:bold;background:repeating-conic-gradient(var(--white) 0 25%,var(--face) 0 50%) 0 0/2px 2px}
+.tray{display:flex;align-items:center;gap:6px;padding:0 10px 0 6px;box-shadow:inset -1px -1px var(--white),inset 1px 1px var(--shadow);flex:none;margin-right:calc(env(safe-area-inset-right,0px))}
+.tray img{width:16px;height:16px}
+
+/* ---------- Menu Démarrer ---------- */
+#startmenu{position:fixed;left:calc(2px + env(safe-area-inset-left,0px));bottom:calc(var(--tb) - 2px + env(safe-area-inset-bottom,0px));display:flex;background:var(--face);box-shadow:var(--raised);padding:3px;z-index:9100}
+#startmenu[hidden]{display:none}
+.band{width:24px;background:linear-gradient(0deg,var(--navy),var(--blue));display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px}
+.band span{writing-mode:vertical-rl;transform:rotate(180deg);color:#fff;font-size:18px;font-family:"Arial Black",Arial,sans-serif;letter-spacing:.5px;white-space:nowrap}
+.band span b{font-weight:900}
+.band span i{font-style:normal;font-weight:400;color:#dfe8ff}
+.items{display:flex;flex-direction:column;min-width:178px}
+.mi{display:flex;align-items:center;gap:10px;height:38px;padding:0 20px 0 6px;border:0;background:none;text-align:left;font-size:12px}
+.mi img{width:32px;height:32px}
+.mi u{text-decoration:underline}
+.mi:hover,.mi:focus-visible{background:var(--navy);color:#fff;outline:none}
+.mdiv{height:2px;margin:3px 2px;box-shadow:inset 0 1px var(--shadow),inset 0 -1px var(--white)}
+
+/* ---------- Boîte de dialogue Réglages ---------- */
+.dlg .wbody{background:var(--face);box-shadow:none;padding:6px 8px 8px;overflow:auto}
+.tabs{display:flex;gap:0;padding-left:2px;position:relative;z-index:1}
+.tab{border:0;background:var(--face);padding:3px 10px 2px;margin-right:-1px;box-shadow:inset 1px 1px var(--white),inset -1px 0 var(--dark),inset -2px 0 var(--shadow);border-radius:3px 3px 0 0;position:relative;top:2px}
+.tab[aria-selected="true"]{top:0;padding:4px 12px 4px;z-index:2;background:var(--face)}
+.tabpane{box-shadow:var(--raised);padding:12px 10px 10px;margin-top:-1px}
+.tabpane[hidden]{display:none}
+fieldset{border:0;box-shadow:inset -1px -1px var(--white),inset 1px 1px var(--shadow),inset -2px -2px var(--shadow),inset 2px 2px var(--white);padding:10px 10px 10px;margin:0 0 10px}
+legend{padding:0 3px}
+.row{display:grid;grid-template-columns:118px 1fr;align-items:center;gap:6px;margin-bottom:6px}
+.row label{white-space:nowrap}
+input[type=text],input[type=email],input[type=password],input[type=url]{font:inherit;width:100%;height:21px;padding:2px 3px;border:0;background:#fff;box-shadow:var(--sunken);user-select:text;-webkit-user-select:text;border-radius:0}
+.btns{display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap}
+.btn{min-width:75px;height:23px;padding:0 10px;border:0;background:var(--face);box-shadow:var(--raised)}
+.btn:active{box-shadow:var(--pressed)}
+.btn[disabled]{color:var(--shadow);text-shadow:1px 1px var(--white)}
+.btn.default{box-shadow:inset 0 0 0 1px var(--dark),inset -2px -2px var(--dark),inset 2px 2px var(--white),inset -3px -3px var(--shadow),inset 3px 3px var(--light)}
+.status{min-height:14px;margin:8px 0 0;line-height:1.4}
+.status.err{color:#a00000}
+.status.ok{color:#006000}
+.hint{color:#404040;line-height:1.45;margin:0 0 8px;max-width:58ch}
+.who{display:flex;align-items:center;gap:8px;margin-bottom:8px;line-height:1.4}
+.who img{width:32px;height:32px}
+.dlgfoot{display:flex;justify-content:flex-end;gap:6px;margin-top:10px}
+
+@media (max-width:640px){
+  .tasks .task span{display:none}
+  .task{flex:0 0 auto;max-width:none;padding:0 5px}
+  .row{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:no-preference){
+  #startmenu:not([hidden]){animation:slide .12s steps(4) both}
+  @keyframes slide{from{clip-path:inset(100% 0 0 0)}to{clip-path:inset(0 0 0 0)}}
+}
+</style>
+</head>
+<body>
+
+<main id="desktop" aria-label="Bureau">
+  <div class="icons" id="icons"></div>
+</main>
+
+<div id="windows"></div>
+
+<nav id="startmenu" hidden aria-label="Menu Démarrer">
+  <div class="band" aria-hidden="true"><span><b>Hobbys</b><i>97</i></span></div>
+  <div class="items" role="menu">
+    <button class="mi" role="menuitem" data-open="vinyls"><img data-icon="vinyl" alt=""><span><u>V</u>inyls</span></button>
+    <button class="mi" role="menuitem" data-open="films"><img data-icon="dvd" alt=""><span><u>F</u>ilms</span></button>
+    <button class="mi" role="menuitem" data-open="cards"><img data-icon="card" alt=""><span><u>C</u>ards</span></button>
+    <div class="mdiv" role="separator"></div>
+    <button class="mi" role="menuitem" data-open="settings"><img data-icon="settings" alt=""><span><u>S</u>ettings</span></button>
+  </div>
+</nav>
+
+<footer id="taskbar">
+  <button class="start" id="startBtn" type="button" aria-haspopup="menu" aria-expanded="false"><img data-icon="logo" alt="">Start</button>
+  <div class="sep" aria-hidden="true"></div>
+  <div class="tasks" id="tasks"></div>
+  <div class="tray"><img data-icon="net" alt="" id="netIcon" title="Vinyls : non connecté"><time id="clock"></time></div>
+</footer>
+
+<script>
+(() => {
+"use strict";
+const $ = (s, r = document) => r.querySelector(s);
+
+/* ================= Icônes en pixel art (dessinées pixel par pixel) ================= */
+const ICON = {};
+function px(size, draw) {
+  const c = document.createElement("canvas"); c.width = c.height = size;
+  const g = c.getContext("2d"); const p = (x, y, col) => { g.fillStyle = col; g.fillRect(x, y, 1, 1); };
+  draw(p, g); return c.toDataURL();
+}
+const dist = (x, y, c) => Math.hypot(x + .5 - c, y + .5 - c);
+
+ICON.vinyl = px(32, p => {
+  for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
+    const d = dist(x, y, 16); if (d > 15.2) continue;
+    let col = "#161616";
+    if (d > 14.3) col = "#000";
+    else if (Math.abs(d - 12) < .5 || Math.abs(d - 9.5) < .5 || Math.abs(d - 7.4) < .45) col = "#2e2e2e";
+    if (d < 6.2) col = "#c8261e";
+    if (d < 6.2 && d > 5.4) col = "#8a140f";
+    if (d < 6.2 && (x + y) % 7 === 0 && y < 15) col = "#e8534a";
+    if (d < 1.4) col = "#000";
+    const a = Math.atan2(y + .5 - 16, x + .5 - 16);
+    if (d > 7 && d < 14 && a > -2.5 && a < -1.9 && (Math.round(d) % 2)) col = "#8c8c8c";
+    if (d > 7 && d < 14 && a > .6 && a < 1.1 && (Math.round(d) % 2)) col = "#5a5a5a";
+    p(x, y, col);
+  }
+});
+
+ICON.dvd = px(32, p => {
+  const rainbow = ["#ff7b7b", "#ffd36b", "#9cf27d", "#71e3ff", "#8f9bff", "#e48cff"];
+  for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
+    const d = dist(x, y, 16); if (d > 15.2 || d < 2.2) continue;
+    let col = "#c9cfd6";
+    const a = Math.atan2(y + .5 - 16, x + .5 - 16);
+    if (d > 14.3) col = "#6d747c";
+    else if (d < 6.6) col = d < 3.2 ? "#6d747c" : (d < 4.6 ? "#eef2f5" : "#b3bac2");
+    else {
+      const t = (a + Math.PI) / (2 * Math.PI);
+      if ((t > .58 && t < .78) || (t > .08 && t < .28)) col = rainbow[Math.floor(((t * 6) % 1) * 6 + d / 3) % 6];
+      else if ((x * 3 + y) % 11 === 0) col = "#e8ecf0";
+      else col = d > 11 ? "#b9c0c8" : "#d6dbe1";
+    }
+    p(x, y, col);
+  }
+});
+
+ICON.card = px(32, (p, g) => {
+  const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+  R(7, 2, 19, 28, "#3a2a00");          // contour
+  R(8, 3, 17, 26, "#f6d23a");          // bordure jaune
+  R(8, 3, 17, 1, "#fff3a8"); R(8, 3, 1, 26, "#fff3a8");
+  R(10, 5, 13, 22, "#f3efe2");          // fond de carte
+  R(11, 6, 8, 1, "#3d3d3d"); R(20, 6, 2, 2, "#d83a2a"); // nom + symbole
+  R(11, 8, 11, 8, "#2b3b7a");          // cadre de l'illustration
+  R(12, 9, 9, 6, "#7fb3ff");           // ciel
+  R(12, 13, 9, 2, "#4c9a3a"); R(14, 12, 4, 1, "#4c9a3a");
+  R(16, 10, 2, 2, "#fff0a0"); R(15, 11, 1, 1, "#fff0a0"); R(18, 11, 1, 1, "#fff0a0");
+  R(11, 18, 11, 1, "#9a9384"); R(11, 20, 8, 1, "#9a9384"); R(11, 22, 10, 1, "#9a9384");
+  R(11, 24, 3, 2, "#d83a2a"); R(19, 24, 3, 2, "#2b3b7a");
+  R(26, 4, 1, 26, "#806400"); R(9, 29, 17, 1, "#806400");
+});
+
+ICON.settings = px(32, (p, g) => {
+  const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+  // écran d'ordinateur avec une prise réseau
+  R(4, 3, 22, 18, "#000"); R(5, 4, 20, 16, "#c0c0c0"); R(5, 4, 20, 1, "#fff"); R(5, 4, 1, 16, "#fff");
+  R(7, 6, 16, 11, "#000"); R(8, 7, 14, 9, "#008080");
+  R(9, 8, 4, 3, "#c0c0c0"); R(14, 9, 6, 1, "#7fe0e0"); R(14, 11, 4, 1, "#7fe0e0");
+  R(12, 21, 6, 2, "#808080"); R(8, 23, 14, 2, "#c0c0c0"); R(8, 24, 14, 1, "#808080");
+  R(23, 22, 1, 6, "#000"); R(23, 27, 6, 1, "#000"); R(27, 25, 4, 5, "#000"); R(28, 26, 2, 3, "#ffd200");
+});
+
+ICON.logo = px(16, (p, g) => {
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+    const d = dist(x, y, 8); if (d > 7.6) continue;
+    p(x, y, d < 2.8 ? (d < .9 ? "#000" : "#c8261e") : (Math.abs(d - 5.2) < .4 ? "#3a3a3a" : "#111"));
+  }
+  g.fillStyle = "#9a9a9a"; g.fillRect(4, 3, 2, 1); g.fillRect(3, 4, 1, 2);
+});
+
+const netIcon = online => px(16, (p, g) => {
+  const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+  R(1, 3, 9, 7, "#000"); R(2, 4, 7, 5, online ? "#00a8a8" : "#808080");
+  R(6, 6, 9, 7, "#000"); R(7, 7, 7, 5, online ? "#00d0d0" : "#a0a0a0");
+  R(3, 10, 4, 1, "#000"); R(8, 13, 4, 1, "#000");
+});
+ICON.net = netIcon(false);
+
+const fillIcons = (root = document) => root.querySelectorAll("img[data-icon]").forEach(i => { i.src = ICON[i.dataset.icon]; });
+fillIcons();
+$("#favicon").href = ICON.vinyl;
+
+/* ================= Les applications ================= */
+const APPS = {
+  vinyls:   { title: "My Discollection", label: "Vinyls", icon: "vinyl", src: "vinyls.html" },
+  films:    { title: "Ma Vidéothèque", label: "Films", icon: "dvd", src: "films.html" },
+  cards:    { title: "Ma Collection de Cartes", label: "Cards", icon: "card", src: "cards.html" },
+  settings: { title: "Settings : connexions", label: "Settings", icon: "settings", dialog: true }
+};
+
+/* Raccourcis du bureau */
+const icons = $("#icons");
+["vinyls", "films", "cards"].forEach(id => {
+  const a = APPS[id], b = document.createElement("button");
+  b.className = "dicon"; b.type = "button"; b.dataset.app = id;
+  b.innerHTML = `<img data-icon="${a.icon}" alt=""><span>${a.label}</span>`;
+  icons.appendChild(b);
+});
+fillIcons(icons);
+let lastPointer = "mouse";
+icons.addEventListener("pointerdown", e => { lastPointer = e.pointerType; });
+icons.addEventListener("click", e => {
+  const b = e.target.closest(".dicon");
+  icons.querySelectorAll(".dicon").forEach(x => x.classList.toggle("sel", x === b));
+  if (b && (lastPointer !== "mouse" || e.detail === 0)) openApp(b.dataset.app); // un toucher ou Entrée ouvre directement
+});
+icons.addEventListener("dblclick", e => { const b = e.target.closest(".dicon"); if (b) openApp(b.dataset.app); });
+$("#desktop").addEventListener("pointerdown", e => { if (!e.target.closest(".dicon")) icons.querySelectorAll(".sel").forEach(x => x.classList.remove("sel")); });
+
+/* ================= Fenêtres ================= */
+const wins = {}; let zTop = 10, cascade = 0;
+const small = () => innerWidth < 700 || innerHeight < 500;
+
+function openApp(id) {
+  closeStart();
+  if (wins[id]) { wins[id].el.hidden = false; focusWin(id); return; }
+  const a = APPS[id], el = document.createElement("section");
+  el.className = "win" + (a.dialog ? " dlg" : ""); el.setAttribute("aria-label", a.title);
+  el.innerHTML = `
+    <header class="tbar"><img data-icon="${a.icon}" alt=""><b>${a.title}</b>
+      ${a.dialog ? "" : `<button class="tbtn" data-w="min" aria-label="Réduire"><svg width="8" height="8" viewBox="0 0 8 8"><rect x="1" y="6" width="6" height="2"/></svg></button>
+      <button class="tbtn" data-w="max" aria-label="Agrandir"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M0 0h9v9H0zM1 2v6h7V2z" fill-rule="evenodd"/></svg></button>`}
+      <button class="tbtn x" data-w="close" aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button>
+    </header>
+    ${a.dialog ? `<div class="wbody">${settingsHtml()}</div>` :
+      `<div class="menubar" aria-hidden="true"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>H</u>elp</span></div>
+       <div class="wbody"><p class="loading">Ouverture de ${a.label}…</p><iframe title="${a.title}" src="${a.src}"></iframe><div class="shield"></div></div>
+       <div class="grip" aria-hidden="true"></div>`}`;
+  fillIcons(el);
+  $("#windows").appendChild(el);
+  const W = innerWidth, H = innerHeight - 30;
+  if (a.dialog) {
+    const w = Math.min(430, W - 16);
+    Object.assign(el.style, { width: w + "px", maxHeight: (H - 16) + "px", left: (W - w) / 2 + "px" });
+    el.style.top = Math.max(8, (H - el.offsetHeight) / 2) + "px";
+  } else {
+    const w = Math.round(W * .82), h = Math.round(H * .84), o = (cascade++ % 4) * 26;
+    Object.assign(el.style, { width: w + "px", height: h + "px", left: Math.round((W - w) / 2 - 39 + o) + "px", top: 12 + o + "px" });
+    if (small()) el.classList.add("max");
+    el.querySelector("iframe").addEventListener("load", () => { const l = el.querySelector(".loading"); if (l) l.remove(); });
+  }
+  const task = document.createElement("button");
+  task.className = "task"; task.type = "button"; task.innerHTML = `<img data-icon="${a.icon}" alt=""><span>${a.title}</span>`;
+  fillIcons(task); $("#tasks").appendChild(task);
+  task.addEventListener("click", () => {
+    const w = wins[id];
+    if (w.el.hidden) { w.el.hidden = false; focusWin(id); }
+    else if (w.el.classList.contains("active")) minimize(id);
+    else focusWin(id);
+  });
+  wins[id] = { el, task };
+  el.addEventListener("pointerdown", () => focusWin(id), true);
+  el.querySelector(".tbar").addEventListener("click", e => {
+    const b = e.target.closest("[data-w]"); if (!b) return;
+    if (b.dataset.w === "close") closeWin(id);
+    else if (b.dataset.w === "min") minimize(id);
+    else toggleMax(id);
+  });
+  el.querySelector(".tbar").addEventListener("dblclick", e => { if (!e.target.closest("[data-w]") && !a.dialog) toggleMax(id); });
+  dragify(el, id); if (!a.dialog) resizify(el);
+  if (a.dialog) initSettings(el);
+  focusWin(id);
+}
+function focusWin(id) {
+  Object.entries(wins).forEach(([k, w]) => { const on = k === id; w.el.classList.toggle("active", on); w.task.classList.toggle("on", on && !w.el.hidden); });
+  wins[id].el.style.zIndex = ++zTop;
+}
+function minimize(id) {
+  const w = wins[id]; w.el.hidden = true; w.el.classList.remove("active"); w.task.classList.remove("on");
+  const next = Object.entries(wins).filter(([, x]) => !x.el.hidden).sort((a, b) => b[1].el.style.zIndex - a[1].el.style.zIndex)[0];
+  if (next) focusWin(next[0]);
+}
+function toggleMax(id) { if (!small()) wins[id].el.classList.toggle("max"); }
+function closeWin(id) { const w = wins[id]; if (!w) return; w.el.remove(); w.task.remove(); delete wins[id]; }
+
+function dragify(el, id) {
+  const bar = el.querySelector(".tbar");
+  bar.addEventListener("pointerdown", e => {
+    if (e.target.closest("[data-w]") || el.classList.contains("max") || e.button > 0) return;
+    const sx = e.clientX, sy = e.clientY, ox = el.offsetLeft, oy = el.offsetTop;
+    document.body.classList.add("dragging"); bar.setPointerCapture(e.pointerId);
+    const mv = ev => {
+      const x = Math.min(innerWidth - 60, Math.max(60 - el.offsetWidth, ox + ev.clientX - sx));
+      const y = Math.min(innerHeight - 60, Math.max(0, oy + ev.clientY - sy));
+      el.style.left = x + "px"; el.style.top = y + "px";
+    };
+    const up = () => { document.body.classList.remove("dragging"); bar.removeEventListener("pointermove", mv); bar.removeEventListener("pointerup", up); bar.removeEventListener("pointercancel", up); };
+    bar.addEventListener("pointermove", mv); bar.addEventListener("pointerup", up); bar.addEventListener("pointercancel", up);
+  });
+}
+function resizify(el) {
+  const g = el.querySelector(".grip");
+  g.addEventListener("pointerdown", e => {
+    e.preventDefault(); const sx = e.clientX, sy = e.clientY, w = el.offsetWidth, h = el.offsetHeight;
+    document.body.classList.add("dragging"); g.setPointerCapture(e.pointerId);
+    const mv = ev => { el.style.width = Math.max(240, w + ev.clientX - sx) + "px"; el.style.height = Math.max(160, h + ev.clientY - sy) + "px"; };
+    const up = () => { document.body.classList.remove("dragging"); g.removeEventListener("pointermove", mv); g.removeEventListener("pointerup", up); };
+    g.addEventListener("pointermove", mv); g.addEventListener("pointerup", up);
+  });
+}
+addEventListener("resize", () => Object.values(wins).forEach(w => { if (small() && !w.el.classList.contains("dlg")) w.el.classList.add("max"); }));
+
+/* ================= Menu Démarrer ================= */
+const sm = $("#startmenu"), sb = $("#startBtn");
+function closeStart() { sm.hidden = true; sb.setAttribute("aria-expanded", "false"); }
+sb.addEventListener("click", () => { const open = sm.hidden; sm.hidden = !open; sb.setAttribute("aria-expanded", String(open)); if (open) sm.querySelector(".mi").focus(); });
+sm.addEventListener("click", e => { const b = e.target.closest("[data-open]"); if (b) openApp(b.dataset.open); });
+document.addEventListener("pointerdown", e => { if (!sm.hidden && !sm.contains(e.target) && !sb.contains(e.target)) closeStart(); });
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeStart();
+  if (!sm.hidden && /^[vfcs]$/i.test(e.key)) { const m = { v: "vinyls", f: "films", c: "cards", s: "settings" }[e.key.toLowerCase()]; openApp(m); }
+  if (!sm.hidden && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+    e.preventDefault(); const it = [...sm.querySelectorAll(".mi")], i = it.indexOf(document.activeElement);
+    it[(i + (e.key === "ArrowDown" ? 1 : it.length - 1)) % it.length].focus();
+  }
+});
+addEventListener("blur", () => setTimeout(() => {
+  const f = document.activeElement; if (!f || f.tagName !== "IFRAME") return;
+  closeStart(); // un clic dans un site passe sa fenêtre au premier plan
+  const id = Object.keys(wins).find(k => wins[k].el.contains(f)); if (id) focusWin(id);
+}, 0));
+
+/* ================= Horloge ================= */
+const clock = $("#clock");
+function tick() {
+  const d = new Date();
+  clock.textContent = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  clock.dateTime = d.toISOString(); clock.title = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+}
+tick(); setInterval(tick, 5000);
+
+/* ================= Settings : connexions =================
+   Mêmes réglages que My Discollection (mv-sb-url, mv-sb-key, session « mv-sb-auth »)
+   et que Ma Vidéothèque (videotheque.tmdbkey) : tout est partagé tant que les fichiers
+   sont hébergés ensemble, à la même adresse. */
+const LS = {
+  get: k => { try { return localStorage.getItem(k) || ""; } catch { return ""; } },
+  set: (k, v) => { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch {} }
+};
+let sbClient = null, sbUser = null;
+
+function settingsHtml() {
+  return `
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="vin" aria-selected="true">Vinyls</button>
+    <button class="tab" role="tab" data-tab="fil" aria-selected="false">Films</button>
+  </div>
+  <div class="tabpane" data-pane="vin">
+    <p class="hint">Ta collection de vinyles se synchronise avec My Discollection grâce à ton projet Supabase. Mets les mêmes réglages que sur l’autre site.</p>
+    <fieldset><legend>Serveur</legend>
+      <div class="row"><label for="sUrl">Adresse du projet</label><input type="url" id="sUrl" placeholder="https://abcd1234.supabase.co" spellcheck="false" autocomplete="off"></div>
+      <div class="row"><label for="sKey">Clé publique</label><input type="text" id="sKey" placeholder="Clé « anon » ou « publishable »" spellcheck="false" autocomplete="off"></div>
+      <div class="btns"><button class="btn" id="sSave" type="button">Enregistrer</button></div>
+    </fieldset>
+    <fieldset><legend>Compte</legend>
+      <div id="acct"></div>
+    </fieldset>
+    <p class="status" id="sStatus" role="status"></p>
+  </div>
+  <div class="tabpane" data-pane="fil" hidden>
+    <p class="hint">Ma Vidéothèque utilise une clé TMDB pour retrouver les affiches et les fiches des films.</p>
+    <fieldset><legend>TMDB</legend>
+      <div class="row"><label for="tKey">Clé d’API TMDB</label><input type="text" id="tKey" spellcheck="false" autocomplete="off"></div>
+      <div class="btns"><button class="btn" id="tSave" type="button">Enregistrer</button></div>
+    </fieldset>
+    <p class="status" id="tStatus" role="status"></p>
+  </div>
+  <div class="dlgfoot"><button class="btn default" type="button" data-w="ok">OK</button></div>`;
+}
+
+function initSettings(el) {
+  const q = s => el.querySelector(s);
+  el.querySelector(".tabs").addEventListener("click", e => {
+    const t = e.target.closest("[data-tab]"); if (!t) return;
+    el.querySelectorAll("[data-tab]").forEach(x => x.setAttribute("aria-selected", String(x === t)));
+    el.querySelectorAll("[data-pane]").forEach(p => { p.hidden = p.dataset.pane !== t.dataset.tab; });
+  });
+  q("[data-w='ok']").addEventListener("click", () => closeWin("settings"));
+  q("#sUrl").value = LS.get("mv-sb-url"); q("#sKey").value = LS.get("mv-sb-key"); q("#tKey").value = LS.get("videotheque.tmdbkey");
+  const say = (id, msg, kind = "") => { const s = q(id); s.textContent = msg; s.className = "status " + kind; };
+
+  q("#sSave").addEventListener("click", async () => {
+    const url = q("#sUrl").value.trim().replace(/\/+$/, ""), key = q("#sKey").value.trim();
+    if (!url && !key) { LS.set("mv-sb-url", ""); LS.set("mv-sb-key", ""); sbClient = null; sbUser = null; renderAcct(el); reloadApp("vinyls"); return say("#sStatus", "Synchronisation désactivée sur ce site."); }
+    if (!/^https:\/\/\S+$/.test(url)) return say("#sStatus", "L’adresse du projet doit commencer par https:// (par exemple https://abcd1234.supabase.co).", "err");
+    if (key.length < 20) return say("#sStatus", "Colle la clé publique complète du projet.", "err");
+    if (/^sb_secret_/.test(key) || /service_role/.test(key)) return say("#sStatus", "C’est la clé secrète : colle plutôt la clé « anon » ou « publishable ».", "err");
+    LS.set("mv-sb-url", url); LS.set("mv-sb-key", key); sbClient = null;
+    say("#sStatus", "Réglages enregistrés. Vérification…");
+    await connect(); renderAcct(el); reloadApp("vinyls");
+    say("#sStatus", sbClient ? "Serveur trouvé." : "Supabase ne répond pas : vérifie l’adresse et ta connexion.", sbClient ? "ok" : "err");
+  });
+
+  q("#tSave").addEventListener("click", async () => {
+    const k = q("#tKey").value.trim(); LS.set("videotheque.tmdbkey", k); reloadApp("films");
+    if (!k) return say("#tStatus", "Clé supprimée.");
+    say("#tStatus", "Vérification…");
+    try {
+      const u = new URL("https://api.themoviedb.org/3/configuration"), h = { accept: "application/json" };
+      if (k.length > 40) h.Authorization = "Bearer " + k; else u.searchParams.set("api_key", k);
+      const r = await fetch(u, { headers: h });
+      say("#tStatus", r.ok ? "Clé enregistrée et valide." : "Clé enregistrée, mais TMDB la refuse. Vérifie-la.", r.ok ? "ok" : "err");
+    } catch { say("#tStatus", "Clé enregistrée. TMDB n’a pas répondu pour la vérifier.", ""); }
+  });
+
+  q("#acct").addEventListener("click", async e => {
+    const b = e.target.closest("[data-acct]"); if (!b) return;
+    if (b.dataset.acct === "out") {
+      try { await sbClient.auth.signOut(); } catch {}
+      sbUser = null; renderAcct(el); reloadApp("vinyls"); setNet(); return say("#sStatus", "Déconnecté.");
+    }
+    const email = q("#aMail").value.trim(), password = q("#aPass").value;
+    if (!email || !password) return say("#sStatus", "Saisis ton adresse e-mail et ton mot de passe.", "err");
+    if (!sbClient) await connect();
+    if (!sbClient) return say("#sStatus", "Enregistre d’abord l’adresse et la clé du serveur.", "err");
+    say("#sStatus", "Connexion…");
+    const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
+    if (error) return say("#sStatus", /invalid login/i.test(error.message) ? "E-mail ou mot de passe incorrect." : error.message, "err");
+    sbUser = data.user; renderAcct(el); reloadApp("vinyls"); setNet();
+    say("#sStatus", "Connecté : ta collection de vinyles va se synchroniser.", "ok");
+  });
+
+  renderAcct(el);
+  connect().then(() => renderAcct(el));
+}
+
+function renderAcct(el) {
+  const box = el && el.querySelector("#acct"); if (!box) return;
+  if (!LS.get("mv-sb-url") || !LS.get("mv-sb-key")) { box.innerHTML = `<p class="hint">Enregistre d’abord l’adresse et la clé du serveur.</p>`; return; }
+  if (sbUser) {
+    box.innerHTML = `<div class="who"><img data-icon="vinyl" alt=""><span>Connecté en tant que<br><b>${esc(sbUser.email || "")}</b></span></div>
+      <div class="btns"><button class="btn" type="button" data-acct="out">Se déconnecter</button></div>`;
+    fillIcons(box);
+  } else {
+    box.innerHTML = `<div class="row"><label for="aMail">E-mail</label><input type="email" id="aMail" autocomplete="username"></div>
+      <div class="row"><label for="aPass">Mot de passe</label><input type="password" id="aPass" autocomplete="current-password"></div>
+      <div class="btns"><button class="btn default" type="button" data-acct="in">Se connecter</button></div>`;
+    box.querySelector("#aPass").addEventListener("keydown", e => { if (e.key === "Enter") box.querySelector("[data-acct='in']").click(); });
+  }
+}
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function loadSupabase() {
+  if (window.supabase && window.supabase.createClient) return Promise.resolve();
+  return new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js";
+    s.onload = res; s.onerror = rej; document.head.appendChild(s);
+  });
+}
+async function connect() {
+  const url = LS.get("mv-sb-url"), key = LS.get("mv-sb-key");
+  if (!url || !key) { sbClient = null; sbUser = null; setNet(); return; }
+  try {
+    await loadSupabase();
+    if (!sbClient) sbClient = window.supabase.createClient(url, key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: "mv-sb-auth" } });
+    const { data } = await sbClient.auth.getSession();
+    sbUser = data && data.session ? data.session.user : null;
+  } catch { sbClient = null; sbUser = null; }
+  setNet();
+}
+function setNet() {
+  const i = $("#netIcon"); i.src = netIcon(!!sbUser);
+  i.title = sbUser ? `Vinyls : connecté (${sbUser.email || ""})` : "Vinyls : non connecté";
+}
+function reloadApp(id) { const w = wins[id]; if (w) { const f = w.el.querySelector("iframe"); f.src = f.src; } }
+
+/* Le site de vinyles peut aussi se connecter de lui-même : on suit la session partagée. */
+addEventListener("storage", e => { if (e.key === "mv-sb-auth" || e.key === "mv-sb-url" || e.key === "mv-sb-key") { sbClient = null; connect().then(() => wins.settings && renderAcct(wins.settings.el)); } });
+if (LS.get("mv-sb-url")) connect();
+})();
+</script>
+</body>
+</html>
