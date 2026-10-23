@@ -643,6 +643,7 @@ function fullOf(f){
   if(f.full===false) return null;
   const c=(f.cv&&f.cv[fkey(f)])||(COVERS[f.id]&&COVERS[f.id][fkey(f)]);
   if(!c) return null;
+  if(/^idb:/.test(c[0])){const u=IMGURL[c[0].slice(4)];return u?{u,a:c[1],b:c[2]}:null}
   return {u:/^(data:|https?:)/.test(c[0])?c[0]:CP+c[0],a:c[1],b:c[2]};
 }
 const hasFull=f=>!!((f.cv&&f.cv[fkey(f)])||(COVERS[f.id]&&COVERS[f.id][fkey(f)]));
@@ -659,7 +660,6 @@ function load(){
   return fromSeed();
 }
 let films=load();
-setTimeout(()=>films.forEach(f=>{if(f.cv)for(const k in f.cv){const th=f.th&&f.th[k];if(!th||th.s!==thSig(f.cv[k]))queueThumb(f,k)}}),800);
 function save(){try{localStorage.setItem(STORE,JSON.stringify({v:1,saved:Date.now(),films}))}catch(e){toast("Impossible d'enregistrer dans ce navigateur.")}}
 const getKey=()=>{try{return localStorage.getItem(KEYSTORE)||''}catch(e){return ''}};
 
@@ -694,7 +694,7 @@ function caseInner(f,size='w342',path){
     if(J){
       const own=f.cv&&f.cv[fkey(f)];
       if(own){const th=f.th&&f.th[fkey(f)];if(th&&th.s===thSig(own))img=`<img src="${th.d}" alt="" decoding="async">`;else{queueThumb(f,fkey(f));if(!f.p)img=`<span class="full on" style="${slice(J.u,J.b,1)}"></span>`}}
-      else{const fb=f.p?esc(src(f.p,size)):'',jq=window.JAQ&&window.JAQ[f.id+'-'+fkey(f)];img=jq?`<img src="${jq}" alt="" decoding="async">`:`<img src="jaquettes/${f.id}-${fkey(f)}.jpg" alt="" loading="lazy" decoding="async"${fb?` onerror="this.onerror=null;this.src='${fb}'"`:''}>`}
+      else{const fb=f.p?esc(src(f.p,size)):'',jq=window.JAQ&&window.JAQ[f.id+'-'+fkey(f)];img=jq?`<img src="${jq}" alt="" decoding="async">`:''}
     }
   }
   if(!img) img=path?`<img src="${esc(src(path,size))}" alt="" loading="lazy" decoding="async">`:`<span class="noimg">${esc(f.t)}</span>`;
@@ -944,13 +944,46 @@ function detectSpine(ctx,W,H,k){
   if(Math.min(at(best[1]),at(best[2]))<med*2.2) return SPINE[k];
   return [+best[1].toFixed(4),+best[2].toFixed(4)];
 }
+/* ---------- Jaquettes personnalisées enregistrées dans le navigateur ----------
+   Un lien est téléchargé une seule fois, réduit (1600 px de large au plus) et rangé dans IndexedDB :
+   plus aucune image distante à recharger, et le même calage sur la boîte que pour un lien. */
+const IMGURL={};
+const imgDB=(()=>{let p;const open=()=>p||(p=new Promise((res,rej)=>{const r=indexedDB.open('videotheque-img',1);r.onupgradeneeded=()=>r.result.createObjectStore('img');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}));
+  const tx=(m,f)=>open().then(db=>new Promise((res,rej)=>{const t=db.transaction('img',m),q=f(t.objectStore('img'));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)}));
+  return {put:(k,b)=>tx('readwrite',s=>s.put(b,k)),all:()=>open().then(db=>new Promise((res,rej)=>{const out={},t=db.transaction('img','readonly'),c=t.objectStore('img').openCursor();c.onsuccess=()=>{const x=c.result;if(x){out[x.key]=x.value;x.continue()}else res(out)};c.onerror=()=>rej(c.error)}))}})();
+async function fetchBlob(u){
+  try{const r=await fetch(u,{mode:'cors'});if(r.ok){const b=await r.blob();if(/^image\//.test(b.type))return b}}catch(e){}
+  const r=await fetch('https://wsrv.nl/?url='+encodeURIComponent(u)+'&w=1600&output=jpg&q=85');if(!r.ok)throw new Error('fetch');return r.blob();
+}
+async function storeFull(src){
+  const blob=typeof src==='string'?await fetchBlob(src):src;
+  const bmp=await createImageBitmap(blob);
+  if(bmp.width<bmp.height*1.3)throw new Error('notfull');
+  const sc=Math.min(1,1600/bmp.width),c=document.createElement('canvas');c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);
+  c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+  const out=await new Promise(r=>c.toBlob(r,'image/jpeg',.84));
+  const key='c'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+  await imgDB.put(key,out);IMGURL[key]=URL.createObjectURL(out);
+  return 'idb:'+key;
+}
+/* au démarrage : on charge les images rangées, puis on convertit en arrière-plan les anciens liens et anciennes images */
+let imgReady=false;
+imgDB.all().then(all=>{for(const k in all)IMGURL[k]=URL.createObjectURL(all[k])}).catch(()=>{}).finally(async()=>{
+  imgReady=true;try{render()}catch(e){}
+  for(const f of films){if(!f.cv)continue;for(const k in f.cv){const c=f.cv[k];
+    const src=/^idb:/.test(c[0])?(IMGURL[c[0].slice(4)]?null:c[3]):/^(https?:|data:)/.test(c[0])?c[0]:null;
+    if(!src)continue;
+    try{const ref=await storeFull(/^data:/.test(src)?await (await fetch(src)).blob():src);f.cv[k]=[ref,c[1],c[2],/^https?:/.test(src)?src:c[3]].filter(x=>x!==undefined);save();try{render()}catch(e){}}catch(e){}}}
+  films.forEach(f=>{if(f.cv)for(const k in f.cv){const th=f.th&&f.th[k];if(!th||th.s!==thSig(f.cv[k]))queueThumb(f,k)}});
+});
+
 /* ---------- Vignettes des jaquettes personnalisées ----------
    La grille n'affiche plus l'image d'origine (souvent 2 Mo) mais une petite vignette du recto,
    fabriquée une seule fois et gardée avec la collection. */
 const TH_W=220;
 const thSig=c=>c[0].length+':'+c[0].slice(-60)+':'+c[2];
-const thQ=[];let thBusy=false,thTimer=0;
-function queueThumb(f,k){if(!thQ.some(q=>q.f===f&&q.k===k)){thQ.push({f,k});if(!thBusy)setTimeout(runThumbs,60)}}
+const thQ=[],thFailed=new Set();let thBusy=false,thTimer=0;
+function queueThumb(f,k){if(!imgReady)return;if(!thQ.some(q=>q.f===f&&q.k===k)){thQ.push({f,k});if(!thBusy)setTimeout(runThumbs,60)}}
 async function runThumbs(){
   if(thBusy)return;thBusy=true;
   while(thQ.length){const {f,k}=thQ.shift();await makeThumb(f,k)}
@@ -966,13 +999,15 @@ async function thImage(u){
 async function makeThumb(f,k){
   const c=f.cv&&f.cv[k];if(!c)return;
   const sig=thSig(c);if(f.th&&f.th[k]&&f.th[k].s===sig)return;
+  if(thFailed.has(sig))return;
+  let u=c[0];if(/^idb:/.test(u)){u=IMGURL[u.slice(4)];if(!u)return}else if(!/^(data:|https?:)/.test(u))u=CP+u;
   try{
-    const img=await thImage(/^(data:|https?:)/.test(c[0])?c[0]:CP+c[0]);
+    const img=await thImage(u);
     const W=img.naturalWidth,H=img.naturalHeight,sx=Math.round((c[2]||0)*W),sw=Math.max(1,W-sx),h=Math.round(H*TH_W/sw);
     const cv=document.createElement('canvas');cv.width=TH_W;cv.height=h;cv.getContext('2d').drawImage(img,sx,0,sw,H,0,0,TH_W,h);
     f.th={...(f.th||{}),[k]:{s:sig,d:cv.toDataURL('image/jpeg',.78)}};
     save();clearTimeout(thTimer);thTimer=setTimeout(()=>{try{render()}catch(e){}},250);
-  }catch(e){}
+  }catch(e){thFailed.add(sig)}
 }
 function setFull(f,c){
   const prev=f.cv,prevFull=f.full;f.cv={...(f.cv||{}),[fkey(f)]:c};delete f.full;
@@ -1000,9 +1035,10 @@ async function openPosters(f){
     </div>
     <div id="pk"><p class="hint">Chargement des jaquettes…</p></div></div></div>`;
   $('#fullFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;
-    try{const {data,a,b}=await fileToFull(file,fkey(f));setFull(f,[data,a,b])}catch(err){toast("Cette image ne peut pas être lue.")}};
+    try{const ref=await storeFull(file);const s=SPINE[fkey(f)];setFull(f,[ref,s[0],s[1]])}catch(err){toast(err&&err.message==='notfull'?"Cette image n'est pas une jaquette intégrale (recto seul ?).":"Cette image ne peut pas être lue.")}};
   $('#fullUrl').onsubmit=e=>{e.preventDefault();const v=e.target.querySelector('input').value.trim();if(!/^https?:\/\//.test(v)){toast("Collez une adresse qui commence par http.");return}
-    const im=new Image();im.onload=()=>{if(im.naturalWidth<im.naturalHeight*1.3){toast("Cette image n'est pas une jaquette intégrale (recto seul ?).");return}const s=SPINE[fkey(f)];setFull(f,[v,s[0],s[1]])};im.onerror=()=>toast("Aucune image trouvée à cette adresse.");im.src=v};
+    toast('Téléchargement de la jaquette…');
+    storeFull(v).then(ref=>{const s=SPINE[fkey(f)];setFull(f,[ref,s[0],s[1],v])}).catch(err=>toast(err&&err.message==='notfull'?"Cette image n'est pas une jaquette intégrale (recto seul ?).":"Aucune image trouvée à cette adresse."))};
   $('#backDetail').onclick=()=>openDetail(f.id);
   $('#ownFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{f.full=false;setCover(f,await fileToCover(file),'Votre image est la nouvelle jaquette.')}catch(err){toast("Cette image ne peut pas être lue.")}};
   $('#ownUrl').onsubmit=e=>{e.preventDefault();const v=e.target.querySelector('input').value.trim();if(!/^https?:\/\//.test(v)){toast("Collez une adresse qui commence par http.");return}
