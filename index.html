@@ -28,9 +28,9 @@ button{font:inherit;color:inherit}
 .icons{display:grid;grid-auto-flow:column;grid-template-rows:repeat(auto-fill,76px);grid-auto-columns:78px;height:100%;gap:0}
 .dicon{display:flex;flex-direction:column;align-items:center;gap:4px;width:78px;padding:2px 0;border:0;background:none;cursor:default}
 .dicon img{width:32px;height:32px}
-.dicon span{color:#fff;padding:1px 2px;line-height:1.25;text-align:center;border:1px dotted transparent}
+.dicon span{color:#fff;text-shadow:1px 1px 0 rgba(0,0,0,.75);padding:1px 2px;line-height:1.25;text-align:center;border:1px dotted transparent}
 .dicon.sel img{filter:brightness(.55) sepia(1) hue-rotate(190deg) saturate(6)}
-.dicon.sel span{background:var(--navy);border-color:#ff0}
+.dicon.sel span{text-shadow:none;background:var(--navy);border-color:#ff0}
 .dicon:focus-visible{outline:none}
 .dicon:focus-visible span{border-color:#fff}
 
@@ -113,10 +113,61 @@ input[type=text],input[type=email],input[type=password],input[type=url]{font:inh
 .who img{width:32px;height:32px}
 .dlgfoot{display:flex;justify-content:flex-end;gap:6px;margin-top:10px}
 
+/* ---------- Icône décorative ---------- */
+.dicon.deco{pointer-events:none}
+
+/* ---------- Explorateur (My Documents) ---------- */
+.toolbar{display:flex;gap:4px;flex-wrap:wrap;padding:3px 2px 4px;flex:none;align-items:center}
+.toolbar .btn{min-width:0}
+.addr{display:flex;align-items:center;gap:6px;padding:0 2px 4px;flex:none}
+.addr span{flex:none}
+.addr div{flex:1;height:21px;padding:3px 4px;background:#fff;box-shadow:var(--sunken);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;user-select:text}
+.page .wbody{overflow:auto}
+.files{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px 4px;padding:8px;align-content:start}
+.file{display:flex;flex-direction:column;align-items:center;gap:4px;padding:2px;border:0;background:none;cursor:default}
+.file .th{width:64px;height:48px;display:grid;place-items:center;background:#fff;border:1px solid var(--shadow);overflow:hidden}
+.file .th img{max-width:100%;max-height:100%;image-rendering:auto}
+.file span{max-width:88px;padding:1px 2px;line-height:1.25;text-align:center;overflow-wrap:anywhere;border:1px dotted transparent}
+.file.sel .th{outline:2px solid var(--navy)}
+.file.sel span{background:var(--navy);color:#fff;border-color:#ff0}
+.empty{padding:16px;color:var(--shadow)}
+.statusbar{display:flex;gap:2px;margin-top:2px;flex:none}
+.statusbar span{flex:1;height:18px;padding:2px 4px;box-shadow:inset -1px -1px var(--white),inset 1px 1px var(--shadow);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.statusbar span:last-child{flex:0 0 120px}
+
+/* ---------- Navigateur ---------- */
+.ie .wbody{overflow:auto;background:#fff}
+.web{max-width:640px;margin:0 auto;padding:18px 16px 28px;font-family:"Times New Roman",Times,serif;font-size:16px;color:#000;user-select:text}
+.web h1{font-size:28px;margin:0 0 4px;color:#000080}
+.web p{margin:0 0 14px;line-height:1.4}
+.web hr{border:0;border-top:2px groove #c0c0c0;margin:14px 0}
+.web .lnk{display:flex;gap:12px;align-items:center;padding:10px;margin:0 0 10px;border:2px outset #e0e0e0;background:#f4f4f4;text-decoration:none;color:inherit}
+.web .lnk:active{border-style:inset}
+.web .lnk img{width:32px;height:32px;flex:none}
+.web .lnk b{display:block;color:#0000ee;text-decoration:underline;font-size:18px}
+.web .lnk small{font-size:14px;color:#333}
+.web .foot{font-size:12px;color:#555;text-align:center}
+.iebtn{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:46px;padding:2px 4px;border:0;background:none;font-size:11px}
+.iebtn svg{width:20px;height:20px}
+.iebtn[disabled]{color:var(--shadow)}
+
+/* ---------- Propriétés d’affichage ---------- */
+.monitor{width:182px;margin:0 auto 22px;padding:10px 10px 14px;background:var(--face);box-shadow:var(--raised);border-radius:4px 4px 2px 2px;position:relative}
+.monitor::after{content:"";position:absolute;left:50%;bottom:-14px;width:70px;height:12px;margin-left:-35px;background:var(--face);box-shadow:var(--raised)}
+.screen{height:118px;box-shadow:var(--sunken);background-color:var(--teal);background-position:center;background-repeat:no-repeat;image-rendering:auto}
+.listbox{height:118px;overflow:auto;background:#fff;box-shadow:var(--sunken);padding:2px}
+.listbox button{display:flex;align-items:center;gap:6px;width:100%;padding:1px 3px;border:0;background:none;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.listbox button img{width:16px;height:16px;flex:none}
+.listbox button[aria-selected="true"]{background:var(--navy);color:#fff}
+.wprow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;margin-top:4px}
+.wprow .side{display:flex;flex-direction:column;gap:6px}
+select{font:inherit;height:21px;border:0;background:#fff;box-shadow:var(--sunken);padding:0 2px;border-radius:0}
+
 @media (max-width:640px){
   .tasks .task span{display:none}
   .task{flex:0 0 auto;max-width:none;padding:0 5px}
   .row{grid-template-columns:1fr}
+  .wprow{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:no-preference){
   #startmenu:not([hidden]){animation:slide .12s steps(4) both}
@@ -233,6 +284,47 @@ ICON.logo = px(16, (p, g) => {
   g.fillStyle = "#9a9a9a"; g.fillRect(4, 3, 2, 1); g.fillRect(3, 4, 1, 2);
 });
 
+ICON.docs = px(32, (p, g) => {
+  const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+  R(2, 6, 10, 3, "#000"); R(3, 7, 8, 2, "#f6dc7a");                     // onglet
+  R(2, 8, 25, 21, "#000"); R(3, 9, 23, 19, "#d8ae2c");                  // dos du dossier
+  R(9, 4, 15, 15, "#000"); R(10, 5, 13, 13, "#fff");                    // feuille qui dépasse
+  R(12, 7, 9, 1, "#7a7a7a"); R(12, 9, 9, 1, "#7a7a7a"); R(12, 11, 6, 1, "#7a7a7a");
+  for (let y = 14; y < 29; y++) { const sh = Math.round((28 - y) * .35); R(2 + sh, y, 28 - sh - 2 + 1, 1, y === 14 ? "#000" : "#ffd94a"); R(2 + sh, y, 1, 1, "#000"); R(30 - 1, y, 1, 1, "#000"); }
+  R(5, 15, 23, 1, "#fff2a8"); R(2, 28, 28, 1, "#000"); R(3, 27, 26, 1, "#b8901a");
+});
+
+ICON.ie = px(32, p => {
+  for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
+    const d = dist(x, y, 16);
+    // anneau en orbite autour du globe
+    const u = (x + .5 - 16) * Math.cos(-.45) - (y + .5 - 16) * Math.sin(-.45), v = (x + .5 - 16) * Math.sin(-.45) + (y + .5 - 16) * Math.cos(-.45);
+    const ring = Math.abs(Math.hypot(u / 15, v / 5) - 1) < .1;
+    if (d <= 11.2) {
+      let col = d > 10.4 ? "#0a2a7a" : "#2f6fe0";
+      const lx = x - 16, ly = y - 16;
+      if ((lx + 3) * (lx + 3) / 20 + (ly + 3) * (ly + 3) / 12 < 1 || (lx - 4) * (lx - 4) / 10 + (ly - 4) * (ly - 4) / 18 < 1 || (lx - 6) * (lx - 6) / 8 + (ly + 6) * (ly + 6) / 4 < 1) col = d > 10.4 ? "#0a4a14" : "#3fae3a";
+      if (lx < -4 && ly < -4 && d < 9 && (x + y) % 3 === 0) col = "#9fd0ff";
+      if (ring && v > 0) col = "#f2c21b";
+      p(x, y, col);
+    } else if (ring) p(x, y, u > 0 ? "#c79a00" : "#f2c21b");
+  }
+});
+
+ICON.bin = px(32, (p, g) => {
+  const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+  R(6, 5, 20, 4, "#000"); R(7, 6, 18, 2, "#b9c9b4");                  // bord supérieur
+  for (let y = 9; y < 29; y++) { const inset = Math.floor((y - 9) / 7); R(8 + inset, y, 16 - inset * 2, 1, (y % 4 === 0) ? "#5f7a5a" : "#d9e4d5"); R(7 + inset, y, 1, 1, "#000"); R(24 - inset, y, 1, 1, "#000"); }
+  for (let x = 10; x < 23; x += 3) R(x, 9, 1, 19, "#7d9677");
+  R(10, 28, 12, 1, "#000");
+  R(13, 13, 6, 1, "#1e8a3a"); R(12, 14, 2, 3, "#1e8a3a"); R(18, 14, 2, 2, "#1e8a3a"); R(14, 19, 5, 1, "#1e8a3a"); R(19, 17, 1, 2, "#1e8a3a");
+});
+
+ICON.img = px(16, (p, g) => {
+  const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+  R(1, 2, 14, 12, "#000"); R(2, 3, 12, 10, "#fff"); R(3, 4, 10, 8, "#7fb3ff"); R(3, 9, 10, 3, "#3f9a3a"); R(5, 8, 3, 1, "#3f9a3a"); R(10, 5, 2, 2, "#ffe14a");
+});
+
 const netIcon = online => px(16, (p, g) => {
   const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
   R(1, 3, 9, 7, "#000"); R(2, 4, 7, 5, online ? "#00a8a8" : "#808080");
@@ -250,54 +342,63 @@ const APPS = {
   vinyls:   { title: "My Discollection", label: "Vinyls", icon: "vinyl", src: "vinyls.html" },
   films:    { title: "Ma Vidéothèque", label: "Films", icon: "dvd", src: "films.html" },
   cards:    { title: "Ma Collection de Cartes", label: "Cards", icon: "card", src: "cards.html" },
-  settings: { title: "Settings : connexions", label: "Settings", icon: "settings", dialog: true }
+  docs:     { title: "My Documents", label: "My Documents", icon: "docs", page: "docs", size: [560, 380] },
+  ie:       { title: "Internet Explorer", label: "Internet Explorer", icon: "ie", page: "ie", size: [620, 460] },
+  settings: { title: "Settings", label: "Settings", icon: "settings", dialog: true }
 };
 
 /* Raccourcis du bureau */
 const icons = $("#icons");
-["vinyls", "films", "cards"].forEach(id => {
-  const a = APPS[id], b = document.createElement("button");
-  b.className = "dicon"; b.type = "button"; b.dataset.app = id;
-  b.innerHTML = `<img data-icon="${a.icon}" alt=""><span>${a.label}</span>`;
+["vinyls", "films", "cards", "docs", "ie", "bin"].forEach(id => {
+  const b = document.createElement(id === "bin" ? "div" : "button");
+  if (id === "bin") { b.className = "dicon deco"; b.setAttribute("aria-hidden", "true"); b.innerHTML = `<img data-icon="bin" alt=""><span>Recycle Bin</span>`; }
+  else { const a = APPS[id]; b.className = "dicon"; b.type = "button"; b.dataset.app = id; b.innerHTML = `<img data-icon="${a.icon}" alt=""><span>${a.label}</span>`; }
   icons.appendChild(b);
 });
 fillIcons(icons);
 let lastPointer = "mouse";
 icons.addEventListener("pointerdown", e => { lastPointer = e.pointerType; });
 icons.addEventListener("click", e => {
-  const b = e.target.closest(".dicon");
+  const b = e.target.closest("button.dicon");
   icons.querySelectorAll(".dicon").forEach(x => x.classList.toggle("sel", x === b));
   if (b && (lastPointer !== "mouse" || e.detail === 0)) openApp(b.dataset.app); // un toucher ou Entrée ouvre directement
 });
-icons.addEventListener("dblclick", e => { const b = e.target.closest(".dicon"); if (b) openApp(b.dataset.app); });
-$("#desktop").addEventListener("pointerdown", e => { if (!e.target.closest(".dicon")) icons.querySelectorAll(".sel").forEach(x => x.classList.remove("sel")); });
+icons.addEventListener("dblclick", e => { const b = e.target.closest("button.dicon"); if (b) openApp(b.dataset.app); });
+$("#desktop").addEventListener("pointerdown", e => { if (!e.target.closest("button.dicon")) icons.querySelectorAll(".sel").forEach(x => x.classList.remove("sel")); });
 
 /* ================= Fenêtres ================= */
 const wins = {}; let zTop = 10, cascade = 0;
 const small = () => innerWidth < 700 || innerHeight < 500;
+const TBTN = `<button class="tbtn" data-w="min" aria-label="Réduire"><svg width="8" height="8" viewBox="0 0 8 8"><rect x="1" y="6" width="6" height="2"/></svg></button>
+      <button class="tbtn" data-w="max" aria-label="Agrandir"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M0 0h9v9H0zM1 2v6h7V2z" fill-rule="evenodd"/></svg></button>`;
 
-function openApp(id) {
+function openApp(id, opts = {}) {
   closeStart();
-  if (wins[id]) { wins[id].el.hidden = false; focusWin(id); return; }
+  if (wins[id]) { wins[id].el.hidden = false; focusWin(id); if (id === "settings" && opts.tab) selectSettingsTab(wins[id].el, opts.tab, opts); return; }
   const a = APPS[id], el = document.createElement("section");
-  el.className = "win" + (a.dialog ? " dlg" : ""); el.setAttribute("aria-label", a.title);
+  el.className = "win" + (a.dialog ? " dlg" : "") + (a.page ? " page " + a.page : ""); el.setAttribute("aria-label", a.title);
+  let body;
+  if (a.dialog) body = `<div class="wbody">${settingsHtml()}</div>`;
+  else if (a.page === "docs") body = docsHtml();
+  else if (a.page === "ie") body = ieHtml();
+  else body = `<div class="menubar" aria-hidden="true"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>H</u>elp</span></div>
+       <div class="wbody"><p class="loading">Ouverture de ${a.label}…</p><iframe title="${a.title}" src="${a.src}"></iframe><div class="shield"></div></div>`;
   el.innerHTML = `
     <header class="tbar"><img data-icon="${a.icon}" alt=""><b>${a.title}</b>
-      ${a.dialog ? "" : `<button class="tbtn" data-w="min" aria-label="Réduire"><svg width="8" height="8" viewBox="0 0 8 8"><rect x="1" y="6" width="6" height="2"/></svg></button>
-      <button class="tbtn" data-w="max" aria-label="Agrandir"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M0 0h9v9H0zM1 2v6h7V2z" fill-rule="evenodd"/></svg></button>`}
+      ${a.dialog ? "" : TBTN}
       <button class="tbtn x" data-w="close" aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button>
     </header>
-    ${a.dialog ? `<div class="wbody">${settingsHtml()}</div>` :
-      `<div class="menubar" aria-hidden="true"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>H</u>elp</span></div>
-       <div class="wbody"><p class="loading">Ouverture de ${a.label}…</p><iframe title="${a.title}" src="${a.src}"></iframe><div class="shield"></div></div>
-       <div class="grip" aria-hidden="true"></div>`}`;
+    ${body}${a.dialog ? "" : `<div class="grip" aria-hidden="true"></div>`}`;
   fillIcons(el);
   $("#windows").appendChild(el);
   const W = innerWidth, H = innerHeight - 30;
   if (a.dialog) {
-    const w = Math.min(430, W - 16);
+    const w = Math.min(440, W - 16);
     Object.assign(el.style, { width: w + "px", maxHeight: (H - 16) + "px", left: (W - w) / 2 + "px" });
-    el.style.top = Math.max(8, (H - el.offsetHeight) / 2) + "px";
+  } else if (a.page) {
+    const w = Math.min(a.size[0], W - 20), h = Math.min(a.size[1], H - 20), o = (cascade++ % 4) * 26;
+    Object.assign(el.style, { width: w + "px", height: h + "px", left: Math.max(4, Math.round((W - w) / 2) + o - 40) + "px", top: Math.max(4, Math.round((H - h) / 2) + o - 40) + "px" });
+    if (W < 520) el.classList.add("max");
   } else {
     const w = Math.round(W * .82), h = Math.round(H * .84), o = (cascade++ % 4) * 26;
     Object.assign(el.style, { width: w + "px", height: h + "px", left: Math.round((W - w) / 2 - 39 + o) + "px", top: 12 + o + "px" });
@@ -323,7 +424,9 @@ function openApp(id) {
   });
   el.querySelector(".tbar").addEventListener("dblclick", e => { if (!e.target.closest("[data-w]") && !a.dialog) toggleMax(id); });
   dragify(el, id); if (!a.dialog) resizify(el);
-  if (a.dialog) initSettings(el);
+  if (a.dialog) { initSettings(el, opts); el.style.top = Math.max(8, (H - el.offsetHeight) / 2) + "px"; }
+  if (a.page === "docs") initDocs(el);
+  if (a.page === "ie") initIe(el);
   focusWin(id);
 }
 function focusWin(id) {
@@ -404,13 +507,205 @@ const LS = {
 };
 let sbClient = null, sbUser = null;
 
+/* ================= Papiers peints d’époque (dessinés ici, pas de fichiers à part) ================= */
+function rng(seed) { return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
+function canvasOf(w, h, draw) { const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h); return c.toDataURL("image/png"); }
+const WALLS = [
+  { id: "w-nuages", name: "Nuages.bmp", mode: "stretch", draw: () => canvasOf(800, 600, (g, w, h) => {
+      const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, "#1f5fc8"); gr.addColorStop(1, "#8ec0f2"); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+      const r = rng(7);
+      for (let c = 0; c < 14; c++) {
+        const cx = r() * w, cy = 40 + r() * h * .8, sz = 30 + r() * 60;
+        for (let k = 0; k < 18; k++) {
+          const x = cx + (r() - .5) * sz * 3, y = cy + (r() - .5) * sz * .8, rad = sz * (.35 + r() * .5);
+          const rg = g.createRadialGradient(x, y - rad * .3, rad * .1, x, y, rad);
+          rg.addColorStop(0, "rgba(255,255,255,.95)"); rg.addColorStop(.6, "rgba(240,246,255,.55)"); rg.addColorStop(1, "rgba(255,255,255,0)");
+          g.fillStyle = rg; g.beginPath(); g.arc(x, y, rad, 0, 7); g.fill();
+        }
+      }
+    }) },
+  { id: "w-briques", name: "Briques rouges.bmp", mode: "tile", draw: () => canvasOf(64, 32, (g) => {
+      g.fillStyle = "#b9b2a4"; g.fillRect(0, 0, 64, 32); const r = rng(3);
+      const brick = (x, y, w) => { const t = 140 + Math.floor(r() * 30); g.fillStyle = `rgb(${t},${50 + r() * 14 | 0},${36 + r() * 10 | 0})`; g.fillRect(x, y, w, 14); g.fillStyle = "rgba(255,255,255,.18)"; g.fillRect(x, y, w, 2); g.fillStyle = "rgba(0,0,0,.22)"; g.fillRect(x, y + 12, w, 2); };
+      brick(1, 1, 30); brick(33, 1, 30); brick(-15, 17, 30); brick(17, 17, 30); brick(49, 17, 30);
+    }) },
+  { id: "w-damier", name: "Damier.bmp", mode: "tile", draw: () => canvasOf(16, 16, (g) => {
+      g.fillStyle = "#4b4b4b"; g.fillRect(0, 0, 16, 16); g.fillStyle = "#6a6a6a"; g.fillRect(0, 0, 8, 8); g.fillRect(8, 8, 8, 8);
+      g.fillStyle = "#7c7c7c"; g.fillRect(0, 0, 8, 1); g.fillRect(8, 8, 8, 1);
+    }) },
+  { id: "w-mosaique", name: "Mosaïque bleue.bmp", mode: "tile", draw: () => canvasOf(32, 32, (g) => {
+      g.fillStyle = "#1c3c8c"; g.fillRect(0, 0, 32, 32);
+      g.fillStyle = "#2f5fbf"; g.beginPath(); g.moveTo(16, 2); g.lineTo(30, 16); g.lineTo(16, 30); g.lineTo(2, 16); g.fill();
+      g.fillStyle = "#5c8ce6"; g.beginPath(); g.moveTo(16, 8); g.lineTo(24, 16); g.lineTo(16, 24); g.lineTo(8, 16); g.fill();
+      g.fillStyle = "#c8dcff"; g.fillRect(15, 15, 2, 2);
+    }) },
+  { id: "w-vagues", name: "Vagues.bmp", mode: "tile", draw: () => canvasOf(64, 32, (g) => {
+      const cols = ["#0d4f8b", "#1669b0", "#2385d1", "#53a8e8"];
+      for (let y = 0; y < 32; y++) for (let x = 0; x < 64; x++) {
+        const v = Math.sin((x / 64) * Math.PI * 2 + y / 32 * Math.PI * 2) * 4 + y; g.fillStyle = cols[Math.floor(((v % 16) + 16) % 16 / 4)]; g.fillRect(x, y, 1, 1);
+      }
+    }) },
+  { id: "w-espace", name: "Espace.bmp", mode: "stretch", draw: () => canvasOf(800, 600, (g, w, h) => {
+      const gr = g.createRadialGradient(w * .7, h * .3, 20, w * .5, h * .5, w * .8); gr.addColorStop(0, "#2a1f5c"); gr.addColorStop(1, "#05051a"); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+      const r = rng(11);
+      for (let i = 0; i < 420; i++) { const b = r(); g.fillStyle = b > .96 ? "#fff6c8" : b > .85 ? "#cfe0ff" : "rgba(255,255,255,.55)"; const s = b > .97 ? 2 : 1; g.fillRect(r() * w | 0, r() * h | 0, s, s); }
+      const px0 = w * .72, py0 = h * .32; const pg = g.createRadialGradient(px0 - 25, py0 - 25, 5, px0, py0, 70); pg.addColorStop(0, "#f0b27a"); pg.addColorStop(1, "#7a3b1c"); g.fillStyle = pg; g.beginPath(); g.arc(px0, py0, 70, 0, 7); g.fill();
+      g.strokeStyle = "rgba(240,210,160,.8)"; g.lineWidth = 6; g.beginPath(); g.ellipse(px0, py0, 120, 26, -.35, 0, 7); g.stroke();
+    }) },
+  { id: "w-prairie", name: "Collines.bmp", mode: "stretch", draw: () => canvasOf(800, 600, (g, w, h) => {
+      const sky = g.createLinearGradient(0, 0, 0, h * .6); sky.addColorStop(0, "#2d6fd6"); sky.addColorStop(1, "#bfe0ff"); g.fillStyle = sky; g.fillRect(0, 0, w, h);
+      const hill = (y0, amp, col, ph) => { g.fillStyle = col; g.beginPath(); g.moveTo(0, h); for (let x = 0; x <= w; x += 8) g.lineTo(x, y0 + Math.sin(x / w * Math.PI * 1.4 + ph) * amp); g.lineTo(w, h); g.fill(); };
+      hill(h * .62, 40, "#5f9f3e", .4); hill(h * .72, 55, "#4c8f2c", 2.2); hill(h * .84, 30, "#3c7d22", 4);
+    }) }
+];
+const WALLCACHE = {};
+const wallUrl = w => WALLCACHE[w.id] || (WALLCACHE[w.id] = w.draw());
+
+/* ================= My Documents : images rangées dans le navigateur (IndexedDB) ================= */
+const docsDB = (() => {
+  let dbp;
+  const open = () => dbp || (dbp = new Promise((res, rej) => {
+    const r = indexedDB.open("hobbys97", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("images", { keyPath: "id" });
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  }));
+  const run = (mode, f) => open().then(db => new Promise((res, rej) => {
+    const t = db.transaction("images", mode), q = f(t.objectStore("images"));
+    t.oncomplete = () => res(q && q.result); t.onerror = () => rej(t.error);
+  }));
+  return { all: () => run("readonly", s => s.getAll()), put: r => run("readwrite", s => s.put(r)), del: id => run("readwrite", s => s.delete(id)) };
+})();
+let userImgs = [];              // { id, name, blob, added }
+const blobUrls = {};
+const imgUrl = im => blobUrls[im.id] || (blobUrls[im.id] = URL.createObjectURL(im.blob));
+async function loadDocs() { try { userImgs = ((await docsDB.all()) || []).sort((a, b) => a.added - b.added); } catch { userImgs = []; } }
+function allDocs() {
+  return [...WALLS.map(w => ({ id: w.id, name: w.name, builtin: true, mode: w.mode, url: () => wallUrl(w) })),
+          ...userImgs.map(im => ({ id: im.id, name: im.name, mode: "fill", url: () => imgUrl(im) }))];
+}
+async function importImages(files) {
+  const list = [...(files || [])].filter(f => /^image\//.test(f.type));
+  if (!list.length) return 0;
+  for (const f of list) { await docsDB.put({ id: "u-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7), name: f.name, blob: f, added: Date.now() }); }
+  await loadDocs(); docsChanged(); return list.length;
+}
+async function deleteImage(id) {
+  await docsDB.del(id); if (blobUrls[id]) { URL.revokeObjectURL(blobUrls[id]); delete blobUrls[id]; }
+  await loadDocs();
+  if (wallpaper.id === id) setWallpaper({ id: "", mode: "center" });
+  docsChanged();
+}
+function pickFiles(cb) {
+  const i = document.createElement("input"); i.type = "file"; i.accept = "image/*"; i.multiple = true;
+  i.addEventListener("change", () => cb(i.files)); i.click();
+}
+function docsChanged() {
+  if (wins.docs) renderDocs(wins.docs.el);
+  if (wins.settings) renderWallList(wins.settings.el);
+}
+
+/* ================= Fond d’écran ================= */
+let wallpaper = (() => { try { return JSON.parse(localStorage.getItem("h97-wallpaper")) || { id: "", mode: "center" }; } catch { return { id: "", mode: "center" }; } })();
+const MODES = { center: "Centrer", tile: "Mosaïque", stretch: "Étirer", fill: "Remplir" };
+function paint(el, wp) {
+  const d = wp.id && allDocs().find(x => x.id === wp.id);
+  if (!d) { el.style.backgroundImage = "none"; return; }
+  el.style.backgroundImage = `url("${d.url()}")`;
+  const m = wp.mode;
+  el.style.backgroundRepeat = m === "tile" ? "repeat" : "no-repeat";
+  el.style.backgroundPosition = m === "tile" ? "0 0" : "center";
+  el.style.backgroundSize = m === "stretch" ? "100% 100%" : m === "fill" ? "cover" : "auto";
+  el.style.imageRendering = m === "tile" ? "pixelated" : "auto";
+}
+function setWallpaper(wp) {
+  wallpaper = { id: wp.id || "", mode: wp.mode || "center" };
+  try { localStorage.setItem("h97-wallpaper", JSON.stringify(wallpaper)); } catch {}
+  paint($("#desktop"), wallpaper);
+}
+
+/* ================= Fenêtre My Documents ================= */
+function docsHtml() {
+  return `<div class="menubar" aria-hidden="true"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>V</u>iew</span><span><u>H</u>elp</span></div>
+    <div class="toolbar">
+      <button class="btn" type="button" data-d="import">Importer des images…</button>
+      <button class="btn" type="button" data-d="wall" disabled>Utiliser en fond d’écran</button>
+      <button class="btn" type="button" data-d="del" disabled>Supprimer</button>
+    </div>
+    <div class="addr"><span>Adresse</span><div>C:\\Mes documents</div></div>
+    <div class="wbody"><div class="files" role="listbox" aria-label="Images"></div></div>
+    <div class="statusbar"><span class="st1"></span><span class="st2">Poste de travail</span></div>`;
+}
+function initDocs(el) {
+  el.querySelector(".toolbar").addEventListener("click", async e => {
+    const b = e.target.closest("[data-d]"); if (!b) return;
+    const sel = el.dataset.sel;
+    if (b.dataset.d === "import") pickFiles(async fl => { const n = await importImages(fl); el.querySelector(".st1").textContent = n ? `${n} image${n > 1 ? "s" : ""} importée${n > 1 ? "s" : ""}` : "Aucune image reconnue"; });
+    else if (b.dataset.d === "wall" && sel) openApp("settings", { tab: "bg", select: sel });
+    else if (b.dataset.d === "del" && sel) { const d = allDocs().find(x => x.id === sel); if (d && !d.builtin && confirm(`Supprimer « ${d.name} » ?`)) { delete el.dataset.sel; await deleteImage(sel); } }
+  });
+  const files = el.querySelector(".files");
+  files.addEventListener("click", e => { const f = e.target.closest(".file"); el.dataset.sel = f ? f.dataset.id : ""; if (!f) delete el.dataset.sel; renderDocs(el); });
+  files.addEventListener("dblclick", e => { const f = e.target.closest(".file"); if (f) openApp("settings", { tab: "bg", select: f.dataset.id }); });
+  const wb = el.querySelector(".wbody");
+  ["dragenter", "dragover"].forEach(t => wb.addEventListener(t, e => { e.preventDefault(); }));
+  wb.addEventListener("drop", async e => { e.preventDefault(); await importImages(e.dataTransfer.files); });
+  renderDocs(el);
+}
+function renderDocs(el) {
+  const docs = allDocs(), sel = el.dataset.sel, files = el.querySelector(".files");
+  files.innerHTML = docs.map(d => `<button class="file${d.id === sel ? " sel" : ""}" type="button" role="option" aria-selected="${d.id === sel}" data-id="${d.id}">${d.mode === "tile" && d.builtin ? `<span class="th" style="background:url(&quot;${d.url()}&quot;) repeat;image-rendering:pixelated"></span>` : `<span class="th"><img src="${d.url()}" alt=""></span>`}<span>${esc(d.name)}</span></button>`).join("");
+  const cur = docs.find(d => d.id === sel);
+  el.querySelector("[data-d='wall']").disabled = !cur;
+  el.querySelector("[data-d='del']").disabled = !cur || cur.builtin;
+  el.querySelector(".st1").textContent = cur ? `${cur.name}${cur.builtin ? " (fond d’écran d’origine)" : ""}` : `${docs.length} objet${docs.length > 1 ? "s" : ""}`;
+}
+
+/* ================= Internet Explorer (favoris) ================= */
+function ieHtml() {
+  return `<div class="menubar" aria-hidden="true"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>V</u>iew</span><span>F<u>a</u>vorites</span><span><u>H</u>elp</span></div>
+    <div class="toolbar" aria-hidden="true">
+      <button class="iebtn" type="button" disabled tabindex="-1"><svg viewBox="0 0 20 20"><path d="M12 4 6 10l6 6" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>Précédente</button>
+      <button class="iebtn" type="button" disabled tabindex="-1"><svg viewBox="0 0 20 20"><path d="m8 4 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>Suivante</button>
+      <button class="iebtn" type="button" disabled tabindex="-1"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="#c00"/><path d="m7 7 6 6M13 7l-6 6" stroke="#fff" stroke-width="2"/></svg>Arrêter</button>
+      <button class="iebtn" type="button" disabled tabindex="-1"><svg viewBox="0 0 20 20"><path d="M3 10 10 4l7 6v7H3z" fill="#e8c440" stroke="#000"/></svg>Démarrage</button>
+    </div>
+    <div class="addr"><span>Adresse</span><div>about:favoris</div></div>
+    <div class="wbody"><div class="web">
+      <h1>Mes favoris</h1>
+      <p>Les sites où sont répertoriées mes collections. Ils s’ouvrent dans un nouvel onglet.</p>
+      <hr>
+      <a class="lnk" id="lkLb" href="https://letterboxd.com/fromoors/" target="_blank" rel="noopener"><img data-icon="dvd" alt=""><span><b>Letterboxd</b><small>Mon profil et ma liste de DVD et Blu-ray</small></span></a>
+      <a class="lnk" id="lkDg" href="https://www.discogs.com/" target="_blank" rel="noopener"><img data-icon="vinyl" alt=""><span><b>Discogs</b><small id="dgSub">Ma collection de vinyles</small></span></a>
+      <hr>
+      <p class="foot">Meilleur affichage en 800 × 600.</p>
+    </div></div>
+    <div class="statusbar"><span class="st1">Terminé</span><span class="st2">Internet</span></div>`;
+}
+function initIe(el) {
+  const u = LS.get("mv-discogs-user");
+  if (u) el.querySelector("#lkDg").href = `https://www.discogs.com/user/${encodeURIComponent(u)}/collection`;
+  el.querySelectorAll(".lnk").forEach(a => {
+    a.addEventListener("mouseenter", () => { el.querySelector(".st1").textContent = a.href; });
+    a.addEventListener("mouseleave", () => { el.querySelector(".st1").textContent = "Terminé"; });
+  });
+}
+
+/* ================= Settings ================= */
 function settingsHtml() {
   return `
   <div class="tabs" role="tablist">
-    <button class="tab" role="tab" data-tab="vin" aria-selected="true">Vinyls</button>
+    <button class="tab" role="tab" data-tab="bg" aria-selected="true">Arrière-plan</button>
+    <button class="tab" role="tab" data-tab="vin" aria-selected="false">Vinyls</button>
     <button class="tab" role="tab" data-tab="fil" aria-selected="false">Films</button>
   </div>
-  <div class="tabpane" data-pane="vin">
+  <div class="tabpane" data-pane="bg">
+    <div class="monitor"><div class="screen" id="pvScreen"></div></div>
+    <div class="wprow">
+      <div><label for="wpList">Papier peint (images de My Documents)</label><div class="listbox" id="wpList" role="listbox" tabindex="0"></div></div>
+      <div class="side"><button class="btn" type="button" id="wpBrowse">Importer…</button><label for="wpMode">Affichage</label><select id="wpMode">${Object.entries(MODES).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select></div>
+    </div>
+  </div>
+  <div class="tabpane" data-pane="vin" hidden>
     <p class="hint">Ta collection de vinyles se synchronise avec My Discollection grâce à ton projet Supabase. Mets les mêmes réglages que sur l’autre site.</p>
     <fieldset><legend>Serveur</legend>
       <div class="row"><label for="sUrl">Adresse du projet</label><input type="url" id="sUrl" placeholder="https://abcd1234.supabase.co" spellcheck="false" autocomplete="off"></div>
@@ -430,24 +725,63 @@ function settingsHtml() {
     </fieldset>
     <p class="status" id="tStatus" role="status"></p>
   </div>
-  <div class="dlgfoot"><button class="btn default" type="button" data-w="ok">OK</button></div>`;
+  <div class="dlgfoot"><button class="btn default" type="button" data-w="ok">OK</button><button class="btn" type="button" data-w="cancel">Annuler</button><button class="btn" type="button" data-w="apply" disabled>Appliquer</button></div>`;
+}
+function selectSettingsTab(el, tab, opts = {}) {
+  el.querySelectorAll("[data-tab]").forEach(x => x.setAttribute("aria-selected", String(x.dataset.tab === tab)));
+  el.querySelectorAll("[data-pane]").forEach(p => { p.hidden = p.dataset.pane !== tab; });
+  if (opts.select) { const d = allDocs().find(x => x.id === opts.select); el._pending = { id: opts.select, mode: d ? d.mode : "center" }; renderWallList(el); }
+}
+function renderWallList(el) {
+  const list = el.querySelector("#wpList"); if (!list) return;
+  const p = el._pending, docs = allDocs();
+  if (p.id && !docs.some(d => d.id === p.id)) p.id = "";
+  list.innerHTML = `<button type="button" role="option" data-wp="" aria-selected="${!p.id}">(Aucun)</button>` +
+    docs.map(d => `<button type="button" role="option" data-wp="${d.id}" aria-selected="${d.id === p.id}"><img data-icon="img" alt="">${esc(d.name)}</button>`).join("");
+  fillIcons(list);
+  el.querySelector("#wpMode").value = p.mode; el.querySelector("#wpMode").disabled = !p.id;
+  const scr = el.querySelector("#pvScreen"); paint(scr, p);
+  if (p.mode === "center" && p.id) scr.style.backgroundSize = "18%"; // l’aperçu est 5 fois plus petit que l’écran
+  if (p.mode === "tile") scr.style.backgroundSize = "";
+  el.querySelector("[data-w='apply']").disabled = p.id === wallpaper.id && p.mode === wallpaper.mode;
+  const s = list.querySelector("[aria-selected='true']"); if (s) s.scrollIntoView({ block: "nearest" });
 }
 
-function initSettings(el) {
+function initSettings(el, opts = {}) {
   const q = s => el.querySelector(s);
-  el.querySelector(".tabs").addEventListener("click", e => {
-    const t = e.target.closest("[data-tab]"); if (!t) return;
-    el.querySelectorAll("[data-tab]").forEach(x => x.setAttribute("aria-selected", String(x === t)));
-    el.querySelectorAll("[data-pane]").forEach(p => { p.hidden = p.dataset.pane !== t.dataset.tab; });
+  el._pending = { ...wallpaper };
+  el.querySelector(".tabs").addEventListener("click", e => { const t = e.target.closest("[data-tab]"); if (t) selectSettingsTab(el, t.dataset.tab); });
+  q("#wpList").addEventListener("click", e => {
+    const b = e.target.closest("[data-wp]"); if (!b) return;
+    const d = allDocs().find(x => x.id === b.dataset.wp);
+    el._pending = { id: b.dataset.wp, mode: d ? (el._pending.id ? el._pending.mode : d.mode) : el._pending.mode };
+    if (d && d.builtin) el._pending.mode = d.mode;
+    renderWallList(el);
   });
-  q("[data-w='ok']").addEventListener("click", () => closeWin("settings"));
+  q("#wpList").addEventListener("keydown", e => {
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return; e.preventDefault();
+    const ids = ["", ...allDocs().map(d => d.id)], i = ids.indexOf(el._pending.id), n = ids[Math.max(0, Math.min(ids.length - 1, i + (e.key === "ArrowDown" ? 1 : -1)))];
+    const d = allDocs().find(x => x.id === n); el._pending = { id: n, mode: d ? d.mode : el._pending.mode }; renderWallList(el);
+  });
+  q("#wpMode").addEventListener("change", e => { el._pending.mode = e.target.value; renderWallList(el); });
+  q("#wpBrowse").addEventListener("click", () => pickFiles(async fl => {
+    const before = new Set(userImgs.map(x => x.id)); await importImages(fl);
+    const added = userImgs.find(x => !before.has(x.id)); if (added) { el._pending = { id: added.id, mode: "fill" }; renderWallList(el); }
+  }));
+  q("[data-w='ok']").addEventListener("click", () => { setWallpaper(el._pending); closeWin("settings"); });
+  q("[data-w='cancel']").addEventListener("click", () => closeWin("settings"));
+  q("[data-w='apply']").addEventListener("click", () => { setWallpaper(el._pending); renderWallList(el); });
+  renderWallList(el);
+  if (opts.tab) selectSettingsTab(el, opts.tab, opts);
+
   q("#sUrl").value = LS.get("mv-sb-url"); q("#sKey").value = LS.get("mv-sb-key"); q("#tKey").value = LS.get("videotheque.tmdbkey");
   const say = (id, msg, kind = "") => { const s = q(id); s.textContent = msg; s.className = "status " + kind; };
 
   q("#sSave").addEventListener("click", async () => {
     const url = q("#sUrl").value.trim().replace(/\/+$/, ""), key = q("#sKey").value.trim();
     if (!url && !key) { LS.set("mv-sb-url", ""); LS.set("mv-sb-key", ""); sbClient = null; sbUser = null; renderAcct(el); reloadApp("vinyls"); return say("#sStatus", "Synchronisation désactivée sur ce site."); }
-    if (!/^https:\/\/\S+$/.test(url)) return say("#sStatus", "L’adresse du projet doit commencer par https:// (par exemple https://abcd1234.supabase.co).", "err");
+    if (/supabase\.com\/dashboard/.test(url)) return say("#sStatus", "C’est l’adresse du tableau de bord. Colle plutôt la « Project URL » (Project Settings, puis Data API), du type https://abcd1234.supabase.co.", "err");
+    if (!/^https:\/\/[a-z0-9-]+\.supabase\.(co|in)$/i.test(url) && !/^https:\/\/\S+$/.test(url)) return say("#sStatus", "L’adresse du projet doit commencer par https:// (par exemple https://abcd1234.supabase.co).", "err");
     if (key.length < 20) return say("#sStatus", "Colle la clé publique complète du projet.", "err");
     if (/^sb_secret_/.test(key) || /service_role/.test(key)) return say("#sStatus", "C’est la clé secrète : colle plutôt la clé « anon » ou « publishable ».", "err");
     LS.set("mv-sb-url", url); LS.set("mv-sb-key", key); sbClient = null;
@@ -479,9 +813,16 @@ function initSettings(el) {
     if (!sbClient) await connect();
     if (!sbClient) return say("#sStatus", "Enregistre d’abord l’adresse et la clé du serveur.", "err");
     say("#sStatus", "Connexion…");
-    const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
-    if (error) return say("#sStatus", /invalid login/i.test(error.message) ? "E-mail ou mot de passe incorrect." : error.message, "err");
-    sbUser = data.user; renderAcct(el); reloadApp("vinyls"); setNet();
+    let res;
+    try { res = await sbClient.auth.signInWithPassword({ email, password }); } catch (err) { res = { error: err }; }
+    const error = res.error;
+    if (error) {
+      const m = String(error.message || error);
+      return say("#sStatus", /invalid login/i.test(m) ? "E-mail ou mot de passe incorrect."
+        : /failed to fetch|network|load failed/i.test(m) ? "Impossible de joindre le serveur Supabase : vérifie l’adresse du projet, que le projet n’est pas en pause, et qu’aucune extension ne bloque supabase.co."
+        : /email not confirmed/i.test(m) ? "Ton adresse n’est pas encore confirmée : clique sur le lien reçu par e-mail." : m, "err");
+    }
+    sbUser = res.data.user; renderAcct(el); reloadApp("vinyls"); setNet();
     say("#sStatus", "Connecté : ta collection de vinyles va se synchroniser.", "ok");
   });
 
@@ -533,6 +874,7 @@ function reloadApp(id) { const w = wins[id]; if (w) { const f = w.el.querySelect
 /* Le site de vinyles peut aussi se connecter de lui-même : on suit la session partagée. */
 addEventListener("storage", e => { if (e.key === "mv-sb-auth" || e.key === "mv-sb-url" || e.key === "mv-sb-key") { sbClient = null; connect().then(() => wins.settings && renderAcct(wins.settings.el)); } });
 if (LS.get("mv-sb-url")) connect();
+loadDocs().then(() => paint($("#desktop"), wallpaper));
 })();
 </script>
 </body>

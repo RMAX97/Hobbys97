@@ -71,6 +71,31 @@ body.visiting #customBtn,body.visiting #dActions,body.visiting #removeBtn,body.v
 <style id="hobbys97-slim">
 nav [data-go="game"],nav [data-go="friends"],#musicBtn,#profBtn,#streamPanel,#player,#playBtn,#gCopies,#patchNote,#setProfile,#profileView,#friendsView,#friendView,#gameView,#binView,#stickerBook,#setSheet section.invite:has(#svcSeg),.h97-hide{display:none!important}
 #trackList .trk{cursor:default;pointer-events:none}
+/* Fiche album ajustée à la fenêtre : pochette et infos côte à côte, sans défilement de page */
+@media (min-width:560px) and (min-aspect-ratio:5/4){
+  #detail{place-items:center;overflow:hidden}
+  #detail .detail{--S:min(calc(100vh - 130px),26vw,500px);grid-template-columns:auto minmax(230px,1fr);gap:clamp(14px,3vw,48px);align-items:center;width:100%;max-width:1300px;height:100vh;padding:16px clamp(60px,6vw,84px) 14px;box-sizing:border-box}
+  #detail .stage{width:calc(var(--S)*1.5);justify-self:center}
+  #detail .panel{width:auto;max-width:560px;justify-self:start;max-height:calc(100vh - 30px);overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;padding-right:4px}
+  #detail .panel h2{font-size:clamp(1.15rem,5vh,2.4rem)}
+  #detail .facts{gap:clamp(2px,.8vh,6px) 18px;font-size:clamp(.8rem,2.4vh,1rem)}
+  #detail .panel>.view{gap:clamp(5px,1.6vh,16px)}
+  #detail .panel>.view>*,#detail #infoView .chiprow,#detail #infoView h2{margin-top:0!important;margin-bottom:0!important}
+  #detail .tracks h3{padding-top:clamp(6px,1.5vh,14px);font-size:clamp(.85rem,2.4vh,1.05rem)}
+  #detail .tracks ol{columns:2 160px;column-gap:22px}
+  #detail .tracks li{padding:clamp(1px,.45vh,6px) 0;font-size:clamp(.72rem,2vh,.92rem)}
+  #detail .tracks .trk{display:grid;grid-template-columns:minmax(2.2ch,auto) minmax(0,1fr) auto;gap:8px;width:100%;align-items:baseline;text-align:left}
+  #detail .tracks .tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #detail .tracks h4{margin:6px 0 0;font-size:clamp(.7rem,1.9vh,.85rem)}
+  #detail .dactions .btn,#detail .remove{padding-top:clamp(5px,1.2vh,12px);padding-bottom:clamp(5px,1.2vh,12px)}
+  #detail .chip{padding-top:clamp(5px,1.1vh,10px);padding-bottom:clamp(5px,1.1vh,10px)}
+  #detail .tracks .sum{font-size:clamp(.72rem,2vh,.9rem);margin-top:6px}
+  #detail .remove{margin-top:clamp(8px,2vh,18px)}
+  #detail .hint{font-size:clamp(.7rem,2vh,.9rem)}
+  .dnav{top:50%;margin-top:-23px}
+  .dnav.prev{left:12px;right:auto}
+  .dnav.next{right:12px}
+}
 </style>
 </head>
 <body>
@@ -5079,7 +5104,7 @@ $("#stickerBook").addEventListener("click", e => { if (e.target.id === "stickerB
   $("#pnLater").addEventListener("click", () => close(false));
   $("#pnNever").addEventListener("click", () => close(true));
   el.addEventListener("click", e => { if (e.target === el) close(false); });
-  if (!seen) setTimeout(() => { el.hidden = false; requestAnimationFrame(() => el.classList.add("open")); }, 700);
+  if (false) setTimeout(() => { el.hidden = false; requestAnimationFrame(() => el.classList.add("open")); }, 700);
 })();
 
 /* ================= Écoute complète avec son compte (Spotify, Deezer, Apple Music) =================
