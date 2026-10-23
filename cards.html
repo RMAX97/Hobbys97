@@ -472,6 +472,33 @@ input[type=text]::placeholder{color:#808080}
   input,select,textarea{font-size:16px !important}
 }
 @media (prefers-reduced-motion:no-preference){.sidebar{transition:none}}
+
+#fbOverlay{position:fixed;inset:0;background:rgba(10,10,12,.85);display:none;align-items:center;justify-content:center;z-index:85;padding:16px}
+#fbOverlay.open{display:flex}
+#fbForm{background:var(--page);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px;width:min(400px,100%);max-height:92vh;overflow:auto}
+#fbForm h3{margin:0 0 6px}
+#fbForm .hint{color:var(--muted);font-size:13px;margin:0 0 14px;line-height:1.45}
+#fbForm label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:10px 0 4px}
+#fbForm input{width:100%;box-sizing:border-box;font:inherit;font-size:15px;padding:9px 11px;border-radius:var(--r-md);border:1px solid var(--line);background:var(--cover);color:var(--text)}
+#fbForm .err{color:#d97a6a;font-size:13px;min-height:18px;margin:8px 0 0}
+#fbForm .actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:10px}
+#fbForm .actions button{font-family:inherit;font-size:14px;font-weight:600;padding:9px 14px;border-radius:var(--r-md);border:1px solid var(--line);background:var(--cover);color:var(--text);cursor:pointer}
+#fbForm .actions .primary{background:var(--text);color:#18191d;border-color:var(--text)}
+#fbWho{line-height:1.5;margin:0 0 6px}
+html:has(#fbOverlay.open),html:has(#fbOverlay.open) body{overflow:hidden!important}
+
+#fbOverlay{background:rgba(0,128,128,.55)}
+#fbForm{background:var(--face);border:0;border-radius:0;box-shadow:var(--raised);padding:3px 12px 12px;font-size:12px}
+#fbForm::before{content:"Connexion";display:block;height:20px;line-height:20px;margin:0 -9px 10px;padding:0 6px;color:#fff;font-weight:bold;font-size:12px;background:linear-gradient(90deg,var(--navy),var(--blue))}
+#fbForm h3{font-size:13px;font-weight:bold}
+#fbForm .hint{color:#404040;font-size:11px}
+#fbForm label{color:#000;font-weight:normal;font-size:11px}
+#fbForm input{background:#fff;color:#000;border:0;border-radius:0;box-shadow:var(--sunken);font-size:12px;padding:4px 6px}
+#fbForm .err{color:#a00000;font-size:11px}
+#fbForm .actions button{font-size:12px;font-weight:normal;color:#000;background:var(--face);border:0;border-radius:0;box-shadow:var(--raised);padding:5px 12px;min-height:24px}
+#fbForm .actions button:active{box-shadow:var(--pressed)}
+#fbForm .actions .primary{background:var(--face);color:#000;box-shadow:inset 0 0 0 1px #000,inset -2px -2px var(--dark),inset 2px 2px var(--white),inset -3px -3px var(--shadow),inset 3px 3px var(--light)}
+@media (max-width:800px){#fbForm input{font-size:16px!important}}
 </style>
 </head>
 <body>
@@ -497,13 +524,32 @@ input[type=text]::placeholder{color:#808080}
     <div class="navitem" data-view="tangela"><span class="ic"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgBAMAAAAQtmoLAAAAJFBMVEUAAAAQEBAgQVJBe5RapM1zKSmU1fasKUG0tLTeSmr/g4P///+KZCK+AAAAAXRSTlMAQObYZgAAAidJREFUWMPtlSFv3EAQhfdODb/nvUapQuIZ6/ju6x+I7+l4wCm4TrS8IDIODir0XwhrUST/uYJUgbZLCip/eJ7ezJvVbAgrKysrK/+IrQWzxdVmwbNJdrOsXqVYPjxKaheZfCrlUYdSajTSvMdNOHXWtKXUUteonavfdDdto/ZQOulUOlSzgtI10jGXBjiV4nm2p8tH6UgajsShdMyzFvtjDWeWyFweIucstqki8S7g4aHyOYGbyCq6shmdcXYIkxIsOp00Z2TezWz5FpHmTieZ3ah6esvf9joyoWIGyOym22lBJJkAOElUzNxPD5GYrQaAyknJ6VWaTpWN8PIMXP0yk1rmOC3wrPZqfANexjdgL6dPpmRsVF+PIzCOIzztW6YpwYZs2nz9cwTG6xGe6xbcbSfGxv7R80dLlTMyZk+TuXp+H3p8hpNkJHfTgvdYAVQkmGqm6c0Zc2VWA8hKREyYfkynjmzEDDDrltP9hBDCqZhJRyYiS07sZo+MpLoind7oFtNvL4QQILXGSGfMkqQ5CweiMzI+RJpkzYxgy1QzJ/KyxCyztJ07AkRNGtOhxKx2NqQQfIfIr1aVjo3aNH+LPYVISaUzqd4t+Uo22Eun4hIWfQ/4fL7bSwbgbkn9Rf90Pt8BIdz3/YKOwv3QP53vQggXfd9/Xybo/whehyUWF33fYxdCuBheh2FJT8B7OJthWCb44Msw/Pirz30D/JXBysrKyv/Kb+IxjgnGuRedAAAAAElFTkSuQmCC" alt=""></span><span class="label">Saquedeneu</span><span class="cnt" id="navCount-tangela"></span></div>
     <div class="save-box">
       <div class="save-status" id="saveStatus" data-state="local">Enregistré sur cet appareil</div>
+      <div class="save-actions"><button type="button" id="fbAccountBtn">Se connecter</button></div>
       <div class="save-actions">
         <button type="button" id="exportBtn">Exporter</button>
         <label class="btnlike">Importer<input type="file" id="importInput" accept=".json,application/json" hidden></label>
       </div>
     </div>
   </div>
-  <main>
+  <div id="fbOverlay" role="dialog" aria-modal="true" aria-labelledby="fbTitle">
+  <form id="fbForm" autocomplete="on">
+    <h3 id="fbTitle">Synchroniser ma collection</h3>
+    <p class="hint" id="fbHint">Connecte-toi pour retrouver tes cartes sur tous tes appareils (Firebase).</p>
+    <div id="fbIn">
+      <div class="actions" style="justify-content:stretch;margin:0 0 6px"><button type="button" id="fbGoogle" style="flex:1">Continuer avec Google</button></div>
+      <p class="hint" style="text-align:center;margin:4px 0 0">ou avec ton e-mail</p>
+      <label for="fbMail">E-mail</label><input type="email" id="fbMail" autocomplete="username" required>
+      <label for="fbPass">Mot de passe</label><input type="password" id="fbPass" autocomplete="current-password" minlength="6" required>
+      <p class="err" id="fbErr"></p>
+      <div class="actions"><button type="button" id="fbCancel">Annuler</button><button type="button" id="fbSignup">Créer un compte</button><button type="submit" class="primary">Se connecter</button></div>
+    </div>
+    <div id="fbOut" hidden>
+      <p id="fbWho"></p>
+      <div class="actions"><button type="button" id="fbClose">Fermer</button><button type="button" id="fbLogout" class="primary">Se déconnecter</button></div>
+    </div>
+  </form>
+</div>
+<main>
   <div class="view active" id="view-home">
     <div class="home-wrap">
       <section class="home-hero">
@@ -1458,8 +1504,8 @@ function setSaveStatus(state){
   const txt = {
     local:'Enregistré sur cet appareil',
     syncing:'Enregistrement…',
-    cloud:'Enregistré dans ton compte Claude',
-    error:"Pas de connexion au compte : enregistré sur cet appareil"
+    cloud:(window.claude&&window.claude.use)?'Enregistré dans ton compte Claude':'Synchronisé en ligne',
+    error:"Pas de connexion au serveur : enregistré sur cet appareil"
   }[state];
   el.textContent = txt;
   el.dataset.state = state;
@@ -1480,12 +1526,19 @@ function rerender(key){
   const container = document.querySelector('#view-'+key+' .art-inner');
   if(container && container._render) container._render(); else updateCounts(key);
 }
+let cloudUnsubs = [];
 async function connectCloud(){
-  if(!window.claude || !window.claude.use){ setSaveStatus('local'); return; }
+  if(!window.claude || !window.claude.use){ return connectFirebase(); }
   try{
     const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
     const uid = user ? await user.id() : null;
     if(!db || !uid){ setSaveStatus('local'); return; }
+    await attachCloud(db, uid);
+  }catch(e){ setSaveStatus(cloud ? 'error' : 'local'); }
+}
+async function attachCloud(db, uid){
+  cloudUnsubs.forEach(u=>{ try{u()}catch(e){} }); cloudUnsubs = [];
+  try{
     cloud = {db, uid};
     setSaveStatus('syncing');
     for(const key of Object.keys(RAW)){
@@ -1513,18 +1566,85 @@ async function connectCloud(){
       }catch(e){}
       rerender(key);
       // modifications faites depuis un autre appareil, en direct
-      ref.onSnapshot(s=>{
-        if(!s.exists || s.hasPendingWrites) return;
+      const unsub = ref.onSnapshot(s=>{
+        if(!s.exists || s.hasPendingWrites || (s.metadata && s.metadata.hasPendingWrites)) return;
         const cards = (s.data()||{}).cards || {};
         if(JSON.stringify(cards) === JSON.stringify(collections[key])) return;
         collections[key] = cards;
         try{ localStorage.setItem('mcc2-collection-'+key, JSON.stringify(cards)); }catch(e){}
         rerender(key);
       }, ()=>setSaveStatus('error'));
+      if(typeof unsub === 'function') cloudUnsubs.push(unsub);
     }
     setSaveStatus('cloud');
   }catch(e){ setSaveStatus(cloud ? 'error' : 'local'); }
 }
+
+/* ---------- Firebase : même base pour toutes les versions du site et tous les appareils ---------- */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAtijZVcoqPXTJ-3hDADEvgT3lazKxuOVo",
+  authDomain: "fermite.firebaseapp.com",
+  projectId: "fermite",
+  storageBucket: "fermite.firebasestorage.app",
+  messagingSenderId: "186949501321",
+  appId: "1:186949501321:web:612c0ed9a983927074e158"
+};
+const FB_SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
+let fbAuth = null, fbUser = null;
+function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+async function connectFirebase(){
+  try{
+    if(!window.firebase || !window.firebase.firestore){
+      await loadScript(FB_SDK+'firebase-app-compat.js');
+      await Promise.all([loadScript(FB_SDK+'firebase-auth-compat.js'), loadScript(FB_SDK+'firebase-firestore-compat.js')]);
+    }
+    if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    fbAuth = firebase.auth();
+    fbAuth.onAuthStateChanged(async user=>{
+      fbUser = user; fbRefreshUI();
+      if(user){ await attachCloud(firebase.firestore(), user.uid); }
+      else { cloudUnsubs.forEach(u=>{ try{u()}catch(e){} }); cloudUnsubs = []; cloud = null; setSaveStatus('local'); }
+    });
+  }catch(e){ setSaveStatus('local'); const b=document.getElementById('fbAccountBtn'); if(b) b.disabled = true; }
+}
+function fbRefreshUI(){
+  const b = document.getElementById('fbAccountBtn'); if(b) b.textContent = fbUser ? 'Mon compte' : 'Se connecter';
+  document.getElementById('fbIn').hidden = !!fbUser; document.getElementById('fbOut').hidden = !fbUser;
+  document.getElementById('fbWho').innerHTML = fbUser ? 'Connecté en tant que <b>'+String(fbUser.email||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))+'</b>.<br>Ta collection est synchronisée sur tous tes appareils.' : '';
+}
+(function(){
+  const ov = document.getElementById('fbOverlay'), err = document.getElementById('fbErr');
+  const open = ()=>{ err.textContent=''; fbRefreshUI(); ov.classList.add('open'); const m=document.getElementById('fbMail'); if(!fbUser) setTimeout(()=>m.focus(),50); };
+  const close = ()=>ov.classList.remove('open');
+  const msg = e=>{ const c = (e && e.code) || ''; return ({
+    'auth/invalid-credential':'E-mail ou mot de passe incorrect.','auth/wrong-password':'E-mail ou mot de passe incorrect.','auth/user-not-found':'Aucun compte avec cet e-mail : clique sur « Créer un compte ».',
+    'auth/email-already-in-use':'Un compte existe déjà avec cet e-mail : clique sur « Se connecter ».','auth/weak-password':'Le mot de passe doit faire au moins 6 caractères.',
+    'auth/invalid-email':'Adresse e-mail invalide.','auth/operation-not-allowed':'La connexion par e-mail n’est pas activée dans Firebase (Authentication > Sign-in method).',
+    'auth/unauthorized-domain':'Ce site n’est pas dans les domaines autorisés de Firebase.','auth/network-request-failed':'Pas de connexion à Internet.','auth/too-many-requests':'Trop d’essais : réessaie dans quelques minutes.'
+  })[c] || ((e && e.message) || 'Erreur inconnue.'); };
+  document.getElementById('fbAccountBtn').onclick = open;
+  document.getElementById('fbCancel').onclick = close; document.getElementById('fbClose').onclick = close;
+  ov.addEventListener('click', e=>{ if(e.target===ov) close(); });
+  const go = async signup=>{
+    if(!fbAuth){ err.textContent='Connexion à Firebase impossible pour le moment.'; return; }
+    const m = document.getElementById('fbMail').value.trim(), p = document.getElementById('fbPass').value;
+    if(!m || !p){ err.textContent='Saisis ton e-mail et ton mot de passe.'; return; }
+    err.textContent = signup ? 'Création du compte…' : 'Connexion…';
+    try{ signup ? await fbAuth.createUserWithEmailAndPassword(m,p) : await fbAuth.signInWithEmailAndPassword(m,p); err.textContent=''; close(); }
+    catch(e){ err.textContent = msg(e); }
+  };
+  document.getElementById('fbForm').addEventListener('submit', e=>{ e.preventDefault(); go(false); });
+  document.getElementById('fbSignup').onclick = ()=>go(true);
+  document.getElementById('fbGoogle').onclick = async ()=>{
+    if(!fbAuth){ err.textContent='Connexion à Firebase impossible pour le moment.'; return; }
+    err.textContent='Connexion avec Google…';
+    try{ await fbAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); err.textContent=''; close(); }
+    catch(e){ err.textContent = e && e.code==='auth/operation-not-allowed' ? 'La connexion Google n’est pas activée dans Firebase (Authentication > Sign-in method).' : e && (e.code==='auth/popup-blocked') ? 'Le navigateur a bloqué la fenêtre de connexion : autorise les fenêtres pop-up pour ce site.' : e && e.code==='auth/popup-closed-by-user' ? '' : msg(e); }
+  };
+  document.getElementById('fbLogout').onclick = async ()=>{ try{ await fbAuth.signOut(); }catch(e){} close(); };
+  addEventListener('keydown', e=>{ if(e.key==='Escape' && ov.classList.contains('open')) close(); });
+  if(window.claude && window.claude.use){ const b=document.getElementById('fbAccountBtn'); if(b) b.parentNode.hidden = true; }
+})();
 
 // ---------- Ajout manuel de cartes (nouvelles sorties) ----------
 function saveCustomCard(key, card){
