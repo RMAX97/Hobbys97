@@ -322,13 +322,24 @@
   --cover:#c0c0c0;--cover-deep:#c0c0c0;--page:#fff;--sleeve:#e8e8e8;--line:#808080;--text:#000;--muted:#404040;
   --yellow:#000080;--normal:#0000a8;--holo:#a87800;--reverse:#606060;--ok:#008000;--r-sm:0;--r-md:0;--r-lg:0;
 }
-html{color-scheme:light;scrollbar-color:#c0c0c0 #e4e4e4}
-::-webkit-scrollbar{width:16px;height:16px}
+html{color-scheme:light}
+/* barres de défilement Windows 98 (Chrome, Edge, Safari) */
+html,*{scrollbar-color:auto;scrollbar-width:auto}
+@supports not selector(::-webkit-scrollbar){html,*{scrollbar-color:#c0c0c0 #e8e8e8}}
+::-webkit-scrollbar{width:16px;height:16px;background:#c0c0c0}
 ::-webkit-scrollbar-track{background:repeating-conic-gradient(#fff 0 25%,#c0c0c0 0 50%) 0 0/2px 2px}
-::-webkit-scrollbar-thumb{background:#c0c0c0;border-radius:0;box-shadow:var(--raised)}
+::-webkit-scrollbar-thumb{background:#c0c0c0;border:0;border-radius:0;box-shadow:inset -1px -1px #0a0a0a,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff}
 ::-webkit-scrollbar-thumb:hover{background:#c0c0c0}
-::-webkit-scrollbar-button:single-button{display:block;height:16px;width:16px;background:#c0c0c0;box-shadow:var(--raised)}
+::-webkit-scrollbar-button:single-button{display:block;width:16px;height:16px;background-color:#c0c0c0;background-repeat:no-repeat;background-position:center;box-shadow:inset -1px -1px #0a0a0a,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff}
+::-webkit-scrollbar-button:single-button:active{box-shadow:inset 0 0 0 1px #808080;background-position:calc(50% + 1px) calc(50% + 1px)}
+::-webkit-scrollbar-button:single-button:vertical:decrement{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M3%202h1v1h1v1h1v1H1V4h1V3h1z%22%20fill%3D%22%23000%22/%3E%3C/svg%3E")}
+::-webkit-scrollbar-button:single-button:vertical:increment{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M1%203h5v1H5v1H4v1H3V5H2V4H1z%22%20fill%3D%22%23000%22/%3E%3C/svg%3E")}
+::-webkit-scrollbar-button:single-button:horizontal:decrement{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M4%201h1v5H4V5H3V4H2V3h1V2h1z%22%20fill%3D%22%23000%22/%3E%3C/svg%3E")}
+::-webkit-scrollbar-button:single-button:horizontal:increment{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M2%201h1v1h1v1h1v1H4v1H3v1H2z%22%20fill%3D%22%23000%22/%3E%3C/svg%3E")}
 ::-webkit-scrollbar-corner{background:#c0c0c0}
+/* la page ne défile plus derrière la fiche d’une carte ou le formulaire d’ajout */
+html:has(#overlay[style*="flex"]),html:has(#addOverlay[style*="flex"]),html:has(#overlay[style*="flex"]) body,html:has(#addOverlay[style*="flex"]) body{overflow:hidden!important}
+#overlay,#addOverlay{overscroll-behavior:contain}
 body{font-family:Tahoma,"MS Sans Serif","Microsoft Sans Serif",Geneva,Arial,sans-serif;font-size:12px;background:var(--face);color:#000;-webkit-font-smoothing:none}
 .brand-title,h1,h2,h3{font-family:Tahoma,"MS Sans Serif",Arial,sans-serif}
 :focus-visible{outline:1px dotted #000;outline-offset:1px}
