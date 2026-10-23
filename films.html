@@ -659,6 +659,7 @@ function load(){
   return fromSeed();
 }
 let films=load();
+setTimeout(()=>films.forEach(f=>{if(f.cv)for(const k in f.cv){const th=f.th&&f.th[k];if(!th||th.s!==thSig(f.cv[k]))queueThumb(f,k)}}),800);
 function save(){try{localStorage.setItem(STORE,JSON.stringify({v:1,saved:Date.now(),films}))}catch(e){toast("Impossible d'enregistrer dans ce navigateur.")}}
 const getKey=()=>{try{return localStorage.getItem(KEYSTORE)||''}catch(e){return ''}};
 
@@ -692,7 +693,7 @@ function caseInner(f,size='w342',path){
     const J=fullOf(f);
     if(J){
       const own=f.cv&&f.cv[fkey(f)];
-      if(own) img=`<span class="full on" style="${slice(J.u,J.b,1)}"></span>`;
+      if(own){const th=f.th&&f.th[fkey(f)];if(th&&th.s===thSig(own))img=`<img src="${th.d}" alt="" decoding="async">`;else{queueThumb(f,fkey(f));if(!f.p)img=`<span class="full on" style="${slice(J.u,J.b,1)}"></span>`}}
       else{const fb=f.p?esc(src(f.p,size)):'',jq=window.JAQ&&window.JAQ[f.id+'-'+fkey(f)];img=jq?`<img src="${jq}" alt="" decoding="async">`:`<img src="jaquettes/${f.id}-${fkey(f)}.jpg" alt="" loading="lazy" decoding="async"${fb?` onerror="this.onerror=null;this.src='${fb}'"`:''}>`}
     }
   }
@@ -942,6 +943,36 @@ function detectSpine(ctx,W,H,k){
   const sorted=[...g.slice(Math.floor(W*.3),Math.floor(W*.7))].sort((p,q)=>p-q),med=sorted[sorted.length>>1]||1;
   if(Math.min(at(best[1]),at(best[2]))<med*2.2) return SPINE[k];
   return [+best[1].toFixed(4),+best[2].toFixed(4)];
+}
+/* ---------- Vignettes des jaquettes personnalisées ----------
+   La grille n'affiche plus l'image d'origine (souvent 2 Mo) mais une petite vignette du recto,
+   fabriquée une seule fois et gardée avec la collection. */
+const TH_W=220;
+const thSig=c=>c[0].length+':'+c[0].slice(-60)+':'+c[2];
+const thQ=[];let thBusy=false,thTimer=0;
+function queueThumb(f,k){if(!thQ.some(q=>q.f===f&&q.k===k)){thQ.push({f,k});if(!thBusy)setTimeout(runThumbs,60)}}
+async function runThumbs(){
+  if(thBusy)return;thBusy=true;
+  while(thQ.length){const {f,k}=thQ.shift();await makeThumb(f,k)}
+  thBusy=false;
+}
+function thLoad(src,cors){return new Promise((res,rej)=>{const i=new Image();if(cors)i.crossOrigin='anonymous';i.onload=()=>res(i);i.onerror=rej;i.src=src})}
+async function thImage(u){
+  if(/^data:/.test(u))return thLoad(u,false);
+  try{const i=await thLoad(u,true);const t=document.createElement('canvas');t.width=t.height=1;const x=t.getContext('2d');x.drawImage(i,0,0,1,1);x.getImageData(0,0,1,1);return i}catch(e){}
+  // site sans autorisation de lecture : on passe par le service de redimensionnement wsrv.nl
+  return thLoad('https://wsrv.nl/?url='+encodeURIComponent(u)+'&w=1000&output=jpg&q=85',true);
+}
+async function makeThumb(f,k){
+  const c=f.cv&&f.cv[k];if(!c)return;
+  const sig=thSig(c);if(f.th&&f.th[k]&&f.th[k].s===sig)return;
+  try{
+    const img=await thImage(/^(data:|https?:)/.test(c[0])?c[0]:CP+c[0]);
+    const W=img.naturalWidth,H=img.naturalHeight,sx=Math.round((c[2]||0)*W),sw=Math.max(1,W-sx),h=Math.round(H*TH_W/sw);
+    const cv=document.createElement('canvas');cv.width=TH_W;cv.height=h;cv.getContext('2d').drawImage(img,sx,0,sw,H,0,0,TH_W,h);
+    f.th={...(f.th||{}),[k]:{s:sig,d:cv.toDataURL('image/jpeg',.78)}};
+    save();clearTimeout(thTimer);thTimer=setTimeout(()=>{try{render()}catch(e){}},250);
+  }catch(e){}
 }
 function setFull(f,c){
   const prev=f.cv,prevFull=f.full;f.cv={...(f.cv||{}),[fkey(f)]:c};delete f.full;
