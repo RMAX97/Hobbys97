@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ma Collection de Cartes</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
     --cover:#18191d;
@@ -314,6 +311,156 @@
     .meta span:first-child{display:none;}
     .meta{justify-content:flex-start;}
   }
+</style>
+<style id="hobbys97-w98">
+/* ===== Habillage Windows 98 (Hobbys97) ===== */
+:root{
+  --face:#c0c0c0;--light:#dfdfdf;--white:#fff;--shadow:#808080;--dark:#0a0a0a;--navy:#000080;--blue:#1084d0;
+  --raised:inset -1px -1px var(--dark),inset 1px 1px var(--white),inset -2px -2px var(--shadow),inset 2px 2px var(--light);
+  --sunken:inset -1px -1px var(--white),inset 1px 1px var(--shadow),inset -2px -2px var(--light),inset 2px 2px var(--dark);
+  --pressed:inset -1px -1px var(--white),inset 1px 1px var(--dark),inset -2px -2px var(--light),inset 2px 2px var(--shadow);
+  --cover:#c0c0c0;--cover-deep:#c0c0c0;--page:#fff;--sleeve:#e8e8e8;--line:#808080;--text:#000;--muted:#404040;
+  --yellow:#000080;--normal:#0000a8;--holo:#a87800;--reverse:#606060;--ok:#008000;--r-sm:0;--r-md:0;--r-lg:0;
+}
+html{color-scheme:light;scrollbar-color:#c0c0c0 #e4e4e4}
+::-webkit-scrollbar{width:16px;height:16px}
+::-webkit-scrollbar-track{background:repeating-conic-gradient(#fff 0 25%,#c0c0c0 0 50%) 0 0/2px 2px}
+::-webkit-scrollbar-thumb{background:#c0c0c0;border-radius:0;box-shadow:var(--raised)}
+::-webkit-scrollbar-thumb:hover{background:#c0c0c0}
+::-webkit-scrollbar-button:single-button{display:block;height:16px;width:16px;background:#c0c0c0;box-shadow:var(--raised)}
+::-webkit-scrollbar-corner{background:#c0c0c0}
+body{font-family:Tahoma,"MS Sans Serif","Microsoft Sans Serif",Geneva,Arial,sans-serif;font-size:12px;background:var(--face);color:#000;-webkit-font-smoothing:none}
+.brand-title,h1,h2,h3{font-family:Tahoma,"MS Sans Serif",Arial,sans-serif}
+:focus-visible{outline:1px dotted #000;outline-offset:1px}
+
+/* panneau gauche : arborescence de l’Explorateur */
+.sidebar{background:var(--face);border-right:0;padding:4px 4px 10px;box-shadow:var(--sunken);margin:4px 2px 4px 4px;height:calc(100vh - 8px);top:4px}
+.sidebar h2{font-size:12px;font-weight:bold;margin:0 0 4px;padding:3px 6px;color:#fff;background:linear-gradient(90deg,var(--navy),var(--blue))}
+.nav-section{padding:8px 6px 3px;font-size:11px;font-weight:bold;color:#000;border-bottom:1px solid var(--shadow);margin:0 4px 4px}
+.navitem{border-radius:0;padding:2px 6px;margin:0 0 1px;gap:8px;color:#000;font-size:12px;font-weight:normal;transition:none}
+.navitem:hover{background:none;color:#000}
+.navitem:hover .label{text-decoration:underline}
+.navitem.active{background:none;color:#000}
+.navitem.active .label{background:var(--navy);color:#fff;padding:1px 3px;outline:1px dotted #ff0;outline-offset:-1px}
+.navitem .cnt{font-size:11px;color:#404040;font-weight:normal}
+.navitem.active .cnt{color:#000}
+.navitem .ic img{width:40px;height:40px}
+.navitem .ic img.illus-icon{width:56px;height:56px;margin:-8px -6px;border-radius:0}
+.navitem .label{flex:0 1 auto}
+.navitem .cnt{margin-left:auto}
+.navitem .ic img.pokeball-icon{width:20px;height:20px}
+.navitem[data-view="home"]{padding:4px 6px}
+
+/* zone principale : fenêtre blanche encastrée */
+main{background:var(--face);box-shadow:var(--sunken);margin:4px 4px 4px 2px;min-height:calc(100vh - 8px)}
+.home-wrap{padding:16px 18px 40px;max-width:none}
+.home-hero{margin-bottom:22px;padding:12px 14px;background:linear-gradient(90deg,var(--navy),var(--blue));color:#fff}
+.home-hero h1{font-size:22px;color:#fff;font-weight:bold;margin:0 0 6px}
+.home-hero p{color:#fff;font-size:12px}
+.home-total span{color:#fff;font-size:12px;font-weight:normal}
+.update-note{color:#dfe8ff !important;font-size:11px !important}
+.home-wrap h2{font-size:13px;font-weight:bold;margin:0 0 2px;padding-bottom:2px;border-bottom:1px solid var(--shadow)}
+.home-wrap .sec-sub{color:#404040;font-size:11px;margin:4px 0 10px}
+.home-sec{margin-bottom:22px}
+.illustrator-list{gap:10px}
+.illustrator-card{background:var(--face);border:0;border-radius:0;box-shadow:var(--raised);padding:12px 10px 10px;transition:none}
+.illustrator-card:hover{background:var(--face)}
+.illustrator-card:active{box-shadow:var(--pressed)}
+.illustrator-card .ic-big img.illus-icon{border-radius:0}
+.illustrator-card .txt b{font-size:12px;font-weight:bold}
+.illustrator-card .txt span{color:#404040;font-size:11px}
+
+/* barre de progression d’installation */
+.bar{height:16px;border-radius:0;background:#fff;box-shadow:var(--sunken);padding:2px}
+.bar i{border-radius:0;background:repeating-linear-gradient(90deg,var(--navy) 0 8px,transparent 8px 10px);transition:none}
+.home-hero .bar{background:#fff}
+.gauge .bar{height:16px}
+
+/* en-tête d’un classeur */
+header.art-header{padding:14px 16px 10px;border-bottom:1px solid var(--shadow)}
+.hero-ic img.illus-icon{border-radius:0}
+.hero-txt h1{font-size:20px;font-weight:bold}
+.sub{color:#404040;font-size:12px}
+.gauge-num{font-family:Tahoma,Arial,sans-serif}
+.gauge-num .owned-count{font-size:18px;color:#000}
+.gauge-num .of,.gauge-num .pct,.gauge-lbl{color:#404040;font-size:11px}
+
+/* barre d’outils */
+.toolbar{background:var(--face);backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:0;box-shadow:inset 0 -1px var(--shadow),inset 0 -2px var(--white),inset 0 1px var(--white);padding:6px 16px;gap:6px}
+input[type=text],select,input[type=url],input[type=month]{font-family:inherit;font-size:12px;background:#fff;color:#000;border:0;border-radius:0;box-shadow:var(--sunken);padding:4px 6px}
+input[type=text]::placeholder{color:#808080}
+.result-count{color:#000;font-weight:normal;font-size:11px}
+.add-btn,.save-actions button,.save-actions .btnlike,#menu .close,#addForm .actions button{font-family:inherit;font-size:12px;font-weight:normal;color:#000;background:var(--face);border:0;border-radius:0;box-shadow:var(--raised);padding:5px 12px;min-height:24px}
+.add-btn:hover,.save-actions button:hover,.save-actions .btnlike:hover,#menu .close:hover{background:var(--face);filter:none}
+.add-btn:active,.save-actions button:active,.save-actions .btnlike:active,#menu .close:active,#addForm .actions button:active{box-shadow:var(--pressed)}
+#addForm .actions .primary{background:var(--face);color:#000;box-shadow:inset 0 0 0 1px #000,inset -2px -2px var(--dark),inset 2px 2px var(--white),inset -3px -3px var(--shadow),inset 3px 3px var(--light)}
+
+/* grille de cartes : diapositives */
+.grid{gap:10px;padding:14px 16px 40px}
+.card{border-radius:0;background:var(--face);border:0;box-shadow:var(--raised);padding:5px 5px 7px;transition:none}
+.card:hover{border:0;outline:1px dotted #000;outline-offset:-4px}
+.card img{border-radius:0;background:#808080;box-shadow:1px 1px 0 #fff,-1px -1px 0 #808080}
+.name{font-size:11px;font-weight:bold}
+.meta{font-size:11px;color:#404040}
+.badges{top:8px;right:8px}
+.badge{border-radius:0;font-size:9px;font-weight:bold;padding:1px 4px;box-shadow:1px 1px 0 #000}
+.badge.normal{background:#0000a8;color:#fff}
+.badge.holo{background:#ffd700;color:#000}
+.badge.reverse{background:#fff;color:#000}
+.mine{background:#ffffe1;color:#000;border:1px solid #000;border-radius:0}
+.empty{color:#404040;font-size:12px}
+
+/* visionneuse : boîte de dialogue */
+#overlay{background:rgba(0,128,128,.55);backdrop-filter:none;-webkit-backdrop-filter:none}
+#bigImgBox{border-radius:0;box-shadow:var(--raised),6px 6px 0 rgba(0,0,0,.35);padding:4px;background:var(--face)}
+#menu{background:var(--face);border:0;border-radius:0;box-shadow:var(--raised);padding:3px 3px 12px}
+#menu::before{content:"Propriétés de la carte";display:block;height:20px;line-height:20px;padding:0 6px;margin:0 0 10px;color:#fff;font-weight:bold;font-size:12px;background:linear-gradient(90deg,var(--navy),var(--blue))}
+#menu>*{margin-left:10px!important;margin-right:10px!important}
+#menu .opt,#menu .close,#menu .del{width:calc(100% - 20px)}
+#menu h3{font-size:14px;font-weight:bold}
+#menu .setline{color:#404040;font-size:11px}
+#menu .q{color:#000;font-size:11px;font-weight:normal;padding-top:6px;border-top:1px solid var(--shadow);box-shadow:0 1px 0 #fff inset}
+#menu .opt{background:none;border:0;border-radius:0;padding:4px 2px;margin-bottom:2px;font-size:12px;font-weight:normal}
+#menu .opt:hover{border:0}
+#menu .opt.checked{background:none;border:0}
+#menu .opt .dot{width:13px;height:13px;border:0;border-radius:0;background:#fff;box-shadow:var(--sunken);font-size:11px;font-weight:bold;color:transparent}
+#menu .opt.checked .dot{background:#fff;color:#000;border:0}
+#menu .opt .sw{border-radius:0;box-shadow:inset 0 0 0 1px #000}
+#menu .opt.holo .sw{background:#ffd700}
+#menu .opt.normal .sw{background:#0000a8}
+#menu .opt.reverse .sw{background:#fff}
+#menu .close{width:calc(100% - 20px);margin-top:10px}
+#menu .del{color:#a00000;font-size:11px}
+
+/* formulaire d’ajout */
+#addOverlay{background:rgba(0,128,128,.55)}
+#addForm{background:var(--face);border:0;border-radius:0;box-shadow:var(--raised);padding:3px 12px 12px}
+#addForm::before{content:"Ajouter une carte";display:block;height:20px;line-height:20px;margin:0 -9px 10px;padding:0 6px;color:#fff;font-weight:bold;font-size:12px;background:linear-gradient(90deg,var(--navy),var(--blue))}
+#addForm h3{font-size:13px;font-weight:bold}
+#addForm .hint{color:#404040;font-size:11px}
+#addForm label{color:#000;font-weight:normal;font-size:11px}
+#addForm input{background:#fff;color:#000;border:0;border-radius:0;box-shadow:var(--sunken);font-size:12px;padding:4px 6px}
+#addForm input[type=file]{background:var(--face);box-shadow:none;padding:2px 0}
+#addForm .err{color:#a00000}
+
+/* sauvegarde */
+.save-box{border-top:1px solid var(--shadow);box-shadow:inset 0 1px #fff}
+.save-status{color:#000;font-size:11px}
+.save-status::before{border-radius:0;box-shadow:inset 0 0 0 1px #000}
+
+/* téléphone */
+#mobileTopbar{background:linear-gradient(90deg,var(--navy),var(--blue));border-bottom:0}
+#mobileTopbar .ttl{color:#fff;font-size:13px;font-weight:bold}
+#mobileTopbar .burger{background:var(--face);border-radius:0;box-shadow:var(--raised);color:#000;width:30px;height:26px;font-size:14px}
+#sidebarBackdrop.open{background:rgba(0,0,0,.25)}
+@media (max-width:800px){
+  main{margin:0;box-shadow:none;min-height:0}
+  .sidebar{margin:0;top:0;height:100dvh;box-shadow:var(--raised),4px 0 0 rgba(0,0,0,.3)}
+  .illustrator-card{border-radius:0}
+  .card{border-radius:0;padding:3px 3px 5px}
+  input,select,textarea{font-size:16px !important}
+}
+@media (prefers-reduced-motion:no-preference){.sidebar{transition:none}}
 </style>
 </head>
 <body>
