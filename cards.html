@@ -2000,5 +2000,18 @@ connectCloud();
   const x=document.getElementById('cwClose'); if(x) x.addEventListener('click',()=>document.getElementById('closeMenu').click());
 })();
 </script>
+<script>
+/* Sur téléphone : la carte s'affiche bien de face (pas d'inclinaison déclenchée par le doigt) */
+(function(){
+  let pt='mouse';
+  addEventListener('pointerdown',e=>{pt=e.pointerType},true);
+  addEventListener('pointermove',e=>{pt=e.pointerType},true);
+  const tw=document.getElementById('tiltWrap'),bx=document.getElementById('bigImgBox'),ov=document.getElementById('overlay');
+  if(!tw||!bx)return;
+  addEventListener('mousemove',e=>{if(pt!=='mouse'&&tw.contains(e.target)){e.stopPropagation();bx.style.transform=''}},true);
+  if(ov)new MutationObserver(()=>{if(ov.style.display==='flex'&&pt!=='mouse')bx.style.transform=''}).observe(ov,{attributes:true,attributeFilter:['style']});
+})();
+</script>
+<style>html{touch-action:manipulation}</style>
 </body>
 </html>

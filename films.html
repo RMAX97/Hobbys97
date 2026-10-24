@@ -537,6 +537,7 @@ html[data-theme="dark"] .seg.fmt button[data-v="4k"][aria-pressed="true"]{backgr
 #covPick{min-height:40px;display:flex;align-items:center;min-width:0}
 .covnote{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;max-width:100%}
 </style>
+<style>html{touch-action:manipulation}</style>
 </head>
 <body>
 
@@ -606,6 +607,22 @@ html[data-theme="dark"] .seg.fmt button[data-v="4k"][aria-pressed="true"]{backgr
       <li><a href="https://picpusdan.com/index.php" target="_blank" rel="noopener">Picpusdan</a></li>
     </ul>
     <hr class="sep">
+    <h3 style="margin:0 0 6px;font-stretch:108%">Synchronisation des jaquettes</h3>
+    <div id="syncBox">
+      <div data-s="out">
+        <p class="hint" style="margin:0 0 8px">Connecte-toi avec le même compte que pour Cards : tes jaquettes, affiches et formats se retrouvent sur tous tes appareils.</p>
+        <button class="btn" type="button" data-a="google" style="width:100%;margin-bottom:8px">Continuer avec Google</button>
+        <div class="field" style="margin-bottom:6px"><input type="email" data-f="mail" placeholder="E-mail" autocomplete="username"></div>
+        <div class="field" style="margin-bottom:8px"><input type="password" data-f="pass" placeholder="Mot de passe" autocomplete="current-password"></div>
+        <button class="btn" type="button" data-a="mail">Se connecter</button>
+      </div>
+      <div data-s="in" hidden>
+        <p class="hint" style="margin:0 0 8px">Synchronisé avec <b data-s="who"></b>. Une jaquette changée ici apparaît sur tes autres appareils.</p>
+        <button class="btn" type="button" data-a="out">Se déconnecter</button>
+      </div>
+      <p class="syncerr hint" style="color:#b0453a;min-height:1em;margin:6px 0 0"></p>
+    </div>
+    <hr class="sep">
     <h3 style="margin:0 0 6px;font-stretch:108%">Sauvegarde</h3>
     <p class="hint" style="margin:0 0 12px">La collection est enregistrée dans ce navigateur. Exportez-la pour la garder ou la passer sur un autre appareil.</p>
     <div class="row">
@@ -660,7 +677,7 @@ function load(){
   return fromSeed();
 }
 let films=load();
-function save(){try{localStorage.setItem(STORE,JSON.stringify({v:1,saved:Date.now(),films}))}catch(e){toast("Impossible d'enregistrer dans ce navigateur.")}}
+function save(){try{localStorage.setItem(STORE,JSON.stringify({v:1,saved:Date.now(),films}))}catch(e){toast("Impossible d'enregistrer dans ce navigateur.")}try{cloudQueue()}catch(e){}}
 const getKey=()=>{try{return localStorage.getItem(KEYSTORE)||''}catch(e){return ''}};
 
 /* ---------- Noms de réalisateurs ---------- */
@@ -1009,7 +1026,7 @@ async function makeThumb(f,k){
     save();clearTimeout(thTimer);thTimer=setTimeout(()=>{try{render()}catch(e){}},250);
   }catch(e){thFailed.add(sig)}
 }
-function setFull(f,c){
+function setFull(f,c){if(c&&!c[4])c=[c[0],c[1],c[2],c[3]||null,rid()];
   const prev=f.cv,prevFull=f.full;f.cv={...(f.cv||{}),[fkey(f)]:c};delete f.full;
   try{localStorage.setItem(STORE,JSON.stringify({v:1,saved:Date.now(),films}))}
   catch(e){f.cv=prev;f.full=prevFull;toast("Image trop lourde pour l'espace disponible dans ce navigateur.");return}
@@ -1171,6 +1188,95 @@ function toast(msg,label,fn){
 })();
 
 renderAll();
+
+/* ================= Synchronisation des jaquettes entre appareils (Firebase, même compte que Cards) =================
+   Par film, seuls quelques champs voyagent : format, affiche choisie, jaquette intégrale (lien d'origine,
+   calage sur la boîte). Une image importée depuis un fichier part une seule fois, compressée (~1000 px). */
+const FB_CFG={apiKey:"AIzaSyAtijZVcoqPXTJ-3hDADEvgT3lazKxuOVo",authDomain:"fermite.firebaseapp.com",projectId:"fermite",storageBucket:"fermite.firebasestorage.app",messagingSenderId:"186949501321",appId:"1:186949501321:web:612c0ed9a983927074e158"};
+const FB_JS='https://www.gstatic.com/firebasejs/10.12.2/';
+const SEEDP={};try{SEED.forEach(r=>{SEEDP[r[0]]=r[6]})}catch(e){}
+let fbs={auth:null,db:null,user:null,col:null,unsub:null},lastSig={},pushT=0,applying=false;
+const rid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+function syncState(f){
+  const cv={};if(f.cv)for(const k in f.cv){const c=f.cv[k];cv[k]={s:c[3]||null,a:c[1],b:c[2],id:c[4]||null}}
+  return {f:f.f||'dvd',p:f.p||null,full:f.full===false?false:true,cv};
+}
+const sigOf=f=>JSON.stringify(syncState(f));
+const isCustom=f=>!!(f.cv&&Object.keys(f.cv).length)||f.full===false||(f.f&&f.f!=='dvd')||(f.p&&SEEDP[f.id]!==undefined&&f.p!==SEEDP[f.id]);
+function cloudQueue(){if(!fbs.user||applying)return;clearTimeout(pushT);pushT=setTimeout(cloudPush,900)}
+async function smallImage(ref){
+  const u=IMGURL[ref.slice(4)];if(!u)return null;
+  const bmp=await createImageBitmap(await (await fetch(u)).blob()),sc=Math.min(1,1000/bmp.width),c=document.createElement('canvas');
+  c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+  return c.toDataURL('image/jpeg',.72);
+}
+async function cloudPush(){
+  if(!fbs.user)return;
+  for(const f of films){
+    if(f.cv)for(const k in f.cv){if(!f.cv[k][4]){f.cv[k]=[f.cv[k][0],f.cv[k][1],f.cv[k][2],f.cv[k][3]||null,rid()]}}
+    const sig=sigOf(f);
+    if(lastSig[f.id]===sig)continue;
+    if(lastSig[f.id]===undefined&&!isCustom(f)){lastSig[f.id]=sig;continue}
+    const st=syncState(f),t=Date.now();
+    try{
+      for(const k in st.cv){const c=f.cv[k];if(!st.cv[k].s&&/^idb:/.test(c[0])){const img=await smallImage(c[0]);if(img)st.cv[k].img=img}}
+      await fbs.col.doc(String(f.id)).set({...st,t});
+      f.st=t;lastSig[f.id]=sig;
+    }catch(e){console.warn('sync',e)}
+  }
+  try{localStorage.setItem(STORE,JSON.stringify({v:1,saved:Date.now(),films}))}catch(e){}
+}
+async function applyRemote(id,r){
+  const f=films.find(x=>String(x.id)===String(id));if(!f||!r||!(r.t>(f.st||0)))return false;
+  f.f=r.f||'dvd';if(r.p)f.p=r.p;if(r.full===false)f.full=false;else delete f.full;
+  const cv={};
+  for(const k in (r.cv||{})){
+    const x=r.cv[k],old=f.cv&&f.cv[k];
+    if(old&&old[4]&&old[4]===x.id){cv[k]=[old[0],x.a,x.b,old[3]||null,x.id];continue}
+    try{const ref=x.s?await storeFull(x.s):x.img?await storeFull(await (await fetch(x.img)).blob()):null;if(ref)cv[k]=[ref,x.a,x.b,x.s||null,x.id]}catch(e){if(old)cv[k]=old}
+  }
+  if(Object.keys(cv).length)f.cv=cv;else delete f.cv;
+  f.st=r.t;lastSig[f.id]=sigOf(f);return true;
+}
+function fbLoad(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+async function cloudInit(){
+  try{
+    if(!window.firebase||!window.firebase.firestore){await fbLoad(FB_JS+'firebase-app-compat.js');await Promise.all([fbLoad(FB_JS+'firebase-auth-compat.js'),fbLoad(FB_JS+'firebase-firestore-compat.js')])}
+    if(!firebase.apps.length)firebase.initializeApp(FB_CFG);
+    fbs.auth=firebase.auth();fbs.db=firebase.firestore();
+    fbs.auth.onAuthStateChanged(async user=>{
+      fbs.user=user;if(fbs.unsub){fbs.unsub();fbs.unsub=null}
+      syncUI();
+      if(!user)return;
+      fbs.col=fbs.db.collection('data/users/'+user.uid+'/films/items');
+      await new Promise(r=>{const wait=()=>imgReady?r():setTimeout(wait,200);wait()});
+      fbs.unsub=fbs.col.onSnapshot(async qs=>{
+        applying=true;let changed=false;
+        for(const ch of qs.docChanges()){if(ch.doc.metadata.hasPendingWrites)continue;if(await applyRemote(ch.doc.id,ch.doc.data()))changed=true}
+        applying=false;
+        if(changed){try{localStorage.setItem(STORE,JSON.stringify({v:1,saved:Date.now(),films}))}catch(e){}try{render()}catch(e){}
+          films.forEach(f=>{if(f.cv)for(const k in f.cv){const th=f.th&&f.th[k];if(!th||th.s!==thSig(f.cv[k]))queueThumb(f,k)}})}
+        cloudQueue();
+      },e=>console.warn('sync',e));
+    });
+  }catch(e){console.warn('firebase',e)}
+}
+function syncUI(){
+  const box=document.getElementById('syncBox');if(!box)return;
+  const u=fbs.user;
+  box.querySelector('[data-s=out]').hidden=!!u;box.querySelector('[data-s=in]').hidden=!u;
+  const w=box.querySelector('[data-s=who]');if(w)w.textContent=u?(u.email||'ton compte'):'';
+}
+(function(){
+  const box=document.getElementById('syncBox');if(!box)return;
+  const err=box.querySelector('.syncerr');
+  const m=e=>({'auth/invalid-credential':'E-mail ou mot de passe incorrect.','auth/wrong-password':'E-mail ou mot de passe incorrect.','auth/operation-not-allowed':'Ce mode de connexion n’est pas activé dans Firebase.','auth/unauthorized-domain':'Ce site n’est pas dans les domaines autorisés de Firebase.','auth/popup-blocked':'Autorise les fenêtres pop-up pour ce site.'})[e&&e.code]||(e&&e.message)||'Erreur';
+  box.querySelector('[data-a=google]').onclick=async()=>{if(!fbs.auth)return;err.textContent='';try{await fbs.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())}catch(e){if(e.code!=='auth/popup-closed-by-user')err.textContent=m(e)}};
+  box.querySelector('[data-a=mail]').onclick=async()=>{if(!fbs.auth)return;err.textContent='Connexion…';const em=box.querySelector('[data-f=mail]').value.trim(),pw=box.querySelector('[data-f=pass]').value;try{await fbs.auth.signInWithEmailAndPassword(em,pw);err.textContent=''}catch(e){err.textContent=m(e)}};
+  box.querySelector('[data-a=out]').onclick=()=>fbs.auth&&fbs.auth.signOut();
+})();
+cloudInit();
+
 </script>
 </body>
 </html>

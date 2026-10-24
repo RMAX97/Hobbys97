@@ -26,6 +26,7 @@
   -webkit-font-smoothing:none;
 }
 *{box-sizing:border-box}
+html{touch-action:manipulation}
 html,body{margin:0;height:100%;overflow:hidden;background:var(--teal);color:var(--text);-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
 img,canvas{image-rendering:pixelated}
 img{-webkit-user-drag:none}
@@ -294,6 +295,36 @@ input[type=text],input[type=email],input[type=password],input[type=url]{cursor:t
 .solstat span:first-child{flex:1}
 .solstat span:last-child{flex:0 0 170px}
 
+/* ---------- My Computer ---------- */
+.win.computer .wbody.mcbody{display:flex;padding:0;overflow:hidden;background:#fff;margin-top:2px;position:relative}
+.tsep{width:2px;align-self:stretch;margin:4px 3px;box-shadow:inset 1px 0 var(--shadow),inset -1px 0 var(--white)}
+.mcaddr{gap:6px;padding-top:2px;padding-bottom:3px}
+.mcaddr .lbl{padding-left:2px}
+.mcaddr .ieurl{flex:1}
+.mcai,.mcsi{width:16px;height:16px;flex:none}
+.mcpath{flex:1;padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mcside{flex:0 0 170px;padding:14px 12px;background:linear-gradient(160deg,#c8dcf4 0,#eef4fb 28%,#fff 55%);overflow:hidden}
+.mcbig{width:32px;height:32px;display:block;margin-bottom:6px}
+.mctitle{margin:0;font:bold 24px/1.05 Verdana,Tahoma,Arial,sans-serif;color:#000;overflow-wrap:anywhere}
+.mcline{display:block;height:2px;margin:6px 0 12px;background:linear-gradient(90deg,#c00 0 25%,#f0c000 25% 50%,#2a8a2a 50% 75%,#2050c8 75%)}
+.mcdesc{margin:0;font-size:11px;line-height:1.45}
+.mcgrid{flex:1;display:grid;grid-template-columns:repeat(auto-fill,82px);grid-auto-rows:min-content;gap:10px 4px;padding:12px;align-content:start;overflow:auto;outline:0}
+.mci{display:flex;flex-direction:column;align-items:center;gap:3px;padding:2px;border:0;background:none;font:inherit;cursor:var(--hand)}
+.mci img{width:32px;height:32px}
+.mci span{padding:1px 2px;text-align:center;line-height:1.25;border:1px dotted transparent}
+.mci.sel img{filter:brightness(.6) sepia(1) hue-rotate(190deg) saturate(5)}
+.mci.sel span{background:var(--navy);color:#fff;border-color:#ff0}
+.mcempty{color:var(--shadow);margin:4px}
+.iestatus .st2{gap:4px;flex:0 0 180px}
+.mcmsg{position:absolute;inset:0;display:grid;place-items:center;background:rgba(255,255,255,.01);z-index:5}
+.mcmsg[hidden]{display:none}
+.mcmsg>div{background:var(--face);box-shadow:var(--raised),3px 3px 0 rgba(0,0,0,.3);padding:3px 3px 10px;width:min(320px,90%)}
+.mcmsg h4{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px;padding:2px 2px 2px 6px;color:#fff;font-size:11px;background:linear-gradient(90deg,var(--navy),var(--blue))}
+.mmb{display:flex;gap:12px;align-items:flex-start;padding:0 12px 10px}
+.mmi{flex:none;width:32px;height:32px;border-radius:50%;background:#e00000;color:#fff;font:bold 18px/32px Arial,sans-serif;text-align:center;box-shadow:inset -2px -2px rgba(0,0,0,.3)}
+.mmb p{margin:2px 0 0;font-size:11px;line-height:1.3}
+.mcmsg .btns{justify-content:center}
+@media (max-width:520px){.mcside{display:none}.win.computer .tsep,.win.computer .ieb:has([data-mc=cut]),.win.computer .ieb:has([data-mc=copy]),.win.computer .ieb:has([data-mc=paste]),.win.computer .ieb:has([data-mc=undo]){display:none}}
 
 @media (max-width:640px){
   .tasks .task span{display:none}
@@ -419,6 +450,7 @@ const APPS = {
   films:    { title: "Ma Vidéothèque", label: "Films", icon: "dvd", src: "films.html" },
   cards:    { title: "Ma Collection de Cartes", label: "Cards", icon: "card", src: "cards.html" },
   docs:     { title: "My Documents", label: "My Documents", icon: "docs", page: "docs", size: [560, 380] },
+  computer: { title: "My Computer", label: "My Computer", icon: "computer", page: "computer", size: [560, 440] },
   ie:       { title: "Mes favoris - Internet Explorer", label: "Internet Explorer", icon: "ie", page: "ie", size: [760, 540] },
   sol:      { title: "Solitaire", label: "Solitaire", icon: "sol", page: "sol", size: [660, 500] },
   mines:    { title: "Minesweeper", label: "Minesweeper", icon: "mines", page: "mines", fixed: true },
@@ -427,7 +459,7 @@ const APPS = {
 
 /* Raccourcis du bureau */
 const icons = $("#icons");
-const DECO = { computer: "My Computer", bin: "Recycle Bin" };
+const DECO = { bin: "Recycle Bin" };
 const ICON_IDS = ["computer", "vinyls", "films", "cards", "docs", "ie", "sol", "mines", "bin"];
 const iconOrder = (() => { let o = []; try { o = JSON.parse(localStorage.getItem("h97-icons")) || []; } catch {} o = o.filter(x => ICON_IDS.includes(x)); return [...o, ...ICON_IDS.filter(x => !o.includes(x))]; })();
 iconOrder.forEach(id => {
@@ -499,6 +531,7 @@ function openApp(id, opts = {}) {
   else if (a.page === "ie") body = ieHtml();
   else if (a.page === "mines") body = minesHtml();
   else if (a.page === "sol") body = solHtml();
+  else if (a.page === "computer") body = compHtml();
   else body = `<div class="menubar" aria-hidden="true"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>H</u>elp</span></div>
        <div class="wbody"><p class="loading">Ouverture de ${a.label}…</p><iframe title="${a.title}" src="${a.src}"></iframe><div class="shield"></div></div>`;
   el.innerHTML = `
@@ -549,6 +582,7 @@ function openApp(id, opts = {}) {
   if (a.page === "ie") initIe(el);
   if (a.page === "mines") initMines(el);
   if (a.page === "sol") initSol(el);
+  if (a.page === "computer") initComp(el);
   focusWin(id);
 }
 
@@ -558,7 +592,7 @@ function skinFrame(f) {
   if (!d || !d.documentElement || d.getElementById("h97-cursors")) return;
   const cs = getComputedStyle(document.documentElement), CUR = cs.getPropertyValue("--cur").trim(), HAND = cs.getPropertyValue("--hand").trim();
   const st = d.createElement("style"); st.id = "h97-cursors";
-  st.textContent = `html{cursor:${CUR}}*{cursor:inherit}
+  st.textContent = `html{cursor:${CUR};touch-action:manipulation}*{cursor:inherit}
     input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=button]):not([type=submit]):not([type=file]),textarea,[contenteditable="true"]{cursor:text}
     button:not([disabled]),a[href],select,label,summary,[role=button],[role=tab],[role=switch],input[type=checkbox],input[type=radio],input[type=range]{cursor:${HAND}}`;
   (d.head || d.documentElement).appendChild(st);
@@ -893,6 +927,130 @@ function initIe(el) {
     else if (k === "print") window.print();
     else if (k === "books") body.querySelector(".lnk").focus();
   }));
+}
+
+/* ================= My Computer (Poste de travail) ================= */
+(() => { // icônes des lecteurs et dossiers, en pixel art
+  const R = g => (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(x, y, w, h); };
+  ICON.folder = px(32, (p, g) => { const r = R(g);
+    r(2, 7, 11, 3, "#000"); r(3, 8, 9, 2, "#f8e08a"); r(2, 9, 27, 19, "#000"); r(3, 10, 25, 17, "#f0c840"); r(3, 10, 25, 1, "#fff2b0"); r(3, 10, 1, 17, "#fff2b0"); r(4, 26, 24, 1, "#b08a10"); r(27, 11, 1, 16, "#b08a10"); });
+  ICON.folder16 = px(16, (p, g) => { const r = R(g); r(1, 3, 6, 2, "#000"); r(1, 4, 14, 10, "#000"); r(2, 5, 12, 8, "#f0c840"); r(2, 5, 12, 1, "#fff2b0"); });
+  const drive = (r, y) => { r(2, y, 28, 10, "#000"); r(3, y + 1, 26, 8, "#c0c0c0"); r(3, y + 1, 26, 1, "#fff"); r(3, y + 1, 1, 8, "#fff"); r(4, y + 8, 25, 1, "#808080"); r(28, y + 2, 1, 7, "#808080"); };
+  ICON.hdd = px(32, (p, g) => { const r = R(g); drive(r, 12); r(6, 17, 3, 2, "#00c000"); r(14, 16, 12, 1, "#808080"); r(14, 18, 12, 1, "#808080"); });
+  ICON.floppy = px(32, (p, g) => { const r = R(g); r(9, 4, 14, 9, "#000"); r(10, 5, 12, 8, "#3a3a3a"); r(12, 5, 7, 4, "#c8c8c8"); r(16, 6, 2, 2, "#3a3a3a"); drive(r, 13); r(8, 17, 16, 2, "#000"); r(24, 19, 3, 1, "#00a000"); });
+  ICON.cdrom = px(32, (p, g) => { const r = R(g); drive(r, 16); r(6, 20, 20, 2, "#000"); r(24, 23, 3, 1, "#00a000");
+    for (let y = 0; y < 18; y++) for (let x = 0; x < 32; x++) { const d = Math.hypot(x + .5 - 18, y + .5 - 9); if (d < 8.2 && y < 17) p(x, y, d > 7.4 ? "#606060" : d < 1.6 ? "#000" : d < 3 ? "#e8e8e8" : ["#c8d0d8", "#f0a8c8", "#a8e8f0", "#f0e8a0", "#c8d0d8"][Math.floor((Math.atan2(y - 9, x - 18) + Math.PI) / 1.3) % 5]); } });
+  ICON.printer = px(32, (p, g) => { const r = R(g); r(9, 3, 14, 10, "#000"); r(10, 4, 12, 9, "#fff"); r(12, 6, 8, 1, "#808080"); r(12, 8, 6, 1, "#808080");
+    r(3, 12, 26, 12, "#000"); r(4, 13, 24, 10, "#c0c0c0"); r(4, 13, 24, 1, "#fff"); r(4, 22, 24, 1, "#808080"); r(22, 15, 3, 2, "#00b000"); r(7, 20, 18, 6, "#000"); r(8, 21, 16, 5, "#fff"); r(10, 23, 12, 1, "#808080"); });
+  const badge = (base, draw) => px(32, (p, g) => { g.drawImage(base, 0, 0); draw(R(g), p); });
+  const img = src => { const i = new Image(); i.src = src; return i; };
+  const fImg = img(ICON.folder);
+  const mk = () => {
+    ICON.dialup = badge(fImg, r => { r(13, 13, 12, 10, "#000"); r(14, 14, 10, 8, "#2850c8"); r(16, 16, 6, 4, "#fff"); r(10, 22, 18, 2, "#000"); r(18, 24, 2, 3, "#000"); });
+    ICON.tasks = badge(fImg, (r, p) => { r(13, 12, 12, 12, "#000"); r(14, 13, 10, 10, "#fff"); r(18, 15, 1, 4, "#000"); r(19, 18, 3, 1, "#000"); r(14, 13, 10, 1, "#c00000"); });
+    ICON.progs = badge(fImg, r => { r(14, 13, 11, 9, "#000"); r(15, 14, 9, 7, "#008080"); r(15, 14, 9, 2, "#000080"); });
+  };
+  if (fImg.complete) mk(); else fImg.onload = mk; mk();
+})();
+
+const FS = {
+  root: { name: "My Computer", icon: "computer", addr: "My Computer", desc: "Sélectionne un élément pour afficher sa description.", items: ["a", "c", "d", "printers", "control", "dialup", "tasks"] },
+  a: { name: "3½ Floppy (A:)", icon: "floppy", desc: "Lecteur de disquettes 3½ pouces", notReady: true },
+  c: { name: "(C:)", icon: "hdd", addr: "C:\\", desc: "Disque local\nCapacité : 2,01 Go\nEspace libre : 812 Mo", items: ["docs", "games", "progs"] },
+  d: { name: "HOBBYS97 (D:)", icon: "cdrom", addr: "D:\\", desc: "Disque compact\nHOBBYS97 : mes collections", items: ["vinyls", "films", "cards"] },
+  printers: { name: "Printers", icon: "printer", addr: "Printers", desc: "Ajoute, supprime et configure les imprimantes.", items: ["addprinter"] },
+  control: { name: "Control Panel", icon: "settings", desc: "Configure le bureau, les connexions et le fond d’écran.", app: "settings" },
+  dialup: { name: "Dial-Up Networking", icon: "dialup", desc: "Connexion à Internet par modem.", app: "ie" },
+  tasks: { name: "Scheduled Tasks", icon: "tasks", addr: "Scheduled Tasks", desc: "Planifie des tâches automatiques.", items: [] },
+  docs: { name: "Mes documents", icon: "docs", desc: "Tes images et fonds d’écran.", app: "docs" },
+  games: { name: "Jeux", icon: "folder", addr: "C:\\Jeux", desc: "Les jeux de l’ordinateur.", items: ["sol", "mines"] },
+  progs: { name: "Program Files", icon: "progs", addr: "C:\\Program Files", desc: "Les programmes installés.", items: ["ie"] },
+  addprinter: { name: "Ajout d’imprimante", icon: "printer", desc: "Aucune imprimante n’est installée." },
+  sol: { name: "Solitaire", icon: "sol", desc: "Le jeu de cartes Klondike.", app: "sol" },
+  mines: { name: "Minesweeper", icon: "mines", desc: "Le démineur.", app: "mines" },
+  ie: { name: "Internet Explorer", icon: "ie", desc: "Navigateur Web.", app: "ie" },
+  vinyls: { name: "Vinyls", icon: "vinyl", desc: "My Discollection : ma collection de vinyles.", app: "vinyls" },
+  films: { name: "Films", icon: "dvd", desc: "Ma Vidéothèque : mes DVD et Blu-ray.", app: "films" },
+  cards: { name: "Cards", icon: "card", desc: "Ma Collection de Cartes.", app: "cards" }
+};
+const MCI = {
+  up: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M3 8h7l2 2h9v11H3z" fill="#e8c440" stroke="#000"/><path d="M12 11l5 5h-3v4h-4v-4H7z" fill="#000"/></svg>`,
+  cut: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M9 3l3 8 3-8h2l-4 10 2 4h-2l-1-2-1 2H9l2-4-4-10z" fill="#000"/><circle cx="8" cy="19" r="3" fill="none" stroke="#000" stroke-width="1.6"/><circle cx="16" cy="19" r="3" fill="none" stroke="#000" stroke-width="1.6"/></svg>`,
+  copy: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M4 3h9l3 3v11H4z" fill="#fff" stroke="#000"/><path d="M9 8h9l3 3v11H9z" fill="#fff" stroke="#000"/><path d="M11 13h7M11 15h7M11 17h5" stroke="#000080"/></svg>`,
+  paste: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M4 5h14v17H4z" fill="#b07a30" stroke="#000"/><path d="M8 3h6v4H8z" fill="#c0c0c0" stroke="#000"/><path d="M10 10h10v12H10z" fill="#fff" stroke="#000"/><path d="M12 14h6M12 16h6M12 18h4" stroke="#000080"/></svg>`,
+  undo: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M6 9h9a5 5 0 0 1 0 10h-5" fill="none" stroke="#000" stroke-width="2"/><path d="M8 4v10L2 9z" fill="#000"/></svg>`
+};
+function compHtml() {
+  const tb = (k, label, ic) => `<div class="ieb"><button type="button" class="iebtn" data-mc="${k}"${k === "back" || k === "fwd" || k === "up" ? "" : " disabled"}>${ic}<span>${label}</span></button>${k === "back" || k === "fwd" ? `<button type="button" class="iedrop" disabled aria-hidden="true"><svg viewBox="0 0 7 4"><path d="M0 0h7L3.5 4z"/></svg></button>` : ""}</div>`;
+  return `<div class="menubar iemenu" aria-hidden="true"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>V</u>iew</span><span><u>G</u>o</span><span>F<u>a</u>vorites</span><span><u>H</u>elp</span></div>
+    <div class="iebar">
+      <span class="grab" aria-hidden="true"></span>
+      ${tb("back", "Back", IEI.back)}${tb("fwd", "Forward", IEI.fwd)}${tb("up", "Up", MCI.up)}
+      <span class="tsep" aria-hidden="true"></span>${tb("cut", "Cut", MCI.cut)}${tb("copy", "Copy", MCI.copy)}${tb("paste", "Paste", MCI.paste)}
+      <span class="tsep" aria-hidden="true"></span>${tb("undo", "Undo", MCI.undo)}
+      <span class="throb" aria-hidden="true"><img data-icon="logo" alt=""></span>
+    </div>
+    <div class="iebar iepers mcaddr"><span class="grab" aria-hidden="true"></span><span class="lbl">Address</span>
+      <span class="ieurl"><img class="mcai" alt=""><span class="mcpath"></span><button type="button" class="iecombo" tabindex="-1" aria-hidden="true"><svg viewBox="0 0 7 4"><path d="M0 0h7L3.5 4z"/></svg></button></span></div>
+    <div class="wbody mcbody">
+      <aside class="mcside"><img class="mcbig" alt=""><h2 class="mctitle"></h2><i class="mcline"></i><p class="mcdesc"></p></aside>
+      <div class="mcgrid" role="listbox" aria-label="Contenu du dossier"></div>
+      <div class="mcmsg" hidden><div><h4>Erreur<button class="tbtn x" type="button" data-mm="x" aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></h4>
+        <div class="mmb"><span class="mmi">✕</span><p>A:\\ n’est pas accessible.<br><br>Le périphérique n’est pas prêt.</p></div>
+        <div class="btns"><button class="btn default" type="button" data-mm="retry">Recommencer</button><button class="btn" type="button" data-mm="x">Annuler</button></div></div></div>
+    </div>
+    <div class="iestatus"><span class="st1"></span><span class="st2"><img class="mcsi" alt=""><span class="mcloc"></span></span></div>`;
+}
+function initComp(el) {
+  el.classList.add("ie");
+  let cur = "root", sel = null, back = [], fwd = [];
+  const $c = s => el.querySelector(s), grid = $c(".mcgrid");
+  const parentOf = id => Object.keys(FS).find(k => (FS[k].items || []).includes(id));
+  function go(id, push = true) {
+    if (push && id !== cur) { back.push(cur); fwd = []; }
+    cur = id; sel = null; draw();
+  }
+  function draw() {
+    const n = FS[cur];
+    grid.innerHTML = n.items.map(k => `<button type="button" class="mci" data-k="${k}" role="option"><img data-icon="${FS[k].icon}" alt=""><span>${FS[k].name}</span></button>`).join("") || `<p class="mcempty">Ce dossier est vide.</p>`;
+    fillIcons(grid);
+    $c(".mcbig").src = ICON[n.icon]; $c(".mctitle").textContent = n.name; $c(".mcpath").textContent = n.addr || n.name;
+    $c(".mcai").src = ICON[n.icon]; $c(".mcsi").src = ICON[n.icon]; $c(".mcloc").textContent = n.name;
+    el.querySelector(".tbar b").textContent = n.name;
+    el.querySelector(".tbar img").src = ICON[n.icon]; const ti = wins.computer && wins.computer.task.querySelector("img"); if (ti) ti.src = ICON[n.icon];
+    const task = wins.computer && wins.computer.task.querySelector("span"); if (task) task.textContent = n.name;
+    $c("[data-mc=back]").disabled = !back.length; $c("[data-mc=fwd]").disabled = !fwd.length; $c("[data-mc=up]").disabled = cur === "root";
+    describe();
+  }
+  function describe() {
+    const n = sel ? FS[sel] : FS[cur];
+    $c(".mcdesc").innerHTML = sel ? `<b>${esc(n.name)}</b><br>${esc(n.desc || "").replace(/\n/g, "<br>")}` : esc(cur === "root" ? FS.root.desc : (n.desc || "")).replace(/\n/g, "<br>");
+    grid.querySelectorAll(".mci").forEach(b => b.classList.toggle("sel", b.dataset.k === sel));
+    const count = (FS[cur].items || []).length;
+    $c(".st1").textContent = sel ? "1 objet(s) sélectionné(s)" : `${count} objet(s)`;
+  }
+  function openItem(k) {
+    const n = FS[k];
+    if (n.notReady) { $c(".mcmsg").hidden = false; return; }
+    if (n.items) return go(k);
+    if (n.app) openApp(n.app);
+  }
+  let lastPT = "mouse";
+  grid.addEventListener("pointerdown", e => { lastPT = e.pointerType; });
+  grid.addEventListener("click", e => {
+    const b = e.target.closest(".mci"); sel = b ? b.dataset.k : null; describe();
+    if (b && (lastPT !== "mouse" || e.detail === 0)) openItem(b.dataset.k);
+  });
+  grid.addEventListener("dblclick", e => { const b = e.target.closest(".mci"); if (b) openItem(b.dataset.k); });
+  grid.addEventListener("keydown", e => { if (e.key === "Backspace") { e.preventDefault(); if (cur !== "root") go(parentOf(cur) || "root"); } });
+  el.querySelectorAll("[data-mc]").forEach(b => b.addEventListener("click", () => {
+    const k = b.dataset.mc;
+    if (k === "back" && back.length) { fwd.push(cur); go(back.pop(), false); }
+    else if (k === "fwd" && fwd.length) { back.push(cur); go(fwd.pop(), false); }
+    else if (k === "up" && cur !== "root") go(parentOf(cur) || "root");
+  }));
+  el.querySelectorAll("[data-mm]").forEach(b => b.addEventListener("click", () => { $c(".mcmsg").hidden = b.dataset.mm !== "retry" ? true : false; }));
+  draw();
 }
 
 /* ================= Démineur ================= */
