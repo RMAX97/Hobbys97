@@ -2013,5 +2013,34 @@ connectCloud();
 })();
 </script>
 <style>html{touch-action:manipulation}</style>
+<style>
+/* téléphone et tablette : pas d’effet 3D, la carte reste toujours bien de face */
+@media (hover:none),(pointer:coarse){
+  #tiltWrap{perspective:none!important}
+  #bigImgBox{transform:none!important;transform-style:flat!important;transition:none!important}
+}
+</style>
+<style>
+/* chaque carte de la grille est un vrai bouton Windows 98 qui s’enfonce */
+.grid .card{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+.grid .card:active,.grid .card.press{box-shadow:var(--pressed)!important;outline:1px dotted #000;outline-offset:-4px}
+.grid .card:active>*,.grid .card.press>*{transform:translate(1px,1px)}
+.grid .card:focus-visible{outline:1px dotted #000;outline-offset:-4px}
+.illustrator-card.press{box-shadow:var(--pressed)}
+</style>
+<script>
+(function(){
+  /* rôle de bouton, clavier, et appui visible au doigt (iOS n’active :active qu’avec un écouteur tactile) */
+  const tag=root=>root.querySelectorAll('.grid .card:not([role])').forEach(c=>{c.setAttribute('role','button');c.tabIndex=0});
+  tag(document);new MutationObserver(()=>tag(document)).observe(document.querySelector('main')||document.body,{childList:true,subtree:true});
+  document.addEventListener('keydown',e=>{const c=e.target.closest&&e.target.closest('.grid .card');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();c.click()}});
+  let pressed=null;
+  const clear=()=>{if(pressed){pressed.classList.remove('press');pressed=null}};
+  document.addEventListener('touchstart',e=>{const c=e.target.closest&&e.target.closest('.grid .card,.illustrator-card');clear();if(c){pressed=c;c.classList.add('press')}},{passive:true});
+  document.addEventListener('touchmove',clear,{passive:true});
+  document.addEventListener('touchend',()=>setTimeout(clear,120),{passive:true});
+  document.addEventListener('touchcancel',clear,{passive:true});
+})();
+</script>
 </body>
 </html>
