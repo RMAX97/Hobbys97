@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ma Mangathèque</title>
+<style>
+:root{
+  --face:#c0c0c0;--light:#dfdfdf;--white:#fff;--shadow:#808080;--dark:#0a0a0a;--navy:#000080;--blue:#1084d0;
+  --raised:inset -1px -1px var(--dark),inset 1px 1px var(--white),inset -2px -2px var(--shadow),inset 2px 2px var(--light);
+  --sunken:inset -1px -1px var(--white),inset 1px 1px var(--shadow),inset -2px -2px var(--light),inset 2px 2px var(--dark);
+  --pressed:inset -1px -1px var(--white),inset 1px 1px var(--dark),inset -2px -2px var(--light),inset 2px 2px var(--shadow);
+  --title:linear-gradient(90deg,var(--navy),var(--blue));
+  font-family:Tahoma,"MS Sans Serif","Microsoft Sans Serif",Geneva,Arial,sans-serif;font-size:12px;color:#000;
+  -webkit-font-smoothing:none;color-scheme:light;
+}
+*{box-sizing:border-box}
+html{touch-action:manipulation}
+html,*{scrollbar-color:auto;scrollbar-width:auto}
+@supports not selector(::-webkit-scrollbar){html,*{scrollbar-color:#c0c0c0 #e8e8e8}}
+::-webkit-scrollbar{width:16px;height:16px;background:#c0c0c0}
+::-webkit-scrollbar-track{background:repeating-conic-gradient(#fff 0 25%,#c0c0c0 0 50%) 0 0/2px 2px}
+::-webkit-scrollbar-thumb{background:#c0c0c0;box-shadow:inset -1px -1px #0a0a0a,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff}
+::-webkit-scrollbar-button:single-button{display:block;width:16px;height:16px;background:#c0c0c0 no-repeat center;box-shadow:inset -1px -1px #0a0a0a,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff}
+::-webkit-scrollbar-button:single-button:vertical:decrement{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M3 2h1v1h1v1h1v1H1V4h1V3h1z'/%3E%3C/svg%3E")}
+::-webkit-scrollbar-button:single-button:vertical:increment{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M1 3h5v1H5v1H4v1H3V5H2V4H1z'/%3E%3C/svg%3E")}
+::-webkit-scrollbar-corner{background:#c0c0c0}
+body{margin:0;background:var(--face);min-height:100vh;display:flex}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:1px dotted #000;outline-offset:1px}
+img{max-width:100%}
+
+/* boutons et champs */
+.btn{min-height:24px;padding:4px 12px;border:0;background:var(--face);box-shadow:var(--raised);cursor:pointer;white-space:nowrap}
+.btn:active{box-shadow:var(--pressed)}
+.btn.default{box-shadow:inset 0 0 0 1px #000,inset -2px -2px var(--dark),inset 2px 2px var(--white),inset -3px -3px var(--shadow),inset 3px 3px var(--light)}
+.btn[disabled]{color:var(--shadow);text-shadow:1px 1px #fff;cursor:default}
+input[type=text],input[type=search],input[type=email],input[type=password],input[type=url],input[type=date],select,textarea{background:#fff;border:0;border-radius:0;box-shadow:var(--sunken);padding:4px 6px;min-height:24px}
+label{cursor:pointer}
+
+/* panneau de gauche : arborescence */
+.side{position:sticky;top:0;flex:0 0 260px;height:100vh;height:100dvh;display:flex;flex-direction:column;padding:4px 2px 4px 4px;gap:4px}
+.side .titlebar{flex:none}
+.titlebar{height:20px;display:flex;align-items:center;gap:6px;padding:0 6px;color:#fff;font-weight:bold;background:var(--title)}
+.tree{flex:1;min-height:0;overflow:auto;background:#fff;box-shadow:var(--sunken);padding:4px}
+.tree .ti{display:flex;align-items:center;gap:6px;width:100%;padding:2px 4px;border:0;background:none;text-align:left;cursor:pointer;line-height:1.3}
+.tree .ti img{width:16px;height:16px;flex:none;image-rendering:pixelated}
+.tree .ti .lb{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:1px 3px}
+.tree .ti .ct{margin-left:auto;color:#404040;font-size:11px;flex:none}
+.tree .ti:hover .lb{text-decoration:underline}
+.tree .ti.on .lb{background:var(--navy);color:#fff;outline:1px dotted #ff0;outline-offset:-1px}
+.tree .ts{padding:8px 4px 3px;font-size:11px;font-weight:bold;border-bottom:1px solid var(--shadow);margin:0 2px 4px}
+.side .tools{display:flex;flex-direction:column;gap:4px;padding:4px 2px 2px}
+.side .tools .btn{width:100%}
+.status{display:flex;align-items:center;gap:6px;font-size:11px;padding:2px 4px;box-shadow:inset 1px 1px var(--shadow),inset -1px -1px var(--white)}
+.status i{width:8px;height:8px;background:#808080;box-shadow:inset 0 0 0 1px #000;flex:none}
+.status.on i{background:#00c000}
+
+/* zone principale */
+main{flex:1;min-width:0;margin:4px 4px 4px 2px;box-shadow:var(--sunken);background:var(--face);min-height:calc(100vh - 8px)}
+.hero{margin:12px 14px 14px;padding:12px 14px;background:var(--title);color:#fff}
+.hero h1{margin:0 0 4px;font-size:22px}
+.hero p{margin:0;font-size:12px;color:#dfe8ff}
+.toolbar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 14px;background:var(--face);box-shadow:inset 0 -1px var(--shadow),inset 0 -2px var(--white)}
+.toolbar input[type=search]{flex:1 1 220px;min-width:0}
+.toolbar .cnt{margin-left:auto;font-size:11px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:14px 14px 40px}
+.tile{position:relative;display:flex;flex-direction:column;gap:5px;padding:6px 6px 8px;border:0;background:var(--face);box-shadow:var(--raised);text-align:left;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.tile:active,.tile.press{box-shadow:var(--pressed)}
+.tile:active>*,.tile.press>*{transform:translate(1px,1px)}
+.tile:hover{outline:1px dotted #000;outline-offset:-4px}
+.cover{display:block;width:100%;aspect-ratio:2/3;object-fit:cover;background:#808080;box-shadow:1px 1px 0 #fff,-1px -1px 0 #808080}
+.ph{display:grid;place-items:center;width:100%;aspect-ratio:2/3;background:repeating-linear-gradient(45deg,#a8a8a8 0 6px,#b4b4b4 6px 12px);box-shadow:1px 1px 0 #fff,-1px -1px 0 #808080;color:#000;font-weight:bold;text-align:center;padding:8px;font-size:12px}
+.tile b{font-size:12px;line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.tile small{font-size:11px;color:#404040}
+.tile.miss .cover,.tile.miss .ph{filter:grayscale(1) opacity(.45)}
+.tile.miss small{color:#808080}
+.tile .own{position:absolute;top:10px;right:10px;width:16px;height:16px;background:#fff;box-shadow:var(--sunken);display:grid;place-items:center;font-weight:bold;font-size:12px}
+.empty{padding:30px 16px;color:#404040;font-size:12px;line-height:1.5}
+.empty .btn{margin-top:10px}
+
+/* page d’une série */
+.shead{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;margin:12px 14px}
+.shead .cv{width:110px}
+.shead h1{margin:0 0 6px;font-size:20px}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:0 0 8px;font-size:12px}
+.facts dt{color:#404040}
+.facts dd{margin:0}
+.edrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}
+.edrow select{max-width:100%;flex:1 1 220px}
+.bar{height:16px;background:#fff;box-shadow:var(--sunken);padding:2px;margin-top:8px;max-width:360px}
+.bar i{display:block;height:100%;background:repeating-linear-gradient(90deg,var(--navy) 0 8px,transparent 8px 10px)}
+.backbtn{margin:12px 14px 0}
+
+/* fenêtres (dialogues) */
+.ov{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(0,128,128,.45)}
+.ov.open{display:flex}
+.win{display:flex;flex-direction:column;background:var(--face);box-shadow:var(--raised),6px 6px 0 rgba(0,0,0,.35);padding:3px;width:min(760px,100%);max-height:100%}
+.win .titlebar{justify-content:space-between;padding-right:2px}
+.x{width:18px;height:16px;padding:0;border:0;background:var(--face);box-shadow:var(--raised);display:grid;place-items:center;cursor:pointer;flex:none}
+.x:active{box-shadow:var(--pressed)}
+.wbody{padding:10px;overflow:auto;min-height:0}
+.wfoot{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;padding:6px 10px 8px}
+
+/* fiche d’un tome */
+.vol{display:grid;grid-template-columns:minmax(0,240px) 1fr;gap:14px}
+.vol .vc{box-shadow:var(--sunken);background:#808080 repeating-conic-gradient(#7a7a7a 0 25%,#868686 0 50%) 0 0/4px 4px;padding:10px;display:flex;align-items:center;justify-content:center;align-self:start}
+.vol .vc img,.vol .vc .ph{width:100%;max-width:220px;aspect-ratio:auto}
+.vol .vc img{height:auto;object-fit:contain;box-shadow:2px 2px 0 rgba(0,0,0,.35)}
+.props{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin:0;align-content:start}
+.props dt{color:#404040;white-space:nowrap}
+.props dd{margin:0;overflow-wrap:anywhere}
+.props dd input[type=date]{min-height:22px;padding:1px 4px}
+.vol h2{margin:0 0 8px;font-size:15px}
+.sum{margin-top:10px;padding:8px;background:#fff;box-shadow:var(--sunken);max-height:140px;overflow:auto;line-height:1.45;white-space:pre-line}
+.chk{display:flex;align-items:center;gap:6px;margin-top:10px}
+.chk input{width:13px;height:13px;margin:0}
+.navv{display:flex;gap:6px;margin-right:auto}
+fieldset{border:0;box-shadow:inset -1px -1px var(--white),inset 1px 1px var(--shadow),inset -2px -2px var(--shadow),inset 2px 2px var(--white);padding:10px;margin:0 0 10px}
+legend{padding:0 3px}
+.row{display:grid;grid-template-columns:130px 1fr;gap:6px;align-items:center;margin-bottom:6px}
+.hint{color:#404040;font-size:11px;line-height:1.45;margin:0 0 8px}
+.msg{min-height:16px;font-size:11px;margin:6px 0 0}
+.msg.err{color:#a00000}.msg.ok{color:#006000}
+
+/* choix de couverture */
+.covs{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;padding:8px;box-shadow:var(--sunken);background:#fff;margin-bottom:10px}
+.co{display:flex;flex-direction:column;gap:4px;padding:4px;border:0;background:none;cursor:pointer;text-align:center;font-size:11px;outline:3px solid transparent;outline-offset:-1px}
+.co.on{outline-color:var(--navy)}
+.co img{width:100%;aspect-ratio:2/3;object-fit:cover;background:#ddd}
+
+/* recherche de séries */
+.results{max-height:50vh;overflow:auto;background:#fff;box-shadow:var(--sunken);padding:2px;margin-top:8px}
+.results button{display:flex;justify-content:space-between;gap:10px;width:100%;padding:3px 6px;border:0;background:none;text-align:left;cursor:pointer}
+.results button:hover,.results button:focus-visible{background:var(--navy);color:#fff;outline:0}
+.results small{opacity:.75;white-space:nowrap}
+
+/* barre du haut sur téléphone */
+.mtop{display:none}
+@media (max-width:760px){
+  body{display:block}
+  .toolbar{top:44px}
+  .mtop{display:flex;position:sticky;top:0;z-index:30;align-items:center;gap:8px;height:44px;padding:0 8px;background:var(--title);color:#fff;font-weight:bold}
+  .mtop .btn{color:#000;min-width:34px}
+  .side{position:fixed;left:0;top:0;bottom:0;z-index:60;width:min(300px,86vw);height:auto;background:var(--face);box-shadow:var(--raised),4px 0 0 rgba(0,0,0,.3);transform:translateX(-105%);transition:transform .18s}
+  .side.open{transform:none}
+  .scrim{position:fixed;inset:0;z-index:55;background:rgba(0,0,0,.25);display:none}
+  .scrim.open{display:block}
+  main{margin:0;box-shadow:none;min-height:0}
+  .grid{grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 10px 40px}
+  .hero{margin:10px}
+  .shead{grid-template-columns:80px 1fr;margin:10px}
+  .shead .cv{width:80px}
+  .vol{grid-template-columns:1fr}
+  .vol .vc img{max-width:180px}
+  .row{grid-template-columns:1fr}
+  input,select,textarea{font-size:16px!important}
+  .ov{padding:6px}
+}
+</style>
+</head>
+<body>
+<div class="mtop"><button class="btn" type="button" id="burger" aria-label="Menu">☰</button><span>Ma Mangathèque</span></div>
+<div class="scrim" id="scrim"></div>
+
+<aside class="side" id="side">
+  <div class="titlebar">Ma Mangathèque</div>
+  <nav class="tree" id="tree" aria-label="Séries"></nav>
+  <div class="tools">
+    <button class="btn" type="button" id="addBtn">+ Ajouter une série…</button>
+    <button class="btn" type="button" id="setBtn">Mangacollec et synchronisation…</button>
+    <div class="status" id="syncSt"><i></i><span>Enregistré sur cet appareil</span></div>
+  </div>
+</aside>
+<main id="main"></main>
+
+<!-- fiche d’un tome -->
+<div class="ov" id="ovVol"><div class="win" role="dialog" aria-modal="true" aria-labelledby="volTitle">
+  <div class="titlebar"><span id="volTitle">Propriétés du tome</span><button class="x" type="button" data-close aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></div>
+  <div class="wbody" id="volBody"></div>
+  <div class="wfoot"><span class="navv"><button class="btn" type="button" id="vPrev">◄ Précédent</button><button class="btn" type="button" id="vNext">Suivant ►</button></span><button class="btn" type="button" id="vCover">Changer la couverture…</button><button class="btn default" type="button" data-close>OK</button></div>
+</div></div>
+
+<!-- couverture -->
+<div class="ov" id="ovCov"><div class="win" role="dialog" aria-modal="true" aria-labelledby="covTitle" style="width:min(640px,100%)">
+  <div class="titlebar"><span id="covTitle">Choisir la couverture</span><button class="x" type="button" data-close aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></div>
+  <div class="wbody">
+    <p class="hint">Couverture de Mangacollec, couvertures alternatives des autres éditions de ce tome, ou ta propre image.</p>
+    <div class="covs" id="covs"></div>
+    <fieldset><legend>Ma propre image</legend>
+      <div class="row"><label for="covUrl">Lien de l’image</label><input type="url" id="covUrl" placeholder="https://…"></div>
+      <div class="row"><label for="covFile">Depuis un fichier</label><input type="file" id="covFile" accept="image/*"></div>
+    </fieldset>
+    <p class="msg" id="covMsg"></p>
+  </div>
+  <div class="wfoot"><button class="btn default" type="button" id="covOk">OK</button><button class="btn" type="button" data-close>Annuler</button></div>
+</div></div>
+
+<!-- ajout d’une série -->
+<div class="ov" id="ovAdd"><div class="win" role="dialog" aria-modal="true" aria-labelledby="addTitle" style="width:min(560px,100%)">
+  <div class="titlebar"><span id="addTitle">Ajouter une série</span><button class="x" type="button" data-close aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></div>
+  <div class="wbody">
+    <p class="hint">Cherche dans la base de Mangacollec, puis coche les tomes que tu possèdes.</p>
+    <input type="search" id="addQ" placeholder="Titre de la série…" style="width:100%" autocomplete="off">
+    <div class="results" id="addRes"><p class="hint" style="margin:6px">Tape au moins deux lettres.</p></div>
+  </div>
+  <div class="wfoot"><button class="btn" type="button" data-close>Fermer</button></div>
+</div></div>
+
+<!-- choix d’édition -->
+<div class="ov" id="ovEd"><div class="win" role="dialog" aria-modal="true" aria-labelledby="edTitle" style="width:min(460px,100%)">
+  <div class="titlebar"><span id="edTitle">Changer d’édition</span><button class="x" type="button" data-close aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></div>
+  <div class="wbody"><p id="edText" style="margin:0;line-height:1.5"></p></div>
+  <div class="wfoot"><button class="btn default" type="button" id="edMove">Déplacer mes tomes</button><button class="btn" type="button" id="edView">Juste afficher</button><button class="btn" type="button" data-close>Annuler</button></div>
+</div></div>
+
+<!-- réglages -->
+<div class="ov" id="ovSet"><div class="win" role="dialog" aria-modal="true" aria-labelledby="setTitle" style="width:min(520px,100%)">
+  <div class="titlebar"><span id="setTitle">Mangacollec et synchronisation</span><button class="x" type="button" data-close aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></div>
+  <div class="wbody">
+    <fieldset><legend>Importer depuis Mangacollec</legend>
+      <p class="hint">Ajoute à ta mangathèque tous les tomes que tu possèdes sur Mangacollec. Rien n’est supprimé ici, et rien n’est modifié sur Mangacollec.</p>
+      <div class="row"><label for="mcUser">Nom d’utilisateur</label><input type="text" id="mcUser" autocomplete="off" spellcheck="false" placeholder="ton pseudo Mangacollec"></div>
+      <p class="hint">Fonctionne si ton profil Mangacollec est public. Sinon, connecte-toi plutôt :</p>
+      <div class="row"><label for="mcMail">E-mail</label><input type="email" id="mcMail" autocomplete="username"></div>
+      <div class="row"><label for="mcPass">Mot de passe</label><input type="password" id="mcPass" autocomplete="current-password"></div>
+      <p class="hint">Ton mot de passe sert seulement à la connexion à Mangacollec, il n’est pas enregistré.</p>
+      <div style="display:flex;justify-content:flex-end"><button class="btn default" type="button" id="mcGo">Importer ma collection</button></div>
+      <p class="msg" id="mcMsg"></p>
+    </fieldset>
+    <fieldset><legend>Synchronisation entre appareils</legend>
+      <div id="fbOut">
+        <p class="hint">Même compte que pour Cards et Films : ta mangathèque, tes éditions et tes couvertures se retrouvent sur tous tes appareils.</p>
+        <button class="btn" type="button" id="fbGoogle" style="width:100%;margin-bottom:6px">Continuer avec Google</button>
+        <div class="row"><label for="fbMail">E-mail</label><input type="email" id="fbMail" autocomplete="username"></div>
+        <div class="row"><label for="fbPass">Mot de passe</label><input type="password" id="fbPass" autocomplete="current-password"></div>
+        <div style="display:flex;justify-content:flex-end"><button class="btn" type="button" id="fbLogin">Se connecter</button></div>
+      </div>
+      <div id="fbIn" hidden><p class="hint">Synchronisé avec <b id="fbWho"></b>.</p><button class="btn" type="button" id="fbLogout">Se déconnecter</button></div>
+      <p class="msg" id="fbMsg"></p>
+    </fieldset>
+    <fieldset><legend>Sauvegarde</legend>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn" type="button" id="expBtn">Exporter</button><button class="btn" type="button" id="impBtn">Importer une sauvegarde</button><input type="file" id="impFile" accept="application/json" hidden></div>
+    </fieldset>
+  </div>
+  <div class="wfoot"><button class="btn default" type="button" data-close>OK</button></div>
+</div></div>
+
+<script>
+(() => {
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const norm = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const fmtDate = d => { if (!d) return "—"; const [y, m, j] = d.split("-"); return j && m ? `${j}/${m}/${y}` : d; };
+
+/* ---------------- Mangacollec (API utilisée par leur site, ouverte aux autres sites) ---------------- */
+const MC = "https://api.mangacollec.com", CID = "38fee110b53a75af6cc72f6fb66fa504fc6241e566788f4b2f5b21c25ba2fefb", CSEC = "060658630f7d199c19ab1cf34ed4e50935c748267e318a24e048d6ab45871da2";
+let appTok = null;
+async function token() {
+  if (appTok && appTok.exp > Date.now()) return appTok.t;
+  const r = await fetch(MC + "/oauth/token", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ grant_type: "client_credentials", client_id: CID, client_secret: CSEC }) });
+  if (!r.ok) throw new Error("token");
+  const j = await r.json(); appTok = { t: j.access_token, exp: Date.now() + (j.expires_in - 60) * 1000 }; return appTok.t;
+}
+async function api(path, tok) {
+  const r = await fetch(MC + path, { headers: { Authorization: "Bearer " + (tok || await token()), Accept: "application/json" } });
+  if (r.status === 404) throw new Error("notfound");
+  if (!r.ok) throw new Error("http" + r.status);
+  return r.json();
+}
+
+/* cache des fiches (IndexedDB) */
+const cache = (() => {
+  let p; const open = () => p || (p = new Promise((res, rej) => { const r = indexedDB.open("h97-manga-cache", 1); r.onupgradeneeded = () => r.result.createObjectStore("c"); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }));
+  const tx = (m, f) => open().then(db => new Promise((res, rej) => { const t = db.transaction("c", m), q = f(t.objectStore("c")); t.oncomplete = () => res(q && q.result); t.onerror = () => rej(t.error); }));
+  return { get: k => tx("readonly", s => s.get(k)).catch(() => null), put: (k, v) => tx("readwrite", s => s.put(v, k)).catch(() => {}) };
+})();
+const WEEK = 7 * 864e5;
+async function seriesDetail(sid, force) {
+  const c = await cache.get("s:" + sid);
+  if (c && !force && Date.now() - c.at < WEEK) return c.d;
+  try { const d = await api("/v2/series/" + sid); await cache.put("s:" + sid, { at: Date.now(), d }); return d; }
+  catch (e) { if (c) return c.d; throw e; }
+}
+async function volumeDetail(vid) {
+  const c = await cache.get("v:" + vid);
+  if (c && Date.now() - c.at < WEEK) return c.d;
+  try { const d = (await api("/v2/volumes/" + vid)).volumes[0]; await cache.put("v:" + vid, { at: Date.now(), d }); return d; }
+  catch (e) { return c ? c.d : null; }
+}
+let allSeries = null;
+async function seriesList() {
+  if (allSeries) return allSeries;
+  const c = await cache.get("all");
+  if (c && Date.now() - c.at < WEEK) return (allSeries = c.d);
+  const j = await api("/v2/series"), types = {}; (j.types || []).forEach(t => { types[t.id] = t.title; });
+  allSeries = j.series.map(s => [s.id, s.title, types[s.type_id] || "", s.editions_count]);
+  cache.put("all", { at: Date.now(), d: allSeries }); return allSeries;
+}
+const edName = e => e ? (e.title || "Édition simple") : "";
+
+/* ---------------- ma collection (navigateur + Firebase) ---------------- */
+const KEY = "h97-manga-v1";
+let DB = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch { return null; } })() || { v: 1, series: {}, mcUser: "" };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch {} cloudQueue(); };
+const touch = sid => { const s = DB.series[sid]; if (s) s.t = Date.now(); };
+const ownedIds = s => s && s.own && s.ed && s.own[s.ed] ? s.own[s.ed] : [];
+const ownCount = s => ownedIds(s).length;
+
+/* ---------------- affichage ---------------- */
+const main = $("#main");
+let view = { name: "home" }, showMissing = false, homeQ = "", homeSort = "title";
+const ICO_BOOK = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" shape-rendering="crispEdges"><path d="M3 1h10v14H3z" fill="#000"/><path d="M4 2h8v12H4z" fill="#f4f0e4"/><path d="M4 2h2v12H4z" fill="#c0392b"/><path d="M7 4h4v3H7z" fill="#2850c8"/><path d="M7 9h4v1H7zM7 11h3v1H7z" fill="#808080"/></svg>');
+const ICO_HOME = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" shape-rendering="crispEdges"><path d="M1 3h6l1 1h7v10H1z" fill="#000"/><path d="M2 5h12v8H2z" fill="#f0c840"/><path d="M2 5h12v1H2z" fill="#fff2b0"/></svg>');
+function seriesSorted() {
+  const list = Object.entries(DB.series).filter(([, s]) => !s.del);
+  const q = norm(homeQ);
+  return list.filter(([, s]) => !q || norm(s.title).includes(q)).sort((a, b) =>
+    homeSort === "count" ? ownCount(b[1]) - ownCount(a[1]) || a[1].title.localeCompare(b[1].title, "fr") :
+    homeSort === "added" ? (b[1].added || 0) - (a[1].added || 0) : a[1].title.localeCompare(b[1].title, "fr", { sensitivity: "base" }));
+}
+function coverOf(sid, vol) {
+  const s = DB.series[sid], c = s && s.cov && s.cov[vol.id];
+  return c ? c.u : vol.image_url || "";
+}
+function imgTag(u, alt, cls = "cover") { return u ? `<img class="${cls}" src="${esc(u)}" alt="${esc(alt)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=&quot;ph&quot;>${esc(alt).replace(/'/g, "&#39;")}</span>'">` : `<span class="ph">${esc(alt)}</span>`; }
+
+function drawTree() {
+  const list = Object.entries(DB.series).filter(([, s]) => !s.del).sort((a, b) => a[1].title.localeCompare(b[1].title, "fr", { sensitivity: "base" }));
+  const tomes = list.reduce((n, [, s]) => n + ownCount(s), 0);
+  $("#tree").innerHTML = `<button class="ti${view.name === "home" ? " on" : ""}" type="button" data-go="home"><img src="${ICO_HOME}" alt=""><span class="lb">Toutes les séries</span><span class="ct">${tomes}</span></button>
+    <div class="ts">Séries (${list.length})</div>` +
+    list.map(([sid, s]) => `<button class="ti${view.sid === sid ? " on" : ""}" type="button" data-sid="${sid}"><img src="${ICO_BOOK}" alt=""><span class="lb">${esc(s.title)}</span><span class="ct">${ownCount(s)}</span></button>`).join("");
+}
+function drawHome() {
+  const list = seriesSorted(), all = Object.values(DB.series).filter(s => !s.del);
+  const tomes = all.reduce((n, s) => n + ownCount(s), 0);
+  main.innerHTML = `<div class="hero"><h1>Ma Mangathèque</h1><p>${all.length} série${all.length > 1 ? "s" : ""} · ${tomes} tome${tomes > 1 ? "s" : ""}</p></div>
+    <div class="toolbar"><input type="search" id="hq" placeholder="Rechercher une série" value="${esc(homeQ)}">
+      <select id="hs" aria-label="Trier"><option value="title">Titre</option><option value="count">Nombre de tomes</option><option value="added">Ajout récent</option></select>
+      <button class="btn" type="button" data-act="add">+ Ajouter une série</button><span class="cnt">${list.length} série${list.length > 1 ? "s" : ""}</span></div>
+    ${all.length ? `<div class="grid">${list.map(([sid, s]) => `<button class="tile" type="button" data-sid="${sid}">${imgTag(s.img, s.title)}<b>${esc(s.title)}</b><small>${ownCount(s)} tome${ownCount(s) > 1 ? "s" : ""}${s.edName ? " · " + esc(s.edName) : ""}</small></button>`).join("")}</div>` :
+      `<div class="empty">Ta mangathèque est vide.<br>Importe ta collection depuis Mangacollec, ou ajoute une série à la main.<br><button class="btn default" type="button" data-act="set">Importer depuis Mangacollec…</button> <button class="btn" type="button" data-act="add">+ Ajouter une série</button></div>`}`;
+  $("#hs").value = homeSort;
+  $("#hq").oninput = e => { homeQ = e.target.value; const pos = e.target.selectionStart; drawHome(); const i = $("#hq"); i.focus(); i.setSelectionRange(pos, pos); };
+  $("#hs").onchange = e => { homeSort = e.target.value; drawHome(); };
+}
+
+let cur = null; // { sid, d (fiche), vols (tomes de l’édition affichée) }
+async function openSeries(sid, keepScroll) {
+  view = { name: "series", sid }; drawTree(); closeSide();
+  const s = DB.series[sid];
+  main.innerHTML = `<button class="btn backbtn" type="button" data-go="home">◄ Toutes les séries</button><div class="empty">Chargement de « ${esc(s ? s.title : "")} »…</div>`;
+  let d; try { d = await seriesDetail(sid); } catch (e) { main.innerHTML = `<button class="btn backbtn" type="button" data-go="home">◄ Toutes les séries</button><div class="empty">Impossible de joindre Mangacollec pour le moment.</div>`; return; }
+  if (view.sid !== sid) return;
+  const ser = d.series[0];
+  if (!s) return;
+  if (!s.ed || !d.editions.some(e => e.id === s.ed)) { s.ed = pickEdition(d, s); save(); }
+  cur = { sid, d };
+  drawSeries(keepScroll);
+}
+function pickEdition(d, s) {
+  const owned = Object.entries((s && s.own) || {}).sort((a, b) => b[1].length - a[1].length)[0];
+  if (owned && owned[1].length) return owned[0];
+  const eds = d.editions.filter(e => !e.parent_edition_id).sort((a, b) => (b.follow_editions_count || 0) - (a.follow_editions_count || 0));
+  return (eds[0] || d.editions[0]).id;
+}
+function volsOf(d, edId) { return d.volumes.filter(v => v.edition_id === edId).sort((a, b) => a.number - b.number); }
+function drawSeries(keepScroll) {
+  const { sid, d } = cur, s = DB.series[sid], ser = d.series[0];
+  const ed = d.editions.find(e => e.id === s.ed), pub = d.publishers.find(p => ed && p.id === ed.publisher_id);
+  const authors = (d.tasks || []).map(t => { const a = d.authors.find(x => x.id === t.author_id), j = (d.jobs || []).find(x => x.id === t.job_id); return a ? `${[a.first_name, a.name].filter(Boolean).join(" ")}${j && j.title !== "Auteur" ? " (" + j.title.toLowerCase() + ")" : ""}` : ""; }).filter(Boolean);
+  const kinds = (ser.kinds_ids || []).map(k => (d.kinds.find(x => x.id === k) || {}).title).filter(Boolean);
+  const vols = volsOf(d, s.ed), own = new Set(ownedIds(s));
+  cur.vols = vols;
+  const shown = showMissing ? vols : vols.filter(v => own.has(v.id));
+  const first = vols.find(v => own.has(v.id)) || vols[0];
+  // mémorise la couverture et le nom d’édition pour l’accueil
+  const img = first ? coverOf(sid, first) : ""; if (s.img !== img || s.edName !== edName(ed)) { s.img = img; s.edName = edName(ed); save(); }
+  const eds = d.editions.slice().sort((a, b) => (a.parent_edition_id ? 1 : 0) - (b.parent_edition_id ? 1 : 0) || edName(a).localeCompare(edName(b), "fr"));
+  const y = scrollY;
+  main.innerHTML = `<button class="btn backbtn" type="button" data-go="home">◄ Toutes les séries</button>
+    <div class="shead"><div class="cv">${imgTag(img, ser.title)}</div><div>
+      <h1>${esc(ser.title)}</h1>
+      <dl class="facts"><dt>Auteur${authors.length > 1 ? "s" : ""}</dt><dd>${esc(authors.join(", ") || "—")}</dd>
+        <dt>Éditeur</dt><dd>${esc(pub ? pub.title : "—")}</dd>
+        ${kinds.length ? `<dt>Genres</dt><dd>${esc(kinds.join(", "))}</dd>` : ""}
+        <dt>Tomes</dt><dd>${own.size} sur ${vols.length}${ed && ed.not_finished ? " (en cours)" : ed && ed.commercial_stop ? " (arrêt de commercialisation)" : ""}</dd></dl>
+      <div class="edrow"><label for="edSel">Édition :</label><select id="edSel">${eds.map(e => { const p = d.publishers.find(x => x.id === e.publisher_id); const n = (s.own && s.own[e.id] || []).length; return `<option value="${e.id}"${e.id === s.ed ? " selected" : ""}>${esc(edName(e))}${p ? " · " + esc(p.title) : ""} · ${e.volumes_count} t.${n ? " · " + n + " possédé" + (n > 1 ? "s" : "") : ""}</option>`; }).join("")}</select></div>
+      <div class="bar" title="${own.size} / ${vols.length}"><i style="width:${vols.length ? Math.round(own.size / vols.length * 100) : 0}%"></i></div>
+    </div></div>
+    <div class="toolbar"><label class="chk" style="margin:0"><input type="checkbox" id="missChk"${showMissing ? " checked" : ""}> Afficher aussi les tomes que je n’ai pas</label>
+      <button class="btn" type="button" id="rmSeries" style="margin-left:auto">Retirer la série</button></div>
+    ${shown.length ? `<div class="grid">${shown.map(v => `<button class="tile${own.has(v.id) ? "" : " miss"}" type="button" data-vid="${v.id}">${imgTag(coverOf(sid, v), "Tome " + v.number)}<b>Tome ${v.number}${v.title ? " · " + esc(v.title) : ""}</b><small>${own.has(v.id) ? fmtDate(v.release_date) : "Pas dans ma collection"}</small>${showMissing ? `<span class="own">${own.has(v.id) ? "✓" : ""}</span>` : ""}</button>`).join("")}</div>`
+      : `<div class="empty">Aucun tome de cette édition dans ta collection.<br><button class="btn" type="button" id="showAll">Afficher les tomes pour les cocher</button></div>`}`;
+  if (keepScroll) scrollTo(0, y);
+  $("#edSel").onchange = e => askEdition(e.target.value);
+  $("#missChk").onchange = e => { showMissing = e.target.checked; drawSeries(true); };
+  const sa = $("#showAll"); if (sa) sa.onclick = () => { showMissing = true; drawSeries(true); };
+  $("#rmSeries").onclick = () => { if (!confirm(`Retirer « ${ser.title} » de ta mangathèque ?`)) return; DB.series[sid] = { title: ser.title, del: true, t: Date.now() }; save(); go("home"); };
+}
+
+/* changer d’édition */
+let edPending = null;
+function askEdition(newEd) {
+  const { sid, d } = cur, s = DB.series[sid], n = ownedIds(s).length, ne = d.editions.find(e => e.id === newEd);
+  if (!n) { s.ed = newEd; touch(sid); save(); drawSeries(); drawTree(); return; }
+  edPending = newEd;
+  $("#edText").innerHTML = `Tu possèdes <b>${n} tome${n > 1 ? "s" : ""}</b> dans l’édition actuelle.<br><br><b>Déplacer mes tomes</b> : tes tomes passent dans « ${esc(edName(ne))} » (mêmes numéros).<br><b>Juste afficher</b> : tu regardes cette édition sans rien changer.`;
+  openOv("#ovEd");
+}
+$("#edMove").onclick = () => {
+  const { sid, d } = cur, s = DB.series[sid];
+  const oldVols = volsOf(d, s.ed), newVols = volsOf(d, edPending), mine = new Set(ownedIds(s));
+  const nums = oldVols.filter(v => mine.has(v.id)).map(v => v.number);
+  const moved = newVols.filter(v => nums.includes(v.number)).map(v => v.id);
+  s.own = s.own || {}; delete s.own[s.ed]; s.own[edPending] = [...new Set([...(s.own[edPending] || []), ...moved])]; s.ed = edPending;
+  touch(sid); save(); closeOv("#ovEd"); drawSeries(); drawTree();
+};
+$("#edView").onclick = () => { const s = DB.series[cur.sid]; s.ed = edPending; touch(cur.sid); save(); closeOv("#ovEd"); drawSeries(); drawTree(); };
+document.querySelectorAll("#ovEd [data-close]").forEach(b => b.addEventListener("click", () => { const sel = $("#edSel"); if (sel) sel.value = DB.series[cur.sid].ed; }));
+
+/* fiche d’un tome */
+let curVol = null;
+async function openVolume(vid) {
+  const { sid, d } = cur, s = DB.series[sid], v = d.volumes.find(x => x.id === vid); if (!v) return;
+  curVol = vid;
+  const ed = d.editions.find(e => e.id === v.edition_id), pub = d.publishers.find(p => ed && p.id === ed.publisher_id), ser = d.series[0];
+  const authors = (d.tasks || []).map(t => { const a = d.authors.find(x => x.id === t.author_id); return a ? [a.first_name, a.name].filter(Boolean).join(" ") : ""; }).filter(Boolean);
+  const own = ownedIds(s).includes(vid), jp = (s.jp || {})[vid] || "";
+  $("#volTitle").textContent = `${ser.title} – Tome ${v.number}`;
+  const body = (det) => `<div class="vol"><div class="vc">${imgTag(coverOf(sid, v), ser.title + " " + v.number, "")}</div><div>
+      <h2>${esc(ser.title)} – Tome ${v.number}</h2>
+      <dl class="props">
+        <dt>Numéro</dt><dd>${v.number}</dd>
+        <dt>Titre</dt><dd>${esc((det && det.title) || v.title || "—")}</dd>
+        <dt>Auteur${authors.length > 1 ? "s" : ""}</dt><dd>${esc(authors.join(", ") || "—")}</dd>
+        <dt>Éditeur</dt><dd>${esc(pub ? pub.title : "—")}</dd>
+        <dt>Édition</dt><dd>${esc(edName(ed))}</dd>
+        <dt>Sortie en France</dt><dd>${fmtDate(v.release_date)}</dd>
+        <dt>Sortie au Japon</dt><dd><input type="date" id="jpDate" value="${esc(jp)}" title="Mangacollec ne fournit pas cette date : tu peux la saisir"></dd>
+        <dt>Pages</dt><dd>${det && det.nb_pages ? det.nb_pages : "—"}</dd>
+        <dt>ISBN</dt><dd>${esc(v.isbn || "—")}</dd>
+      </dl>
+      ${det && det.content ? `<div class="sum">${esc(det.content)}</div>` : ""}
+      <label class="chk"><input type="checkbox" id="ownChk"${own ? " checked" : ""}> Je possède ce tome</label>
+    </div></div>`;
+  $("#volBody").innerHTML = body(null);
+  const i = cur.vols.findIndex(x => x.id === vid);
+  $("#vPrev").disabled = i <= 0; $("#vNext").disabled = i < 0 || i >= cur.vols.length - 1;
+  openOv("#ovVol"); bindVol(v);
+  const det = await volumeDetail(vid);
+  if (curVol === vid && det) { $("#volBody").innerHTML = body(det); bindVol(v); }
+}
+function bindVol(v) {
+  const sid = cur.sid, s = DB.series[sid];
+  $("#ownChk").onchange = e => {
+    s.own = s.own || {}; const arr = new Set(s.own[s.ed] || []);
+    if (v.edition_id !== s.ed) { s.ed = v.edition_id; }
+    const set = new Set(s.own[v.edition_id] || []); e.target.checked ? set.add(v.id) : set.delete(v.id); s.own[v.edition_id] = [...set];
+    touch(sid); save(); drawSeries(true); drawTree();
+  };
+  $("#jpDate").onchange = e => { s.jp = s.jp || {}; if (e.target.value) s.jp[v.id] = e.target.value; else delete s.jp[v.id]; touch(sid); save(); };
+}
+$("#vPrev").onclick = () => { const i = cur.vols.findIndex(x => x.id === curVol); if (i > 0) openVolume(cur.vols[i - 1].id); };
+$("#vNext").onclick = () => { const i = cur.vols.findIndex(x => x.id === curVol); if (i >= 0 && i < cur.vols.length - 1) openVolume(cur.vols[i + 1].id); };
+
+/* couverture : Mangacollec, couvertures alternatives, image perso */
+let covPick = null;
+$("#vCover").onclick = () => {
+  const { sid, d } = cur, s = DB.series[sid], v = d.volumes.find(x => x.id === curVol), ser = d.series[0];
+  const alts = d.volumes.filter(x => x.number === v.number && x.id !== v.id && x.image_url && x.image_url !== v.image_url);
+  const opts = [{ k: "mc", u: v.image_url, l: "Mangacollec" }, ...alts.map(x => ({ k: "alt", u: x.image_url, l: edName(d.editions.find(e => e.id === x.edition_id)) }))].filter(o => o.u);
+  const curC = s.cov && s.cov[v.id];
+  covPick = curC ? { ...curC } : { k: "mc", u: v.image_url };
+  if (curC && (curC.k === "url" || curC.k === "file") && !opts.some(o => o.u === curC.u)) opts.push({ k: curC.k, u: curC.u, l: "Mon image" });
+  $("#covTitle").textContent = `Couverture – ${ser.title} ${v.number}`;
+  $("#covs").innerHTML = opts.length ? opts.map((o, i) => `<button class="co${o.u === covPick.u ? " on" : ""}" type="button" data-i="${i}"><img src="${esc(o.u)}" alt="" referrerpolicy="no-referrer"><span>${esc(o.l)}</span></button>`).join("") : `<p class="hint" style="margin:6px">Pas de couverture sur Mangacollec pour ce tome.</p>`;
+  $("#covs").onclick = e => { const b = e.target.closest(".co"); if (!b) return; covPick = { k: opts[+b.dataset.i].k, u: opts[+b.dataset.i].u }; $("#covs").querySelectorAll(".co").forEach(x => x.classList.toggle("on", x === b)); };
+  $("#covUrl").value = ""; $("#covFile").value = ""; $("#covMsg").textContent = "";
+  openOv("#ovCov");
+};
+$("#covFile").onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const bmp = await createImageBitmap(f), sc = Math.min(1, 500 / bmp.width), c = document.createElement("canvas");
+    c.width = Math.round(bmp.width * sc); c.height = Math.round(bmp.height * sc); c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+    covPick = { k: "file", u: c.toDataURL("image/jpeg", .82) };
+    $("#covMsg").className = "msg ok"; $("#covMsg").textContent = "Image prête : clique sur OK.";
+    $("#covs").querySelectorAll(".co").forEach(x => x.classList.remove("on"));
+  } catch { $("#covMsg").className = "msg err"; $("#covMsg").textContent = "Cette image ne peut pas être lue."; }
+};
+$("#covOk").onclick = () => {
+  const u = $("#covUrl").value.trim();
+  if (u) { if (!/^https?:\/\//.test(u)) { $("#covMsg").className = "msg err"; $("#covMsg").textContent = "Le lien doit commencer par https://"; return; } covPick = { k: "url", u }; }
+  const { sid, d } = cur, s = DB.series[sid], v = d.volumes.find(x => x.id === curVol);
+  s.cov = s.cov || {};
+  if (!covPick || covPick.k === "mc") delete s.cov[v.id]; else s.cov[v.id] = covPick;
+  touch(sid); save(); closeOv("#ovCov"); openVolume(v.id); drawSeries(true);
+};
+
+/* ajout d’une série */
+let addT = 0;
+$("#addQ").oninput = e => { clearTimeout(addT); addT = setTimeout(() => searchSeries(e.target.value), 200); };
+async function searchSeries(q) {
+  const box = $("#addRes"); q = norm(q).trim();
+  if (q.length < 2) { box.innerHTML = `<p class="hint" style="margin:6px">Tape au moins deux lettres.</p>`; return; }
+  box.innerHTML = `<p class="hint" style="margin:6px">Recherche…</p>`;
+  let list; try { list = await seriesList(); } catch { box.innerHTML = `<p class="hint" style="margin:6px">Impossible de joindre Mangacollec.</p>`; return; }
+  const words = q.split(/\s+/);
+  const res = list.filter(s => { const t = norm(s[1]); return words.every(w => t.includes(w)); }).sort((a, b) => (norm(a[1]).startsWith(q) ? 0 : 1) - (norm(b[1]).startsWith(q) ? 0 : 1) || a[1].localeCompare(b[1], "fr")).slice(0, 60);
+  box.innerHTML = res.length ? res.map(s => `<button type="button" data-add="${s[0]}" data-t="${esc(s[1])}"><span>${esc(s[1])}${DB.series[s[0]] && !DB.series[s[0]].del ? " ✓" : ""}</span><small>${esc(s[2])} · ${s[3]} éd.</small></button>`).join("") : `<p class="hint" style="margin:6px">Aucune série trouvée.</p>`;
+}
+$("#addRes").onclick = e => {
+  const b = e.target.closest("[data-add]"); if (!b) return;
+  const sid = b.dataset.add;
+  if (!DB.series[sid] || DB.series[sid].del) { DB.series[sid] = { title: b.dataset.t, own: {}, added: Date.now(), t: Date.now() }; save(); }
+  closeOv("#ovAdd"); showMissing = true; openSeries(sid);
+};
+
+/* import Mangacollec */
+$("#mcUser").value = DB.mcUser || "";
+$("#mcGo").onclick = async () => {
+  const msg = $("#mcMsg"), say = (t, k = "") => { msg.className = "msg " + k; msg.textContent = t; };
+  const user = $("#mcUser").value.trim(), mail = $("#mcMail").value.trim(), pass = $("#mcPass").value;
+  let data;
+  try {
+    if (mail && pass) {
+      say("Connexion à Mangacollec…");
+      const r = await fetch(MC + "/oauth/token", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ grant_type: "password", client_id: CID, client_secret: CSEC, username: mail, password: pass }) });
+      if (!r.ok) return say("E-mail ou mot de passe Mangacollec incorrect.", "err");
+      const t = (await r.json()).access_token;
+      say("Récupération de ta collection…"); data = await api("/v2/users/me/collection", t);
+      $("#mcPass").value = "";
+    } else if (user) {
+      say("Récupération de ta collection…"); data = await api("/v2/user/" + encodeURIComponent(user) + "/collection");
+      DB.mcUser = user;
+    } else return say("Indique ton nom d’utilisateur, ou ton e-mail et ton mot de passe.", "err");
+  } catch (e) {
+    return say(e.message === "notfound" ? "Profil introuvable ou privé : vérifie le pseudo, ou connecte-toi avec ton e-mail." : "Mangacollec ne répond pas pour le moment.", "err");
+  }
+  const vols = {}, eds = {}, ser = {};
+  (data.volumes || []).forEach(v => { vols[v.id] = v; }); (data.editions || []).forEach(e => { eds[e.id] = e; }); (data.series || []).forEach(s => { ser[s.id] = s; });
+  let added = 0, seriesN = new Set();
+  for (const p of (data.possessions || [])) {
+    const v = vols[p.volume_id], e = v && eds[v.edition_id], s = e && ser[e.series_id]; if (!s) continue;
+    const S = DB.series[s.id] && !DB.series[s.id].del ? DB.series[s.id] : (DB.series[s.id] = { title: s.title, own: {}, added: Date.now() });
+    S.own = S.own || {}; const set = new Set(S.own[e.id] || []); if (!set.has(v.id)) { set.add(v.id); added++; } S.own[e.id] = [...set];
+    S.title = s.title; S.t = Date.now(); seriesN.add(s.id);
+  }
+  // édition affichée = celle où tu as le plus de tomes ; couverture = premier tome possédé
+  seriesN.forEach(sid => {
+    const S = DB.series[sid], best = Object.entries(S.own).sort((a, b) => b[1].length - a[1].length)[0];
+    if (!S.ed || !(S.own[S.ed] || []).length) S.ed = best[0];
+    const first = (S.own[S.ed] || []).map(id => vols[id]).filter(Boolean).sort((a, b) => a.number - b.number)[0];
+    if (first && !S.img) S.img = first.image_url || ""; S.edName = edName(eds[S.ed]);
+  });
+  save(); drawTree(); if (view.name === "home") drawHome();
+  say(`Import terminé : ${seriesN.size} série${seriesN.size > 1 ? "s" : ""}, ${added} nouveau${added > 1 ? "x" : ""} tome${added > 1 ? "s" : ""}.`, "ok");
+};
+
+/* sauvegarde */
+$("#expBtn").onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(DB)], { type: "application/json" })); a.download = "ma-mangatheque.json"; a.click(); };
+$("#impBtn").onclick = () => $("#impFile").click();
+$("#impFile").onchange = async e => { try { const j = JSON.parse(await e.target.files[0].text()); if (!j.series) throw 0; DB = j; DB.series = DB.series || {}; Object.values(DB.series).forEach(s => { s.t = Date.now(); }); save(); go("home"); } catch { alert("Ce fichier n’est pas une sauvegarde de Ma Mangathèque."); } };
+
+/* ---------------- navigation ---------------- */
+function go(name, sid) { if (name === "home") { view = { name: "home" }; drawTree(); drawHome(); scrollTo(0, 0); closeSide(); } else openSeries(sid); }
+document.addEventListener("click", e => {
+  const g = e.target.closest("[data-go]"); if (g) return go(g.dataset.go);
+  const s = e.target.closest("[data-sid]"); if (s) { showMissing = false; return go("series", s.dataset.sid); }
+  const v = e.target.closest("[data-vid]"); if (v) return openVolume(v.dataset.vid);
+  const a = e.target.closest("[data-act]"); if (a) { if (a.dataset.act === "add") openAdd(); else openOv("#ovSet"); }
+});
+const openAdd = () => { openOv("#ovAdd"); setTimeout(() => $("#addQ").focus(), 50); seriesList().catch(() => {}); };
+$("#addBtn").onclick = openAdd; $("#setBtn").onclick = () => openOv("#ovSet");
+const side = $("#side"), scrim = $("#scrim");
+const closeSide = () => { side.classList.remove("open"); scrim.classList.remove("open"); };
+$("#burger").onclick = () => { side.classList.add("open"); scrim.classList.add("open"); };
+scrim.onclick = closeSide;
+
+/* fenêtres : la page reste figée derrière, la barre de défilement reste visible */
+let lockY = null;
+function openOv(id) { const o = $(id); o.classList.add("open"); if (lockY === null) lockY = scrollY; }
+function closeOv(id) { $(id).classList.remove("open"); if (!document.querySelector(".ov.open")) lockY = null; }
+document.querySelectorAll(".ov").forEach(o => {
+  o.addEventListener("click", e => { if (e.target === o || e.target.closest("[data-close]")) closeOv("#" + o.id); });
+});
+addEventListener("keydown", e => { if (e.key === "Escape") { const o = [...document.querySelectorAll(".ov.open")].pop(); if (o) closeOv("#" + o.id); } });
+addEventListener("scroll", () => { if (lockY !== null && scrollY !== lockY) scrollTo(0, lockY); }, { passive: true });
+const canScroll = (n, dy) => { for (; n && n !== document.body; n = n.parentElement) { const cs = getComputedStyle(n); if (/(auto|scroll)/.test(cs.overflowY) && n.scrollHeight > n.clientHeight + 1 && (dy < 0 ? n.scrollTop > 0 : n.scrollTop + n.clientHeight < n.scrollHeight - 1)) return true; } return false; };
+addEventListener("wheel", e => { if (lockY !== null && !canScroll(e.target, e.deltaY)) e.preventDefault(); }, { passive: false });
+let ty = 0; addEventListener("touchstart", e => { ty = e.touches[0].clientY; }, { passive: true });
+addEventListener("touchmove", e => { if (lockY !== null && !canScroll(e.target, ty - e.touches[0].clientY)) e.preventDefault(); }, { passive: false });
+/* appui visible au doigt sur les boutons-vignettes */
+let pressed = null;
+document.addEventListener("touchstart", e => { const t = e.target.closest && e.target.closest(".tile"); if (pressed) pressed.classList.remove("press"); pressed = t; if (t) t.classList.add("press"); }, { passive: true });
+["touchmove", "touchcancel"].forEach(ev => document.addEventListener(ev, () => { if (pressed) { pressed.classList.remove("press"); pressed = null; } }, { passive: true }));
+document.addEventListener("touchend", () => setTimeout(() => { if (pressed) { pressed.classList.remove("press"); pressed = null; } }, 120), { passive: true });
+
+/* ---------------- synchronisation Firebase (même projet que Cards et Films) ---------------- */
+const FB_CFG = { apiKey: "AIzaSyAtijZVcoqPXTJ-3hDADEvgT3lazKxuOVo", authDomain: "fermite.firebaseapp.com", projectId: "fermite", storageBucket: "fermite.firebasestorage.app", messagingSenderId: "186949501321", appId: "1:186949501321:web:612c0ed9a983927074e158" };
+const FB_JS = "https://www.gstatic.com/firebasejs/10.12.2/";
+let fb = { auth: null, user: null, col: null, unsub: null }, lastSig = {}, pushT = 0, applying = false;
+const sigOf = s => JSON.stringify(s);
+function cloudQueue() { if (!fb.user || applying) return; clearTimeout(pushT); pushT = setTimeout(cloudPush, 900); }
+async function cloudPush() {
+  if (!fb.user) return;
+  for (const [sid, s] of Object.entries(DB.series)) {
+    const sig = sigOf(s); if (lastSig[sid] === sig) continue;
+    try { await fb.col.doc(sid).set({ ...JSON.parse(JSON.stringify(s)), t: s.t || Date.now() }); lastSig[sid] = sig; } catch (e) { console.warn("sync", e); }
+  }
+}
+const setSt = (on, txt) => { const st = $("#syncSt"); st.classList.toggle("on", on); st.querySelector("span").textContent = txt; };
+function fbLoad(src) { return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
+async function cloudInit() {
+  try {
+    if (!window.firebase || !window.firebase.firestore) { await fbLoad(FB_JS + "firebase-app-compat.js"); await Promise.all([fbLoad(FB_JS + "firebase-auth-compat.js"), fbLoad(FB_JS + "firebase-firestore-compat.js")]); }
+    if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
+    fb.auth = firebase.auth(); const db = firebase.firestore();
+    fb.auth.onAuthStateChanged(user => {
+      fb.user = user; if (fb.unsub) { fb.unsub(); fb.unsub = null; }
+      $("#fbOut").hidden = !!user; $("#fbIn").hidden = !user; $("#fbWho").textContent = user ? (user.email || "ton compte") : "";
+      if (!user) { setSt(false, "Enregistré sur cet appareil"); return; }
+      setSt(true, "Synchronisé en ligne");
+      fb.col = db.collection("data/users/" + user.uid + "/manga/items");
+      fb.unsub = fb.col.onSnapshot(qs => {
+        applying = true; let changed = false;
+        qs.docChanges().forEach(ch => {
+          if (ch.doc.metadata.hasPendingWrites) return;
+          const r = ch.doc.data(), sid = ch.doc.id, l = DB.series[sid];
+          if (!l || (r.t || 0) > (l.t || 0)) { DB.series[sid] = r; lastSig[sid] = sigOf(r); changed = true; }
+          else if (l && (r.t || 0) === (l.t || 0)) lastSig[sid] = sigOf(l);
+        });
+        applying = false;
+        if (changed) { try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch {} drawTree(); if (view.name === "home") drawHome(); else if (cur && DB.series[cur.sid] && !DB.series[cur.sid].del) drawSeries(true); }
+        cloudQueue();
+      }, () => setSt(false, "Pas de connexion au serveur"));
+    });
+  } catch { setSt(false, "Enregistré sur cet appareil"); }
+}
+const fbMsg = (t, k = "") => { const m = $("#fbMsg"); m.className = "msg " + k; m.textContent = t; };
+const fbErr = e => ({ "auth/invalid-credential": "E-mail ou mot de passe incorrect.", "auth/wrong-password": "E-mail ou mot de passe incorrect.", "auth/operation-not-allowed": "Ce mode de connexion n’est pas activé dans Firebase.", "auth/unauthorized-domain": "Ce site n’est pas dans les domaines autorisés de Firebase.", "auth/popup-blocked": "Autorise les fenêtres pop-up pour ce site." })[e && e.code] || (e && e.message) || "Erreur";
+$("#fbGoogle").onclick = async () => { if (!fb.auth) return; fbMsg(""); try { await fb.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); } catch (e) { if (e.code !== "auth/popup-closed-by-user") fbMsg(fbErr(e), "err"); } };
+$("#fbLogin").onclick = async () => { if (!fb.auth) return; fbMsg("Connexion…"); try { await fb.auth.signInWithEmailAndPassword($("#fbMail").value.trim(), $("#fbPass").value); fbMsg(""); } catch (e) { fbMsg(fbErr(e), "err"); } };
+$("#fbLogout").onclick = () => fb.auth && fb.auth.signOut();
+
+drawTree(); drawHome(); cloudInit();
+})();
+</script>
+</body>
+</html>
