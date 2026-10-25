@@ -37,6 +37,11 @@ img{max-width:100%}
 .btn[disabled]{color:var(--shadow);text-shadow:1px 1px #fff;cursor:default}
 input[type=text],input[type=search],input[type=email],input[type=password],input[type=url],input[type=date],select,textarea{background:#fff;border:0;border-radius:0;box-shadow:var(--sunken);padding:4px 6px;min-height:24px}
 label{cursor:pointer}
+input[type=checkbox]{-webkit-appearance:none;appearance:none;width:13px;height:13px;margin:0;flex:none;background:#fff;border:0;border-radius:0;box-shadow:var(--sunken);cursor:pointer;vertical-align:middle}
+input[type=checkbox]:checked{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='7' shape-rendering='crispEdges'%3E%3Cpath d='M6 0h1v2H6v1H5v1H4v1H3v1H2V5H1V4H0V2h1v1h1v1h1V3h1V2h1V1h1z'/%3E%3C/svg%3E") no-repeat center}
+input[type=checkbox]:active{background-color:var(--face)}
+input[type=checkbox]:disabled{background-color:var(--face)}
+input[type=checkbox]:focus-visible{outline:1px dotted #000;outline-offset:2px}
 
 /* panneau de gauche : arborescence */
 .side{position:sticky;top:0;flex:0 0 260px;height:100vh;height:100dvh;display:flex;flex-direction:column;padding:4px 2px 4px 4px;gap:4px}
@@ -75,7 +80,10 @@ main{flex:1;min-width:0;margin:4px 4px 4px 2px;box-shadow:var(--sunken);backgrou
 .tile small{font-size:11px;color:#404040}
 .tile.miss .cover,.tile.miss .ph{filter:grayscale(1) opacity(.45)}
 .tile.miss small{color:#808080}
-.tile .own{position:absolute;top:10px;right:10px;width:16px;height:16px;background:#fff;box-shadow:var(--sunken);display:grid;place-items:center;font-weight:bold;font-size:12px}
+.tile .own{position:absolute;top:6px;right:6px;width:28px;height:28px;display:grid;place-items:center;cursor:pointer;z-index:2}
+.tile .own i{width:15px;height:15px;background:#fff;box-shadow:var(--sunken)}
+.tile .own[aria-checked="true"] i{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='7' shape-rendering='crispEdges'%3E%3Cpath d='M6 0h1v2H6v1H5v1H4v1H3v1H2V5H1V4H0V2h1v1h1v1h1V3h1V2h1V1h1z'/%3E%3C/svg%3E") no-repeat center}
+.tile .own:active i{background-color:var(--face)}
 .empty{padding:30px 16px;color:#404040;font-size:12px;line-height:1.5}
 .empty .btn{margin-top:10px}
 
@@ -225,7 +233,7 @@ legend{padding:0 3px}
       <div class="row"><label for="mcMail">E-mail</label><input type="email" id="mcMail" autocomplete="username"></div>
       <div class="row"><label for="mcPass">Mot de passe</label><input type="password" id="mcPass" autocomplete="current-password"></div>
       <p class="hint">Ton mot de passe sert seulement à la connexion à Mangacollec, il n’est pas enregistré.</p>
-      <div style="display:flex;justify-content:flex-end"><button class="btn default" type="button" id="mcGo">Importer ma collection</button></div>
+      <div style="display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap"><button class="btn" type="button" id="mcGoogle">Se connecter avec Google</button><button class="btn default" type="button" id="mcGo">Importer ma collection</button></div>
       <p class="msg" id="mcMsg"></p>
     </fieldset>
     <fieldset><legend>Synchronisation entre appareils</legend>
@@ -392,7 +400,7 @@ function drawSeries(keepScroll) {
     </div></div>
     <div class="toolbar"><label class="chk" style="margin:0"><input type="checkbox" id="missChk"${showMissing ? " checked" : ""}> Afficher aussi les tomes que je n’ai pas</label>
       <button class="btn" type="button" id="rmSeries" style="margin-left:auto">Retirer la série</button></div>
-    ${shown.length ? `<div class="grid">${shown.map(v => `<button class="tile${own.has(v.id) ? "" : " miss"}" type="button" data-vid="${v.id}">${imgTag(coverOf(sid, v), "Tome " + v.number)}<b>Tome ${v.number}${v.title ? " · " + esc(v.title) : ""}</b><small>${own.has(v.id) ? fmtDate(v.release_date) : "Pas dans ma collection"}</small>${showMissing ? `<span class="own">${own.has(v.id) ? "✓" : ""}</span>` : ""}</button>`).join("")}</div>`
+    ${shown.length ? `<div class="grid">${shown.map(v => `<button class="tile${own.has(v.id) ? "" : " miss"}" type="button" data-vid="${v.id}">${imgTag(coverOf(sid, v), "Tome " + v.number)}<b>Tome ${v.number}${v.title ? " · " + esc(v.title) : ""}</b><small>${own.has(v.id) ? fmtDate(v.release_date) : "Pas dans ma collection"}</small><span class="own" role="checkbox" tabindex="0" aria-checked="${own.has(v.id)}" aria-label="Je possède le tome ${v.number}" data-own="${v.id}" title="Je possède ce tome"><i></i></span></button>`).join("")}</div>`
       : `<div class="empty">Aucun tome de cette édition dans ta collection.<br><button class="btn" type="button" id="showAll">Afficher les tomes pour les cocher</button></div>`}`;
   if (keepScroll) scrollTo(0, y);
   $("#edSel").onchange = e => askEdition(e.target.value);
@@ -421,6 +429,19 @@ $("#edMove").onclick = () => {
 $("#edView").onclick = () => { const s = DB.series[cur.sid]; s.ed = edPending; touch(cur.sid); save(); closeOv("#ovEd"); drawSeries(); drawTree(); };
 document.querySelectorAll("#ovEd [data-close]").forEach(b => b.addEventListener("click", () => { const sel = $("#edSel"); if (sel) sel.value = DB.series[cur.sid].ed; }));
 
+/* cocher un tome directement dans la grille de la série */
+function toggleOwn(vid, el) {
+  const { sid, d } = cur, s = DB.series[sid], v = d.volumes.find(x => x.id === vid); if (!v) return;
+  s.own = s.own || {}; const set = new Set(s.own[v.edition_id] || []);
+  const on = !set.has(vid); on ? set.add(vid) : set.delete(vid); s.own[v.edition_id] = [...set];
+  touch(sid); save(); drawTree();
+  const tile = el.closest(".tile"); el.setAttribute("aria-checked", String(on)); tile.classList.toggle("miss", !on);
+  tile.querySelector("small").textContent = on ? fmtDate(v.release_date) : "Pas dans ma collection";
+  const n = ownedIds(s).length, tot = cur.vols.length, bar = main.querySelector(".bar i"); if (bar) bar.style.width = (tot ? Math.round(n / tot * 100) : 0) + "%";
+  main.querySelectorAll(".facts dd").forEach(x => { if (/ sur \d+/.test(x.textContent)) x.textContent = x.textContent.replace(/^\d+/, n); });
+}
+document.addEventListener("keydown", e => { const o = e.target.closest && e.target.closest("[data-own]"); if (o && (e.key === " " || e.key === "Enter")) { e.preventDefault(); e.stopPropagation(); toggleOwn(o.dataset.own, o); } }, true);
+
 /* fiche d’un tome */
 let curVol = null;
 async function openVolume(vid) {
@@ -428,7 +449,7 @@ async function openVolume(vid) {
   curVol = vid;
   const ed = d.editions.find(e => e.id === v.edition_id), pub = d.publishers.find(p => ed && p.id === ed.publisher_id), ser = d.series[0];
   const authors = (d.tasks || []).map(t => { const a = d.authors.find(x => x.id === t.author_id); return a ? [a.first_name, a.name].filter(Boolean).join(" ") : ""; }).filter(Boolean);
-  const own = ownedIds(s).includes(vid), jp = (s.jp || {})[vid] || "";
+  const own = ownedIds(s).includes(vid);
   $("#volTitle").textContent = `${ser.title} – Tome ${v.number}`;
   const body = (det) => `<div class="vol"><div class="vc">${imgTag(coverOf(sid, v), ser.title + " " + v.number, "")}</div><div>
       <h2>${esc(ser.title)} – Tome ${v.number}</h2>
@@ -439,7 +460,6 @@ async function openVolume(vid) {
         <dt>Éditeur</dt><dd>${esc(pub ? pub.title : "—")}</dd>
         <dt>Édition</dt><dd>${esc(edName(ed))}</dd>
         <dt>Sortie en France</dt><dd>${fmtDate(v.release_date)}</dd>
-        <dt>Sortie au Japon</dt><dd><input type="date" id="jpDate" value="${esc(jp)}" title="Mangacollec ne fournit pas cette date : tu peux la saisir"></dd>
         <dt>Pages</dt><dd>${det && det.nb_pages ? det.nb_pages : "—"}</dd>
         <dt>ISBN</dt><dd>${esc(v.isbn || "—")}</dd>
       </dl>
@@ -461,7 +481,6 @@ function bindVol(v) {
     const set = new Set(s.own[v.edition_id] || []); e.target.checked ? set.add(v.id) : set.delete(v.id); s.own[v.edition_id] = [...set];
     touch(sid); save(); drawSeries(true); drawTree();
   };
-  $("#jpDate").onchange = e => { s.jp = s.jp || {}; if (e.target.value) s.jp[v.id] = e.target.value; else delete s.jp[v.id]; touch(sid); save(); };
 }
 $("#vPrev").onclick = () => { const i = cur.vols.findIndex(x => x.id === curVol); if (i > 0) openVolume(cur.vols[i - 1].id); };
 $("#vNext").onclick = () => { const i = cur.vols.findIndex(x => x.id === curVol); if (i >= 0 && i < cur.vols.length - 1) openVolume(cur.vols[i + 1].id); };
@@ -521,24 +540,41 @@ $("#addRes").onclick = e => {
 
 /* import Mangacollec */
 $("#mcUser").value = DB.mcUser || "";
+const mcSay = (t, k = "") => { const msg = $("#mcMsg"); msg.className = "msg " + k; msg.textContent = t; };
+/* connexion Mangacollec : e-mail et mot de passe, ou compte Google */
+async function mcPasswordToken(mail, pass) {
+  const r = await fetch(MC + "/oauth/token", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ grant_type: "password", client_id: CID, client_secret: CSEC, username: mail, password: pass }) });
+  if (!r.ok) throw new Error("badpass"); return (await r.json()).access_token;
+}
+async function mcGoogleToken() {
+  await fbReady();
+  const p = new firebase.auth.GoogleAuthProvider(); p.addScope("email"); p.addScope("profile");
+  const res = await fb.auth.signInWithPopup(p);
+  const g = res.credential && res.credential.accessToken; if (!g) throw new Error("nogoogle");
+  const r = await fetch(MC + "/session", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ provider: "google", assertion: g, client: "web" }) });
+  if (!r.ok) throw new Error("mcgoogle"); const j = await r.json(); if (!j.access_token) throw new Error("mcgoogle"); return j.access_token;
+}
+$("#mcGoogle").onclick = async () => {
+  mcSay("Connexion avec Google…");
+  try { const t = await mcGoogleToken(); await runImport({ token: t }); }
+  catch (e) { mcSay(e.code === "auth/popup-closed-by-user" ? "" : e.message === "mcgoogle" ? "Mangacollec a refusé la connexion Google depuis ce site. Utilise ton pseudo (profil public), ou crée un mot de passe sur Mangacollec (« Mot de passe oublié ») pour te connecter par e-mail." : e.code === "auth/popup-blocked" ? "Autorise les fenêtres pop-up pour ce site." : "Connexion Google impossible pour le moment.", "err"); }
+};
 $("#mcGo").onclick = async () => {
-  const msg = $("#mcMsg"), say = (t, k = "") => { msg.className = "msg " + k; msg.textContent = t; };
   const user = $("#mcUser").value.trim(), mail = $("#mcMail").value.trim(), pass = $("#mcPass").value;
-  let data;
   try {
-    if (mail && pass) {
-      say("Connexion à Mangacollec…");
-      const r = await fetch(MC + "/oauth/token", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ grant_type: "password", client_id: CID, client_secret: CSEC, username: mail, password: pass }) });
-      if (!r.ok) return say("E-mail ou mot de passe Mangacollec incorrect.", "err");
-      const t = (await r.json()).access_token;
-      say("Récupération de ta collection…"); data = await api("/v2/users/me/collection", t);
-      $("#mcPass").value = "";
-    } else if (user) {
-      say("Récupération de ta collection…"); data = await api("/v2/user/" + encodeURIComponent(user) + "/collection");
-      DB.mcUser = user;
-    } else return say("Indique ton nom d’utilisateur, ou ton e-mail et ton mot de passe.", "err");
+    if (mail && pass) { mcSay("Connexion à Mangacollec…"); const t = await mcPasswordToken(mail, pass); $("#mcPass").value = ""; await runImport({ token: t }); }
+    else if (user) await runImport({ user });
+    else mcSay("Indique ton pseudo, ou ton e-mail et ton mot de passe, ou connecte-toi avec Google.", "err");
+  } catch (e) { mcSay(e.message === "badpass" ? "E-mail ou mot de passe Mangacollec incorrect." : "Mangacollec ne répond pas pour le moment.", "err"); }
+};
+async function runImport({ user, token }) {
+  const say = mcSay; let data;
+  try {
+    say("Récupération de ta collection…");
+    if (token) data = await api("/v2/users/me/collection", token);
+    else { data = await api("/v2/user/" + encodeURIComponent(user) + "/collection"); DB.mcUser = user; $("#mcUser").value = user; }
   } catch (e) {
-    return say(e.message === "notfound" ? "Profil introuvable ou privé : vérifie le pseudo, ou connecte-toi avec ton e-mail." : "Mangacollec ne répond pas pour le moment.", "err");
+    return say(e.message === "notfound" ? "Profil introuvable ou privé : vérifie le pseudo, ou connecte-toi." : "Mangacollec ne répond pas pour le moment.", "err");
   }
   const vols = {}, eds = {}, ser = {};
   (data.volumes || []).forEach(v => { vols[v.id] = v; }); (data.editions || []).forEach(e => { eds[e.id] = e; }); (data.series || []).forEach(s => { ser[s.id] = s; });
@@ -570,6 +606,7 @@ function go(name, sid) { if (name === "home") { view = { name: "home" }; drawTre
 document.addEventListener("click", e => {
   const g = e.target.closest("[data-go]"); if (g) return go(g.dataset.go);
   const s = e.target.closest("[data-sid]"); if (s) { showMissing = false; return go("series", s.dataset.sid); }
+  const o = e.target.closest("[data-own]"); if (o) { e.stopPropagation(); return toggleOwn(o.dataset.own, o); }
   const v = e.target.closest("[data-vid]"); if (v) return openVolume(v.dataset.vid);
   const a = e.target.closest("[data-act]"); if (a) { if (a.dataset.act === "add") openAdd(); else openOv("#ovSet"); }
 });
@@ -614,6 +651,8 @@ async function cloudPush() {
 }
 const setSt = (on, txt) => { const st = $("#syncSt"); st.classList.toggle("on", on); st.querySelector("span").textContent = txt; };
 function fbLoad(src) { return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
+let fbReadyP = null;
+function fbReady() { return fbReadyP || (fbReadyP = (async () => { for (let i = 0; i < 100 && !fb.auth; i++) await new Promise(r => setTimeout(r, 100)); if (!fb.auth) { fbReadyP = null; throw new Error("nofb"); } })()); }
 async function cloudInit() {
   try {
     if (!window.firebase || !window.firebase.firestore) { await fbLoad(FB_JS + "firebase-app-compat.js"); await Promise.all([fbLoad(FB_JS + "firebase-auth-compat.js"), fbLoad(FB_JS + "firebase-firestore-compat.js")]); }
@@ -647,6 +686,12 @@ $("#fbLogin").onclick = async () => { if (!fb.auth) return; fbMsg("Connexion…"
 $("#fbLogout").onclick = () => fb.auth && fb.auth.signOut();
 
 drawTree(); drawHome(); cloudInit();
+/* import lancé depuis les réglages du bureau Hobbys97 */
+if (location.hash === "#import") {
+  history.replaceState(null, "", location.pathname);
+  let tok = null; try { tok = sessionStorage.getItem("h97-mc-token"); sessionStorage.removeItem("h97-mc-token"); } catch {}
+  if (tok || DB.mcUser) { openOv("#ovSet"); runImport(tok ? { token: tok } : { user: DB.mcUser }); }
+}
 })();
 </script>
 </body>
