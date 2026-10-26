@@ -552,6 +552,19 @@ html,*{scrollbar-color:auto;scrollbar-width:auto}
 ::-webkit-scrollbar-button:single-button:horizontal:decrement{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M4 1h1v5H4V5H3V4H2V3h1V2h1z'/%3E%3C/svg%3E")}
 ::-webkit-scrollbar-button:single-button:horizontal:increment{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M2 1h1v1h1v1h1v1H4v1H3v1H2z'/%3E%3C/svg%3E")}
 ::-webkit-scrollbar-corner{background:#c0c0c0}
+
+/* Les pages d'origine réglaient la barre en « fine, invisible hors défilement » (scrollbar-width / scrollbar-color),
+   ce qui désactive le style Windows 98 ou le fait clignoter. On neutralise ces réglages pour de bon. */
+@supports selector(::-webkit-scrollbar){
+  html,html *:not(.shopwrap),dialog,.dlg-body,.letters{scrollbar-width:auto!important;scrollbar-color:auto!important}
+  html,html *{scrollbar-gutter:auto!important}
+  ::-webkit-scrollbar,html::-webkit-scrollbar{width:16px!important;height:16px!important;background:#c0c0c0!important}
+  ::-webkit-scrollbar-track,html::-webkit-scrollbar-track{background:repeating-conic-gradient(#fff 0 25%,#c0c0c0 0 50%) 0 0/2px 2px!important}
+  ::-webkit-scrollbar-thumb,::-webkit-scrollbar-thumb:hover,.scrolling::-webkit-scrollbar-thumb,.scrolling::-webkit-scrollbar-thumb:hover,.is-scrolling::-webkit-scrollbar-thumb,html.is-scrolling::-webkit-scrollbar-thumb,html.scrolling::-webkit-scrollbar-thumb,html.scrolling.near::-webkit-scrollbar-thumb{background:#c0c0c0!important;background-clip:border-box!important;border:0!important;border-radius:0!important;box-shadow:inset -1px -1px #0a0a0a,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff!important}
+}
+@supports not selector(::-webkit-scrollbar){
+  html,html *{scrollbar-width:auto!important;scrollbar-color:#c0c0c0 #e8e8e8!important}
+}
 </style>
 </head>
 <body>
