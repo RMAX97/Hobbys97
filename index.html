@@ -340,6 +340,12 @@ html,*{scrollbar-color:auto;scrollbar-width:auto}
 ::-webkit-scrollbar-button:single-button:horizontal:increment{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M2 1h1v1h1v1h1v1H4v1H3v1H2z'/%3E%3C/svg%3E")}
 ::-webkit-scrollbar-corner{background:#c0c0c0}
 
+/* contour de déplacement des fenêtres : cadre gris pointillé (damier inversé), épaisseur d'une bordure de fenêtre */
+.dragframe{position:fixed;left:0;top:0;z-index:9400;pointer-events:none;box-sizing:border-box;padding:4px;
+  background:repeating-conic-gradient(#fff 0 25%,#000 0 50%) 0 0/2px 2px;mix-blend-mode:difference;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+
 @media (max-width:640px){
   .tasks .task span{display:none}
   .task{flex:0 0 auto;max-width:none;padding:0 5px}
@@ -645,17 +651,29 @@ function toggleMax(id) { if (!small()) wins[id].el.classList.toggle("max"); }
 function closeWin(id) { const w = wins[id]; if (!w) return; w.el.remove(); w.task.remove(); delete wins[id]; }
 
 function dragify(el, id) {
+  /* Comme sous Windows 98 (et sur win98.si) : pendant le déplacement, seul un contour pointillé suit la souris ;
+     la fenêtre reste en place et saute à l'arrivée quand on relâche. */
   const bar = el.querySelector(".tbar");
   bar.addEventListener("pointerdown", e => {
     if (e.target.closest("[data-w]") || el.classList.contains("max") || e.button > 0) return;
-    const sx = e.clientX, sy = e.clientY, ox = el.offsetLeft, oy = el.offsetTop;
+    const sx = e.clientX, sy = e.clientY, ox = el.offsetLeft, oy = el.offsetTop, w = el.offsetWidth, h = el.offsetHeight;
+    let fx = ox, fy = oy, frame = null;
     document.body.classList.add("dragging"); bar.setPointerCapture(e.pointerId);
     const mv = ev => {
-      const x = Math.min(innerWidth - 60, Math.max(60 - el.offsetWidth, ox + ev.clientX - sx));
-      const y = Math.min(innerHeight - 60, Math.max(0, oy + ev.clientY - sy));
-      el.style.left = x + "px"; el.style.top = y + "px";
+      fx = Math.min(innerWidth - 60, Math.max(60 - w, ox + ev.clientX - sx));
+      fy = Math.min(innerHeight - 60, Math.max(0, oy + ev.clientY - sy));
+      if (!frame) {
+        if (Math.hypot(ev.clientX - sx, ev.clientY - sy) < 3) return;   // un simple clic ne fait rien bouger
+        frame = document.createElement("div"); frame.className = "dragframe"; frame.style.width = w + "px"; frame.style.height = h + "px";
+        document.body.appendChild(frame);
+      }
+      frame.style.transform = `translate(${fx}px,${fy}px)`;
     };
-    const up = () => { document.body.classList.remove("dragging"); bar.removeEventListener("pointermove", mv); bar.removeEventListener("pointerup", up); bar.removeEventListener("pointercancel", up); };
+    const up = ev => {
+      document.body.classList.remove("dragging");
+      bar.removeEventListener("pointermove", mv); bar.removeEventListener("pointerup", up); bar.removeEventListener("pointercancel", up);
+      if (frame) { frame.remove(); if (ev.type !== "pointercancel") { el.style.left = fx + "px"; el.style.top = fy + "px"; } }
+    };
     bar.addEventListener("pointermove", mv); bar.addEventListener("pointerup", up); bar.addEventListener("pointercancel", up);
   });
 }
