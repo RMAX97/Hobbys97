@@ -101,32 +101,29 @@ nav [data-go="game"],nav [data-go="friends"],#musicBtn,#profBtn,#streamPanel,#pl
 </style>
 <style>html{touch-action:manipulation}</style>
 <style id="h97-scrollbars">
-/* barres de défilement Windows 98 */
-html,*{scrollbar-color:auto;scrollbar-width:auto}
-@supports not selector(::-webkit-scrollbar){html,*{scrollbar-color:#c0c0c0 #e8e8e8}}
-::-webkit-scrollbar{width:16px;height:16px;background:#c0c0c0}
-::-webkit-scrollbar-track{background:repeating-conic-gradient(#fff 0 25%,#c0c0c0 0 50%) 0 0/2px 2px}
-::-webkit-scrollbar-thumb{background:#c0c0c0;border:0;border-radius:0;box-shadow:inset -1px -1px #0a0a0a,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff}
-::-webkit-scrollbar-button:single-button{display:block;width:16px;height:16px;background-color:#c0c0c0;background-repeat:no-repeat;background-position:center;box-shadow:inset -1px -1px #0a0a0a,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff}
-::-webkit-scrollbar-button:single-button:active{box-shadow:inset 0 0 0 1px #808080;background-position:calc(50% + 1px) calc(50% + 1px)}
-::-webkit-scrollbar-button:single-button:vertical:decrement{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M3 2h1v1h1v1h1v1H1V4h1V3h1z'/%3E%3C/svg%3E")}
-::-webkit-scrollbar-button:single-button:vertical:increment{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M1 3h5v1H5v1H4v1H3V5H2V4H1z'/%3E%3C/svg%3E")}
-::-webkit-scrollbar-button:single-button:horizontal:decrement{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M4 1h1v5H4V5H3V4H2V3h1V2h1z'/%3E%3C/svg%3E")}
-::-webkit-scrollbar-button:single-button:horizontal:increment{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M2 1h1v1h1v1h1v1H4v1H3v1H2z'/%3E%3C/svg%3E")}
-::-webkit-scrollbar-corner{background:#c0c0c0}
-
-/* Les pages d'origine réglaient la barre en « fine, invisible hors défilement » (scrollbar-width / scrollbar-color),
-   ce qui désactive le style Windows 98 ou le fait clignoter. On neutralise ces réglages pour de bon. */
+/* Barre de défilement Windows 98 : seulement pour la PAGE, toujours affichée (plus de saut d'image).
+   Les fenêtres internes (fiche d'un album ou d'un DVD, réglages…) gardent leur barre fine et moderne d'origine. */
+html{overflow-y:scroll!important;scrollbar-gutter:stable!important}
 @supports selector(::-webkit-scrollbar){
-  html,html *:not(.shopwrap),dialog,.dlg-body,.letters{scrollbar-width:auto!important;scrollbar-color:auto!important}
-  html,html *{scrollbar-gutter:auto!important}
-  ::-webkit-scrollbar,html::-webkit-scrollbar{width:16px!important;height:16px!important;background:#c0c0c0!important}
-  ::-webkit-scrollbar-track,html::-webkit-scrollbar-track{background:repeating-conic-gradient(#fff 0 25%,#c0c0c0 0 50%) 0 0/2px 2px!important}
-  ::-webkit-scrollbar-thumb,::-webkit-scrollbar-thumb:hover,.scrolling::-webkit-scrollbar-thumb,.scrolling::-webkit-scrollbar-thumb:hover,.is-scrolling::-webkit-scrollbar-thumb,html.is-scrolling::-webkit-scrollbar-thumb,html.scrolling::-webkit-scrollbar-thumb,html.scrolling.near::-webkit-scrollbar-thumb{background:#c0c0c0!important;background-clip:border-box!important;border:0!important;border-radius:0!important;box-shadow:inset -1px -1px #0a0a0a,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff!important}
+  html,body,html.scrolling,html.scrolling.near,html.is-scrolling{scrollbar-width:auto!important;scrollbar-color:auto!important}
+  html::-webkit-scrollbar, body::-webkit-scrollbar{width:16px!important;height:16px!important;background:#c0c0c0!important}
+  html::-webkit-scrollbar-track, body::-webkit-scrollbar-track{background:repeating-conic-gradient(#fff 0 25%,#c0c0c0 0 50%) 0 0/2px 2px!important}
+  html::-webkit-scrollbar-thumb, html::-webkit-scrollbar-thumb:hover, html.scrolling::-webkit-scrollbar-thumb, html.scrolling.near::-webkit-scrollbar-thumb, html.is-scrolling::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb:hover{background:#c0c0c0!important;background-clip:border-box!important;border:0!important;border-radius:0!important;box-shadow:inset -1px -1px #0a0a0a,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff!important}
+  html::-webkit-scrollbar-button:single-button, body::-webkit-scrollbar-button:single-button{display:block;width:16px;height:16px;background-color:#c0c0c0;background-repeat:no-repeat;background-position:center;box-shadow:inset -1px -1px #0a0a0a,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff}
+  html::-webkit-scrollbar-button:single-button:active, body::-webkit-scrollbar-button:single-button:active{box-shadow:inset 0 0 0 1px #808080;background-position:calc(50% + 1px) calc(50% + 1px)}
+  html::-webkit-scrollbar-button:single-button:vertical:decrement, body::-webkit-scrollbar-button:single-button:vertical:decrement{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M3 2h1v1h1v1h1v1H1V4h1V3h1z'/%3E%3C/svg%3E")}
+  html::-webkit-scrollbar-button:single-button:vertical:increment, body::-webkit-scrollbar-button:single-button:vertical:increment{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M1 3h5v1H5v1H4v1H3V5H2V4H1z'/%3E%3C/svg%3E")}
+  html::-webkit-scrollbar-button:single-button:horizontal:decrement, body::-webkit-scrollbar-button:single-button:horizontal:decrement{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M4 1h1v5H4V5H3V4H2V3h1V2h1z'/%3E%3C/svg%3E")}
+  html::-webkit-scrollbar-button:single-button:horizontal:increment, body::-webkit-scrollbar-button:single-button:horizontal:increment{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M2 1h1v1h1v1h1v1H4v1H3v1H2z'/%3E%3C/svg%3E")}
+  html::-webkit-scrollbar-corner, body::-webkit-scrollbar-corner{background:#c0c0c0}
+  /* quand une fenêtre est ouverte : la barre reste là mais devient inactive */
+  html.h97-lock::-webkit-scrollbar-thumb{background:#c0c0c0 repeating-conic-gradient(#c0c0c0 0 25%,#d8d8d8 0 50%) 0 0/2px 2px!important}
+  html.h97-lock::-webkit-scrollbar-button:single-button{opacity:.5}
 }
 @supports not selector(::-webkit-scrollbar){
-  html,html *{scrollbar-width:auto!important;scrollbar-color:#c0c0c0 #e8e8e8!important}
+  html{scrollbar-width:auto!important;scrollbar-color:#c0c0c0 #e8e8e8!important}
 }
+html:has(.overlay:not([hidden])){overflow-y:scroll!important;overflow-x:hidden}
 </style>
 </head>
 <body>
@@ -5305,5 +5302,23 @@ const HIDE=/^(Ton profil|Inviter des amis)$/;
 const clean=()=>document.querySelectorAll("#syncSheet section.invite, #setSheet section.invite").forEach(s=>{const h=s.querySelector("h4");if(h&&HIDE.test(h.textContent.trim()))s.classList.add("h97-hide");});
 new MutationObserver(clean).observe(document.body,{childList:true,subtree:true});clean();
 })();</script>
+<script id="h97-lock">
+/* La page ne bouge plus tant qu'une fiche est ouverte, mais sa barre de défilement reste affichée. */
+(function(){
+  const OPEN='.overlay:not([hidden]), #binView:not([hidden])';
+  const isOpen=()=>!!document.querySelector(OPEN);
+  let lockY=null, lastY=scrollY;
+  addEventListener('scroll',()=>{ if(lockY===null) lastY=scrollY; },{passive:true});
+  const check=()=>{ if(isOpen()){ if(lockY===null){ lockY=lastY; document.documentElement.classList.add('h97-lock'); if(scrollY!==lockY) scrollTo({left:0,top:lockY,behavior:'instant'}); } } else if(lockY!==null){ lockY=null; document.documentElement.classList.remove('h97-lock'); } };
+  new MutationObserver(check).observe(document.documentElement,{attributes:true,subtree:true,attributeFilter:['open','hidden']});
+  addEventListener('scroll',()=>{ if(lockY!==null&&scrollY!==lockY) scrollTo({left:0,top:lockY,behavior:'instant'}); },{passive:true});
+  const canScroll=(n,dy)=>{ for(;n&&n!==document.body&&n!==document.documentElement;n=n.parentElement){ const cs=getComputedStyle(n); if(/(auto|scroll)/.test(cs.overflowY)&&n.scrollHeight>n.clientHeight+1&&(dy<0?n.scrollTop>0:n.scrollTop+n.clientHeight<n.scrollHeight-1)) return true; } return false; };
+  addEventListener('wheel',e=>{ if(lockY!==null&&!canScroll(e.target,e.deltaY)) e.preventDefault(); },{passive:false});
+  let ty=0; addEventListener('touchstart',e=>{ ty=e.touches[0].clientY; },{passive:true});
+  addEventListener('touchmove',e=>{ if(lockY!==null&&!canScroll(e.target,ty-e.touches[0].clientY)) e.preventDefault(); },{passive:false});
+  addEventListener('keydown',e=>{ if(lockY!==null&&[' ','PageDown','PageUp','Home','End','ArrowDown','ArrowUp'].includes(e.key)&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)&&!e.target.isContentEditable&&!e.target.closest('dialog,.overlay')) e.preventDefault(); });
+  check();
+})();
+</script>
 </body>
 </html>
