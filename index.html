@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
@@ -180,7 +180,10 @@ input[type=text],input[type=email],input[type=password],input[type=url]{font:inh
 .iebtn:not([disabled]):hover,.iedrop:not([disabled]):hover,.pl:hover,.iesearch:hover{box-shadow:inset -1px -1px var(--shadow),inset 1px 1px var(--white)}
 .iebtn:not([disabled]):active,.pl:active,.iesearch:active{box-shadow:inset 1px 1px var(--shadow),inset -1px -1px var(--white)}
 .iebtn[disabled]{color:var(--shadow);text-shadow:1px 1px var(--white)}
-.iebtn[disabled] svg{filter:grayscale(1) opacity(.45)}
+.iebtn[disabled] svg,.iebtn[disabled] img{filter:grayscale(1) opacity(.45)}
+.iebtn img{width:24px;height:24px;display:block}
+.ieurl .fav img,.iestatus .st2 img,.iestatus .st3 img{width:16px;height:16px;display:block;flex:none}
+.ieurl .fav{display:flex}
 .iedrop{width:12px;padding:0;border:0;background:none;display:grid;place-items:center;margin-left:-3px}
 .iedrop svg,.iecombo svg{width:7px;height:4px}
 .iedrop[disabled] svg{fill:var(--shadow)}
@@ -385,13 +388,21 @@ html,*{scrollbar-color:auto;scrollbar-width:auto}
 .mcth{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:2px 2px 2px 5px;font-size:11px;box-shadow:inset 0 -1px var(--shadow),inset 0 -2px var(--white)}
 .mcth .x{width:15px;height:14px}
 .mctb{flex:1;min-height:0;overflow:auto;background:#fff;box-shadow:var(--sunken);margin:2px;padding:3px 2px}
-.trow{display:flex;align-items:center;gap:3px;width:100%;padding:1px 2px 1px calc(var(--d,0) * 14px);border:0;background:none;text-align:left;white-space:nowrap}
+.trow{display:flex;align-items:center;gap:0;width:100%;height:22px;padding:0 2px 0 1px;border:0;background:none;text-align:left;white-space:nowrap}
+.trow[disabled]{color:inherit}
+.tc{position:relative;flex:none;width:19px;align-self:stretch}
+.tc i{position:absolute;display:block}
+.tc .v,.tc .up{left:9px;top:0;width:1px;bottom:0;background:repeating-linear-gradient(#808080 0 1px,transparent 1px 2px)}
+.tc .up{bottom:auto;height:11px}
+.tc .hz{left:10px;right:1px;top:11px;height:1px;background:repeating-linear-gradient(90deg,transparent 0 1px,#808080 1px 2px)}
+.tc .tpm{position:absolute;left:5px;top:7px;z-index:1}
 .trow img{width:16px;height:16px;flex:none}
-.trow .lb{overflow:hidden;text-overflow:ellipsis;padding:0 2px}
+.trow .lb{overflow:hidden;text-overflow:ellipsis;padding:0 2px;margin-left:4px}
 .trow:hover .lb{text-decoration:underline}
 .trow.on .lb{background:var(--navy);color:#fff;outline:1px dotted #ff0;outline-offset:-1px}
-.tpm{width:11px;height:11px;flex:none;display:grid;place-items:center;font:9px/1 "W98",monospace;background:#fff;box-shadow:inset 0 0 0 1px var(--shadow);margin-right:2px}
-.tpm.empty{background:none;box-shadow:none}
+.tpm{width:9px;height:9px;background:#fff;box-shadow:inset 0 0 0 1px var(--shadow)}
+.tpm::before{content:"";position:absolute;left:2px;top:4px;width:5px;height:1px;background:#000}
+.tpm.plus::after{content:"";position:absolute;left:4px;top:2px;width:1px;height:5px;background:#000}
 .iestatus .st2{flex:0 0 110px}
 .iestatus .st3{flex:0 0 150px;gap:4px}
 @media (max-width:620px){.mctree{display:none!important}}
@@ -532,7 +543,9 @@ body.shut{background:#000;display:grid;place-items:center}
 #volBtn img{width:16px;height:16px}
 .volpop{position:fixed;z-index:9500;width:84px;background:var(--face);box-shadow:var(--raised);padding:6px 6px 8px;text-align:center}
 .vphead{margin-bottom:4px}
-.vpslider{height:96px;display:grid;place-items:center;margin-bottom:6px}
+.vpslider{position:relative;height:96px;display:grid;place-items:center;margin-bottom:6px}
+.vpticks{position:absolute;left:50%;top:0;bottom:0;width:30px;margin-left:-15px;pointer-events:none}
+.vpticks i{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,#000 0 3px,transparent 3px calc(100% - 3px),#000 calc(100% - 3px))}
 .vpslider input[type=range]{writing-mode:vertical-lr;direction:rtl;width:24px;height:92px}
 .vpmute{justify-content:center;font-size:12px}
 .sndlist{max-height:132px;overflow:auto;background:#fff;box-shadow:var(--sunken);padding:2px}
@@ -588,17 +601,48 @@ input[type=range]{accent-color:#000080}
   #startmenu:not([hidden]){animation:slide .12s steps(4) both}
   @keyframes slide{from{clip-path:inset(100% 0 0 0)}to{clip-path:inset(0 0 0 0)}}
 }
+/* ---------- Écran d'ouverture de session ---------- */
+#logon{position:fixed;inset:0;z-index:9900;background:var(--teal);display:grid;place-items:center;padding:8px}
+#logon[hidden]{display:none}
+.logwin .tbtns{display:flex;gap:2px}
+.logwin{width:min(480px,100%);background:var(--face);box-shadow:var(--raised);padding:3px}
+.logwin .tbar{background:linear-gradient(90deg,var(--navy),var(--blue));color:#fff;cursor:default}
+.logwin .tbtn.q{font:bold 11px/1 Arial,sans-serif;color:#000}
+.logbody{display:flex;gap:14px;padding:12px 10px 16px 12px;align-items:flex-start}
+.logbody>img{width:48px;height:48px;flex:none;margin-top:2px}
+.logmain{flex:1;min-width:0;padding-top:4px}
+.logmain p{margin:0 0 14px}
+.logrow{display:flex;align-items:center;gap:8px;margin-top:6px}
+.logrow label{flex:0 0 66px}
+.logrow input{flex:1;min-width:0;height:21px;border:0;padding:2px 4px;background:#fff;box-shadow:var(--sunken);font:inherit;color:#000;outline:0;cursor:default}
+.logbtns{display:flex;flex-direction:column;gap:7px;flex:none;padding-top:6px}
+.logbtns .btn{min-width:75px}
+@media (max-width:420px){.logbody{flex-wrap:wrap}.logbtns{flex-direction:row;margin-left:auto}}
 </style>
 </head>
-<body>
+<body class="locked">
+<div id="logon" role="dialog" aria-modal="true" aria-labelledby="logonTitle">
+  <div class="logwin">
+    <div class="tbar"><b id="logonTitle">Welcome to Windows</b><span class="tbtns"><button class="tbtn q" type="button" data-l="help" aria-label="Help">?</button><button class="tbtn x" type="button" data-l="x" aria-label="Close"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></span></div>
+    <div class="logbody">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAE+ElEQVR4AcyYDZabMAyEpV4suRniZuFkdD6DwSY2S7J5bXgebEuyPOMfmu4f+8ATEfO7+O30ZwJmJW9B5r1A/H6/2/0NrFmYY22+XvUEsKImck/QFNuE8s8Qv91u9g4YqxxKaVtOOq+gJSCTdyVvgfzEbOQxXME4jubuCcQj+rcijgIgxqo7E7SAqGyHQG6f1Zm4xm5h7ssU5PiNiKOAbYIIk5guEGnjuJDYBjUa7p5iG66P7ERTAOSHYbYzZELufRHuB19o1CxQq6K4LzHv7kRDQCTiZiQ+gynOLEKRKwkrHo5N0TVTnA22PNQIWXrmzjyWPgSvHqdKQASkyLwkXPNrAnuCrc8gMhEmfz0mIqx6Dt3kK2zuy/hXd2ITEGHzMMzKuyRSIxXyQqZEchSv4SCiXP1QHFBlVqYebdkVVbm4LwGviEgCItrkc2LqQSxBFoKthNymPOa+X9pQgLQZUHMpcGyQX5yWxpueqyKSAMWfFki7e0pOGyGtAYsIaD9759JUhESYzXKCHOLuqXlFRFfAND0MkAnSs2YAJXn8gJgdYqQO70F1WbBVfRmGIkhTbG73ayK6Am63u92ELWPRyGccPyhcW1PctjaN1qmJwFPjVRFdAawseDweOtuRjo+7pzoiDDt+UFPYe743Lax89p5Slg7lr7rqL1l6x6krgJXNYFWOyD7qesq6x/Ss/m6FPOdGB381ImJUEPVq2iqO7dZpNLoCWNmraOS1cmIot2LMdhERdQTjQW197nUFsLJX8Zx2sbQJDItze9fMGQM299qYpikdW46vTGysKrMkIMJ8HF2GfUXUSWVav0atOgUUr1HHIMKW1dd5GGVokSmGqKkBelN6sdPUJs+YJIBGRFvE2S4wLkNcddlX8qtxiEitmhgLlcx67e06Rq61nJEnZBNAJ6ItAt8ZKvJaeSZN8dz81KiFme3E7eQhD1+747Eph1QCcET0ROB9RkV+dd/udxivPTNpslGB9SrvImq7pecKeQKfBGCMsO6dwA/Ex8AQtp35xLRYdeIyIobUnDv+5FxfV8kT3hSAI8KaIiZdaoivMSb29kR8JcnKT9NkPKuJpobsH4ujIOJ/OjYpyfrqCsAfUYuYpoc+ZToeFjYMtj+ZXa53j93vNyvN7m6jVuBInCHT1P/a4G/hVEBrwNHGpNkmbqlJDUriybG+1kspYftOkOfxeFhEELVfEHonOBUQYc3/5JT5mJTJsUH4SBwbPnfXr9uJZkUcA+PJ8yp5xnYFXCFPAk3qTA4J+plwrrFl3O/3j5Inb1cAzqs4imCc+3IK3F133J+IE4NoxGs8Xef1KroCtAPpK6T7dimnSBx2Yn4iXl7cT5CHWFcATkQI+mrQ+xktEYwqidP/FHlynQogQHBEqL5UjiKOgz5Jntw/ChD5mcBX0BPxafJwOhWQyR+PAAN/QikC4uC3F7Y1Z1cA5IdhNmD21gfCIiJdbD6fQH3T814yDWyVroA9+HfziTQJSuypP9DqCoiw9Bk1e/kKfIDW9RRdATnFOLJ43yviVEDEcvjHERFZ0nfVpwKgGmHrvwPfuQtXBKzMv3MXTgVEWPo53fplye58A04FvE3wHw48FaAdsHH8zqOT1+hUgILSBR71Fze1q9KyVQH/qPOTAGhsIvgrHQbA7qj+79tzRYB42iaCzjfhqgA4JxGsvH7fpD6v/42/AAAA//8w1jVyAAAABklEQVQDAMi7Hotiu9kBAAAAAElFTkSuQmCC" alt="">
+      <div class="logmain">
+        <p>Type a user name and password to log on to Windows.</p>
+        <div class="logrow"><label for="logUser"><u>U</u>ser name:</label><input id="logUser" type="text" value="RMAX97" readonly tabindex="-1" spellcheck="false"></div>
+        <div class="logrow"><label for="logPass"><u>P</u>assword:</label><input id="logPass" type="text" value="•••••••" readonly tabindex="-1" aria-label="Password (already filled in)"></div>
+      </div>
+      <div class="logbtns"><button class="btn default" type="button" data-l="ok">OK</button><button class="btn" type="button" data-l="cancel">Cancel</button></div>
+    </div>
+  </div>
+</div>
 
-<main id="desktop" aria-label="Bureau">
+<main id="desktop" aria-label="Desktop">
   <div class="icons" id="icons"></div>
 </main>
 
 <div id="windows"></div>
 
-<nav id="startmenu" hidden aria-label="Menu Démarrer">
+<nav id="startmenu" hidden aria-label="Start menu">
   <div class="band" aria-hidden="true"><span><b>Hobbys</b><i>97</i></span></div>
   <div class="items" id="startitems" role="menu"></div>
 </nav>
@@ -607,7 +651,7 @@ input[type=range]{accent-color:#000080}
   <button class="start" id="startBtn" type="button" aria-haspopup="menu" aria-expanded="false"><img data-icon="logo16" alt="">Start</button>
   <div class="sep" aria-hidden="true"></div>
   <div class="tasks" id="tasks"></div>
-  <div class="tray"><img data-icon="net" alt="" id="netIcon" title="Hors connexion"><button type="button" id="volBtn" aria-label="Volume"><img data-icon="vol16" alt="" id="volIcon"></button><time id="clock"></time></div>
+  <div class="tray"><img data-icon="net" alt="" id="netIcon" title="Offline"><button type="button" id="volBtn" aria-label="Volume"><img data-icon="vol16" alt="" id="volIcon"></button><time id="clock"></time></div>
 </footer>
 
 <script>
@@ -777,8 +821,8 @@ $("#desktop").addEventListener("pointerdown", e => { if (!e.target.closest("butt
 /* ================= Fenêtres ================= */
 const wins = {}; let zTop = 10, cascade = 0;
 const small = () => innerWidth < 700 || innerHeight < 500;
-const TBTN = `<button class="tbtn" data-w="min" aria-label="Réduire"><svg width="8" height="8" viewBox="0 0 8 8"><rect x="1" y="6" width="6" height="2"/></svg></button>
-      <button class="tbtn" data-w="max" aria-label="Agrandir"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M0 0h9v9H0zM1 2v6h7V2z" fill-rule="evenodd"/></svg></button>`;
+const TBTN = `<button class="tbtn" data-w="min" aria-label="Minimize"><svg width="8" height="8" viewBox="0 0 8 8"><rect x="1" y="6" width="6" height="2"/></svg></button>
+      <button class="tbtn" data-w="max" aria-label="Maximize"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M0 0h9v9H0zM1 2v6h7V2z" fill-rule="evenodd"/></svg></button>`;
 
 function openApp(id, opts = {}) {
   closeStart(); playSnd("start");
@@ -799,7 +843,7 @@ function openApp(id, opts = {}) {
   el.innerHTML = `
     <header class="tbar"><img data-icon="${a.icon}" alt=""><b>${a.title}</b>
       ${a.dialog ? "" : TBTN}
-      <button class="tbtn x" data-w="close" aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button>
+      <button class="tbtn x" data-w="close" aria-label="Close"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button>
     </header>
     ${body}${a.dialog || a.fixed ? "" : `<div class="grip" aria-hidden="true"></div>`}`;
   fillIcons(el);
@@ -924,8 +968,8 @@ addEventListener("resize", () => Object.values(wins).forEach(w => { if (small() 
 
 /* ================= Menu Démarrer ================= */
 const FAVS = [
-  { id: "lb", name: "Letterboxd", url: "https://letterboxd.com/fromoors/", icon: "dvd", desc: "Mon profil et ma liste de DVD et Blu-ray" },
-  { id: "dg", name: "Discogs", url: "https://www.discogs.com/", icon: "vinyl", desc: "Ma collection de vinyles" }
+  { id: "lb", name: "Letterboxd", url: "https://letterboxd.com/fromoors/", icon: "dvd", desc: "My profile and my DVD and Blu-ray list" },
+  { id: "dg", name: "Discogs", url: "https://www.discogs.com/", icon: "vinyl", desc: "My vinyl collection" }
 ];
 const IE_HOME = "http://hobbys97/";
 /* Rubriques du portail. Tous les liens s’ouvrent dans un nouvel onglet du navigateur. */
@@ -969,24 +1013,25 @@ const START = [
       { ic: "group", lb: "Games", sub: [{ ic: "mines", lb: "Minesweeper", open: "mines" }, { ic: "sol", lb: "Solitaire", open: "sol" }] },
       { sep: true }, { ic: "calc", lb: "Calculator", open: "calc" }
     ] },
-    { ic: "folder", lb: "Mes collections", sub: COLLECTIONS }, { sep: true },
+    { ic: "folder", lb: "My Collections", sub: COLLECTIONS }, { sep: true },
     { ic: "ie", lb: "Internet Explorer", open: "ie" },
     { ic: "explorer", lb: "Windows Explorer", open: "explorer" }
   ] },
   { ic: "favfolder", lb: "Favorites", k: "F", sub: FAVS.map(f => ({ ic: f.icon, lb: f.name, href: f.url })) },
   { ic: "docs", lb: "Documents", k: "D", sub: [
     { ic: "docs", lb: "My Documents", open: "docs" },
-    { ic: "folder", lb: "Images", open: "docs", dir: "img" },
-    { ic: "folder", lb: "Musique", open: "docs", dir: "mus" }
+    { ic: "folder", lb: "Pictures", open: "docs", dir: "img" },
+    { ic: "folder", lb: "Music", open: "docs", dir: "mus" }
   ] },
   { ic: "settings", lb: "Settings", k: "S", sub: [
     { ic: "display", lb: "Display…", open: "settings", tab: "bg", mode: "display" },
     { ic: "vol32", lb: "Sounds…", open: "sounds" },
-    { ic: "passwords", lb: "Passwords…", open: "settings", tab: "acc", mode: "pass" }, { sep: true },
+    { ic: "passwords", lb: "Passwords…", open: "settings", tab: "acc", mode: "pass" },
+    { ic: "share", lb: "Share with friends…", open: "share" }, { sep: true },
     { ic: "printer", lb: "Printers", open: "printers" },
     { ic: "computer", lb: "My Computer", open: "computer" }
   ] },
-  { ic: "find", lb: "Find", k: "F", sub: COLLECTIONS.map(c => ({ ...c, lb: "Dans " + c.lb })) },
+  { ic: "find", lb: "Find", k: "F", sub: COLLECTIONS.map(c => ({ ...c, lb: "In " + c.lb })) },
   { ic: "helpbook", lb: "Help", k: "H", open: "help" },
   { ic: "run", lb: "Run…", k: "R", open: "run" },
   { sep: true },
@@ -1043,6 +1088,7 @@ function runStart(x) {
   if (x.open === "sounds") return soundsBox();
   if (x.open === "help") return helpBox();
   if (x.open === "run") return runBox();
+  if (x.open === "share") return shareBox();
   if (x.open === "logoff" || x.open === "shutdown") return shutBox(x.open);
   if (x.open) openApp(x.open, { tab: x.tab, mode: x.mode });
   if (x.dir) { openApp("docs"); if (wins.docs) { wins.docs.el.dataset.dir = x.dir; delete wins.docs.el.dataset.sel; renderDocs(wins.docs.el); } }
@@ -1050,7 +1096,7 @@ function runStart(x) {
 function sysBox(icon, title, html, buttons) {
   if (icon !== "floppy") playSnd("ding");
   const m = document.createElement("div"); m.className = "sysbox";
-  m.innerHTML = `<div class="win"><div class="tbar"><img data-icon="${icon}" alt=""><b>${title}</b><span class="tbtns"><button class="tbtn x" type="button" data-b="x" aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></span></div>
+  m.innerHTML = `<div class="win"><div class="tbar"><img data-icon="${icon}" alt=""><b>${title}</b><span class="tbtns"><button class="tbtn x" type="button" data-b="x" aria-label="Close"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></span></div>
     <div class="wbody" style="background:var(--face);box-shadow:none;padding:12px">${html}
     <div class="btns" style="display:flex;gap:6px;justify-content:flex-end;margin-top:14px">${buttons.map((b, i) => `<button class="btn${b[1] ? " default" : ""}" type="button" data-i="${i}">${b[0]}</button>`).join("")}</div></div></div>`;
   document.body.appendChild(m); fillIcons(m);
@@ -1062,14 +1108,14 @@ function sysBox(icon, title, html, buttons) {
   return m;
 }
 function soundsBox() {
-  const list = [["boot", "Démarrage de Windows"], ["start", "Ouverture d’un programme"], ["ding", "Boîte de dialogue"], ["chord", "Erreur"], ["notify", "Notification"], ["recycle", "Corbeille"], ["chimes", "Fond d’écran changé"], ["tada", "Partie gagnée"], ["logoff", "Fermeture de session"], ["ringin", "Connexion"], ["ringout", "Déconnexion"]];
-  const m = sysBox("vol32", "Propriétés de Sons", `
+  const list = [["boot", "Start Windows"], ["start", "Open program"], ["ding", "Default sound"], ["chord", "Critical Stop"], ["notify", "Notification"], ["recycle", "Empty Recycle Bin"], ["chimes", "Wallpaper changed"], ["tada", "Game won"], ["logoff", "Exit Windows"], ["ringin", "Connect"], ["ringout", "Disconnect"]];
+  const m = sysBox("vol32", "Sounds Properties", `
     <div style="display:flex;gap:14px;align-items:flex-start">
       <img data-icon="vol32" alt="" style="width:32px;height:32px">
       <div style="flex:1;min-width:0">
-        <label class="sndline" style="margin-bottom:10px"><input type="checkbox" id="sbOn"${sndOn ? " checked" : ""}> Sons de Windows 98</label>
+        <label class="sndline" style="margin-bottom:10px"><input type="checkbox" id="sbOn"${sndOn ? " checked" : ""}> Windows 98 sounds</label>
         <label style="display:flex;align-items:center;gap:8px;margin-bottom:12px">Volume<input type="range" id="sbVol" min="0" max="100" value="${sndVol}" style="flex:1"><span id="sbVal" style="width:38px;text-align:right">${sndVol} %</span></label>
-        <div style="margin-bottom:4px">Événements :</div>
+        <div style="margin-bottom:4px">Events:</div>
         <div class="sndlist">${list.map(([k, lb]) => `<button type="button" data-s="${k}"><span>${lb}</span><span class="play">▶</span></button>`).join("")}</div>
       </div>
     </div>`, [["OK", true]]);
@@ -1080,35 +1126,84 @@ function soundsBox() {
 }
 function helpBox() {
   playSnd("ding");
-  sysBox("helpbook", "Aide de Hobbys97", `<div style="display:flex;gap:12px"><img data-icon="helpbook" alt="" style="width:32px;height:32px">
-    <div style="line-height:1.55">Double-clique une icône du bureau pour ouvrir une application.<br>
-    <b>Start</b> donne accès aux programmes, aux documents et aux réglages.<br>
-    <b>Settings → Display</b> change le fond d’écran, <b>Passwords</b> gère les connexions.<br>
-    Les jeux ont leur propre aide dans leur menu <b>Help</b>.</div></div>`, [["OK", true]]);
+  sysBox("helpbook", "Hobbys97 Help", `<div style="display:flex;gap:12px"><img data-icon="helpbook" alt="" style="width:32px;height:32px">
+    <div style="line-height:1.55">Double-click a desktop icon to open an application.<br>
+    <b>Start</b> gives access to programs, documents and settings.<br>
+    <b>Settings → Display</b> changes the wallpaper, <b>Passwords</b> manages your accounts.<br>
+    Games have their own help in their <b>Help</b> menu.</div></div>`, [["OK", true]]);
 }
 function runBox() {
-  const m = sysBox("run", "Exécuter", `<div style="display:flex;gap:12px"><img data-icon="run" alt="" style="width:32px;height:32px">
-    <div style="flex:1"><p style="margin:0 0 10px;line-height:1.5">Tape le nom d’un programme : vinyls, films, cards, mangas, cd, solitaire, demineur, explorer, ie, docs.</p>
-    <label style="display:flex;align-items:center;gap:8px">Ouvrir :<input type="text" id="runIn" style="flex:1" autocomplete="off"></label></div></div>`,
+  const m = sysBox("run", "Run", `<div style="display:flex;gap:12px"><img data-icon="run" alt="" style="width:32px;height:32px">
+    <div style="flex:1"><p style="margin:0 0 10px;line-height:1.5">Type the name of a program: vinyls, films, cards, mangas, cd, solitaire, minesweeper, calc, explorer, ie, docs.</p>
+    <label style="display:flex;align-items:center;gap:8px">Open:<input type="text" id="runIn" style="flex:1" autocomplete="off"></label></div></div>`,
     [["OK", true, mm => {
       const v = (mm.querySelector("#runIn").value || "").trim().toLowerCase();
       const map = { calc: "calc", calculatrice: "calc", calculator: "calc", vinyls: "vinyls", vinyl: "vinyls", films: "films", film: "films", cards: "cards", carte: "cards", cartes: "cards", mangas: "manga", manga: "manga", cd: "cd", cdplayer: "cd", solitaire: "sol", sol: "sol", demineur: "mines", minesweeper: "mines", mines: "mines", explorer: "explorer", ie: "ie", internet: "ie", docs: "docs", documents: "docs", settings: "settings" };
       if (map[v]) openApp(map[v]);
-    }], ["Annuler"]]);
+    }], ["Cancel"]]);
   setTimeout(() => m.querySelector("#runIn").focus(), 30);
   m.querySelector("#runIn").addEventListener("keydown", e => { if (e.key === "Enter") m.querySelector("[data-i='0']").click(); });
 }
 function shutBox(kind) {
   playSnd("ding");
-  sysBox("shutdown", kind === "logoff" ? "Fermer la session" : "Arrêter l’ordinateur", `<div style="display:flex;gap:12px"><img data-icon="shutdown" alt="" style="width:32px;height:32px">
-    <div style="line-height:1.55">${kind === "logoff" ? "Fermer la session et recharger Hobbys97 ?<br>Tes collections sont enregistrées." : "Arrêter Hobbys97 ?<br>La page va se fermer, ou revenir à l’écran d’accueil."}</div></div>`,
-    [["Oui", true, () => { playSnd("logoff"); if (kind === "logoff") setTimeout(() => location.reload(), 1400); else setTimeout(() => { document.body.innerHTML = `<div class="bye">Vous pouvez maintenant éteindre votre ordinateur en toute sécurité.</div>`; document.body.className = "shut"; }, 1400); }], ["Non"]]);
+  sysBox("shutdown", kind === "logoff" ? "Log Off Windows" : "Shut Down Windows", `<div style="display:flex;gap:12px"><img data-icon="shutdown" alt="" style="width:32px;height:32px">
+    <div style="line-height:1.55">${kind === "logoff" ? "Are you sure you want to log off?<br>Your collections are saved." : "Are you sure you want to shut down Hobbys97?"}</div></div>`,
+    [["Yes", true, () => { playSnd("logoff"); if (kind === "logoff") setTimeout(() => location.reload(), 1400); else setTimeout(() => { document.body.innerHTML = `<div class="bye">It’s now safe to turn off your computer.</div>`; document.body.className = "shut"; }, 1400); }], ["No"]]);
+}
+
+/* ===== Partage : instantané des collections pour la version en lecture seule (share-data.js) ===== */
+function idbAll(name, storeName, opts, withKeys) {
+  return new Promise(res => {
+    let r; try { r = indexedDB.open(name, 1); } catch { return res(withKeys ? {} : []); }
+    r.onupgradeneeded = () => { try { r.result.createObjectStore(storeName, opts); } catch {} };   // même schéma que la page, au cas où elle n’a jamais été ouverte
+    r.onerror = () => res(withKeys ? {} : []);
+    r.onsuccess = () => {
+      const db = r.result;
+      try {
+        const st = db.transaction(storeName, "readonly").objectStore(storeName);
+        if (!withKeys) { const q = st.getAll(); q.onsuccess = () => { db.close(); res(q.result || []); }; q.onerror = () => { db.close(); res([]); }; return; }
+        const out = {}, c = st.openCursor();
+        c.onsuccess = () => { const x = c.result; if (x) { out[x.key] = x.value; x.continue(); } else { db.close(); res(out); } };
+        c.onerror = () => { db.close(); res(out); };
+      } catch { db.close(); res(withKeys ? {} : []); }
+    };
+  });
+}
+const blobToUrl = b => new Promise(res => { const f = new FileReader(); f.onload = () => res(f.result); f.onerror = () => res(null); f.readAsDataURL(b); });
+async function makeShareData() {
+  const ls = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (/^(videotheque\.collection\.v1|videotheque\.theme|h97-manga-v1|mcc2-collection-|mcc2-custom-)/.test(k)) ls[k] = localStorage.getItem(k);
+  }
+  if (ls["h97-manga-v1"]) { try { const d = JSON.parse(ls["h97-manga-v1"]); delete d.mcUser; ls["h97-manga-v1"] = JSON.stringify(d); } catch {} }
+  const vinyls = await idbAll("mes-vinyles", "records", { keyPath: "id" });
+  const raw = await idbAll("videotheque-img", "img", undefined, true), filmsImg = {};
+  for (const k in raw) { const v = raw[k]; if (v instanceof Blob) { const u = await blobToUrl(v); if (u) filmsImg[k] = u; } else if (typeof v === "string") filmsImg[k] = v; }
+  const data = { saved: Date.now(), ls, vinyls, filmsImg };
+  return { text: `/* Hobbys97 : collections partagées (lecture seule), créé le ${new Date().toLocaleString("en-GB")} */\nwindow.H97_SHARE = ${JSON.stringify(data)};\n`, vinyls: vinyls.length };
+}
+function shareBox() {
+  const m = sysBox("share", "Share with friends", `<div style="display:flex;gap:12px"><img data-icon="share" alt="" style="width:32px;height:32px;flex:none">
+    <div style="line-height:1.55;max-width:340px">Creates <b>share-data.js</b>, a snapshot of your Vinyls, Films, Cards and Mangas for the read-only copy of Hobbys97.<br><br>
+    1. Open each collection once, so that it is up to date.<br>2. Click <b>Create share-data.js</b>.<br>3. Upload the file to the read-only copy, replacing the old one.
+    <div style="margin-top:12px"><button class="btn" type="button" id="shGo">Create share-data.js</button></div><p class="status" id="shSt" style="margin:8px 0 0"></p></div></div>`, [["Close", true]]);
+  m.querySelector("#shGo").addEventListener("click", async e => {
+    e.stopPropagation(); const st = m.querySelector("#shSt"), b = e.currentTarget; b.disabled = true; st.className = "status"; st.textContent = "Preparing…";
+    try {
+      const r = await makeShareData();
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([r.text], { type: "text/javascript" })); a.download = "share-data.js";
+      document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+      st.className = "status ok"; st.textContent = `share-data.js downloaded (${(r.text.length / 1048576).toFixed(1)} MB).`;
+    } catch { st.className = "status err"; st.textContent = "The file couldn’t be created. Try again."; }
+    b.disabled = false;
+  });
 }
 
 function printersBox() {
   sysBox("printer", "Printers", `<div style="display:flex;gap:12px"><img data-icon="printer" alt="" style="width:32px;height:32px">
-    <p style="margin:0;line-height:1.55">Aucune imprimante n’est installée.<br>Hobbys97 imprime la page affichée avec l’imprimante de ton navigateur.</p></div>`,
-    [["Imprimer la page", false, () => print()], ["OK", true]]);
+    <p style="margin:0;line-height:1.55">No printers are installed.<br>Hobbys97 prints the current page using your browser’s printer.</p></div>`,
+    [["Print page", false, () => print()], ["OK", true]]);
 }
 function closeStart() { closeSub(0); sm.hidden = true; sb.setAttribute("aria-expanded", "false"); }
 sb.addEventListener("click", () => { const open = sm.hidden; sm.hidden = !open; sb.setAttribute("aria-expanded", String(open)); if (open) sm.querySelector(".mi").focus(); });
@@ -1148,8 +1243,8 @@ addEventListener("blur", () => setTimeout(() => {
 const clock = $("#clock");
 function tick() {
   const d = new Date();
-  clock.textContent = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-  clock.dateTime = d.toISOString(); clock.title = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  clock.textContent = d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  clock.dateTime = d.toISOString(); clock.title = d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 }
 tick(); setInterval(tick, 5000);
 
@@ -1161,8 +1256,8 @@ $("#volBtn").addEventListener("click", e => {
   if (volPop) return closeVolPop();
   const m = document.createElement("div"); m.className = "volpop";
   m.innerHTML = `<div class="vphead">Volume</div>
-    <div class="vpslider"><input type="range" min="0" max="100" value="${sndVol}" aria-label="Volume" orient="vertical"></div>
-    <label class="sndline vpmute"><input type="checkbox"${!sndOn || sndVol === 0 ? " checked" : ""}> Mute</label>`;
+    <div class="vpslider"><span class="vpticks" aria-hidden="true"><i style="top:8px"></i><i style="top:16px"></i><i style="top:24px"></i><i style="top:32px"></i><i style="top:40px"></i><i style="top:48px"></i><i style="top:56px"></i><i style="top:64px"></i><i style="top:72px"></i><i style="top:80px"></i><i style="top:88px"></i></span><input type="range" min="0" max="100" value="${sndVol}" aria-label="Volume" orient="vertical"></div>
+    <label class="sndline vpmute"><input type="checkbox"${!sndOn || sndVol === 0 ? " checked" : ""}> <span><u>M</u>ute</span></label>`;
   document.body.appendChild(m); volPop = m;
   const r = $("#volBtn").getBoundingClientRect();
   m.style.left = Math.min(r.left - 40, innerWidth - m.offsetWidth - 4) + "px";
@@ -1194,7 +1289,7 @@ let sbClient = null, sbUser = null;
 function rng(seed) { return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
 function canvasOf(w, h, draw) { const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h); return c.toDataURL("image/png"); }
 const WALLS = [
-  { id: "w-nuages", name: "Nuages.bmp", mode: "stretch", draw: () => canvasOf(800, 600, (g, w, h) => {
+  { id: "w-nuages", name: "Clouds.bmp", mode: "stretch", draw: () => canvasOf(800, 600, (g, w, h) => {
       const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, "#1f5fc8"); gr.addColorStop(1, "#8ec0f2"); g.fillStyle = gr; g.fillRect(0, 0, w, h);
       const r = rng(7);
       for (let c = 0; c < 14; c++) {
@@ -1207,35 +1302,35 @@ const WALLS = [
         }
       }
     }) },
-  { id: "w-briques", name: "Briques rouges.bmp", mode: "tile", draw: () => canvasOf(64, 32, (g) => {
+  { id: "w-briques", name: "Red Bricks.bmp", mode: "tile", draw: () => canvasOf(64, 32, (g) => {
       g.fillStyle = "#b9b2a4"; g.fillRect(0, 0, 64, 32); const r = rng(3);
       const brick = (x, y, w) => { const t = 140 + Math.floor(r() * 30); g.fillStyle = `rgb(${t},${50 + r() * 14 | 0},${36 + r() * 10 | 0})`; g.fillRect(x, y, w, 14); g.fillStyle = "rgba(255,255,255,.18)"; g.fillRect(x, y, w, 2); g.fillStyle = "rgba(0,0,0,.22)"; g.fillRect(x, y + 12, w, 2); };
       brick(1, 1, 30); brick(33, 1, 30); brick(-15, 17, 30); brick(17, 17, 30); brick(49, 17, 30);
     }) },
-  { id: "w-damier", name: "Damier.bmp", mode: "tile", draw: () => canvasOf(16, 16, (g) => {
+  { id: "w-damier", name: "Checkerboard.bmp", mode: "tile", draw: () => canvasOf(16, 16, (g) => {
       g.fillStyle = "#4b4b4b"; g.fillRect(0, 0, 16, 16); g.fillStyle = "#6a6a6a"; g.fillRect(0, 0, 8, 8); g.fillRect(8, 8, 8, 8);
       g.fillStyle = "#7c7c7c"; g.fillRect(0, 0, 8, 1); g.fillRect(8, 8, 8, 1);
     }) },
-  { id: "w-mosaique", name: "Mosaïque bleue.bmp", mode: "tile", draw: () => canvasOf(32, 32, (g) => {
+  { id: "w-mosaique", name: "Blue Mosaic.bmp", mode: "tile", draw: () => canvasOf(32, 32, (g) => {
       g.fillStyle = "#1c3c8c"; g.fillRect(0, 0, 32, 32);
       g.fillStyle = "#2f5fbf"; g.beginPath(); g.moveTo(16, 2); g.lineTo(30, 16); g.lineTo(16, 30); g.lineTo(2, 16); g.fill();
       g.fillStyle = "#5c8ce6"; g.beginPath(); g.moveTo(16, 8); g.lineTo(24, 16); g.lineTo(16, 24); g.lineTo(8, 16); g.fill();
       g.fillStyle = "#c8dcff"; g.fillRect(15, 15, 2, 2);
     }) },
-  { id: "w-vagues", name: "Vagues.bmp", mode: "tile", draw: () => canvasOf(64, 32, (g) => {
+  { id: "w-vagues", name: "Waves.bmp", mode: "tile", draw: () => canvasOf(64, 32, (g) => {
       const cols = ["#0d4f8b", "#1669b0", "#2385d1", "#53a8e8"];
       for (let y = 0; y < 32; y++) for (let x = 0; x < 64; x++) {
         const v = Math.sin((x / 64) * Math.PI * 2 + y / 32 * Math.PI * 2) * 4 + y; g.fillStyle = cols[Math.floor(((v % 16) + 16) % 16 / 4)]; g.fillRect(x, y, 1, 1);
       }
     }) },
-  { id: "w-espace", name: "Espace.bmp", mode: "stretch", draw: () => canvasOf(800, 600, (g, w, h) => {
+  { id: "w-espace", name: "Space.bmp", mode: "stretch", draw: () => canvasOf(800, 600, (g, w, h) => {
       const gr = g.createRadialGradient(w * .7, h * .3, 20, w * .5, h * .5, w * .8); gr.addColorStop(0, "#2a1f5c"); gr.addColorStop(1, "#05051a"); g.fillStyle = gr; g.fillRect(0, 0, w, h);
       const r = rng(11);
       for (let i = 0; i < 420; i++) { const b = r(); g.fillStyle = b > .96 ? "#fff6c8" : b > .85 ? "#cfe0ff" : "rgba(255,255,255,.55)"; const s = b > .97 ? 2 : 1; g.fillRect(r() * w | 0, r() * h | 0, s, s); }
       const px0 = w * .72, py0 = h * .32; const pg = g.createRadialGradient(px0 - 25, py0 - 25, 5, px0, py0, 70); pg.addColorStop(0, "#f0b27a"); pg.addColorStop(1, "#7a3b1c"); g.fillStyle = pg; g.beginPath(); g.arc(px0, py0, 70, 0, 7); g.fill();
       g.strokeStyle = "rgba(240,210,160,.8)"; g.lineWidth = 6; g.beginPath(); g.ellipse(px0, py0, 120, 26, -.35, 0, 7); g.stroke();
     }) },
-  { id: "w-prairie", name: "Collines.bmp", mode: "stretch", draw: () => canvasOf(800, 600, (g, w, h) => {
+  { id: "w-prairie", name: "Hills.bmp", mode: "stretch", draw: () => canvasOf(800, 600, (g, w, h) => {
       const sky = g.createLinearGradient(0, 0, 0, h * .6); sky.addColorStop(0, "#2d6fd6"); sky.addColorStop(1, "#bfe0ff"); g.fillStyle = sky; g.fillRect(0, 0, w, h);
       const hill = (y0, amp, col, ph) => { g.fillStyle = col; g.beginPath(); g.moveTo(0, h); for (let x = 0; x <= w; x += 8) g.lineTo(x, y0 + Math.sin(x / w * Math.PI * 1.4 + ph) * amp); g.lineTo(w, h); g.fill(); };
       hill(h * .62, 40, "#5f9f3e", .4); hill(h * .72, 55, "#4c8f2c", 2.2); hill(h * .84, 30, "#3c7d22", 4);
@@ -1290,7 +1385,7 @@ function docsChanged() {
 
 /* ================= Fond d’écran ================= */
 let wallpaper = (() => { try { return JSON.parse(localStorage.getItem("h97-wallpaper")) || { id: "", mode: "center" }; } catch { return { id: "", mode: "center" }; } })();
-const MODES = { center: "Centrer", tile: "Mosaïque", stretch: "Étirer", fill: "Remplir" };
+const MODES = { center: "Center", tile: "Tile", stretch: "Stretch", fill: "Fill" };
 const SOLID = ["#008080", "#3a6ea5", "#000080", "#5a4fcf", "#800080", "#800000", "#a0522d", "#808000", "#008000", "#2f4f4f", "#000000", "#404040", "#808080", "#c0c0c0", "#e6c7c2", "#ffffff"];
 function paint(el, wp) {
   el.style.backgroundColor = wp.color || "#008080";
@@ -1325,7 +1420,7 @@ function docsHtml() {
       <span class="ieurl"><img class="mcai" alt=""><span class="mcpath"></span><button type="button" class="iecombo" tabindex="-1" aria-hidden="true"><svg viewBox="0 0 7 4"><path d="M0 0h7L3.5 4z"/></svg></button></span></div>
     <div class="wbody mcbody"><div class="mcmain">
       <aside class="mcside"><img class="mcbig" alt=""><h2 class="mctitle"></h2><i class="mcline"></i><p class="mcdesc"></p></aside>
-      <div class="files mcgrid" role="listbox" aria-label="Contenu du dossier"></div>
+      <div class="files mcgrid" role="listbox" aria-label="Folder contents"></div>
     </div></div>
     <div class="iestatus"><span class="st1"></span><span class="st2"></span><span class="st3"><img class="mcsi" alt=""><span class="mcloc">My Computer</span></span></div>`;
 }
@@ -1335,13 +1430,13 @@ function initDocs(el) {
     const b = e.target.closest("[data-d]"); if (!b || b.disabled) return;
     const k = b.dataset.d, sel = el.dataset.sel;
     if (k === "import") {
-      if (el.dataset.dir === "mus") pickAudio(async fl => { const n = await importSongs(fl); el.querySelector(".st1").textContent = n ? `${n} morceau${n > 1 ? "x" : ""} ajouté${n > 1 ? "s" : ""}` : "Aucun fichier audio reconnu"; });
-      else pickFiles(async fl => { const n = await importImages(fl); el.querySelector(".st1").textContent = n ? `${n} image${n > 1 ? "s" : ""} importée${n > 1 ? "s" : ""}` : "Aucune image reconnue"; });
+      if (el.dataset.dir === "mus") pickAudio(async fl => { const n = await importSongs(fl); el.querySelector(".st1").textContent = n ? `${n} song${n > 1 ? "s" : ""} added` : "No audio files recognized"; });
+      else pickFiles(async fl => { const n = await importImages(fl); el.querySelector(".st1").textContent = n ? `${n} picture${n > 1 ? "s" : ""} imported` : "No pictures recognized"; });
     }
     else if (k === "wall" && sel) openApp("settings", { tab: "bg", select: sel });
     else if (k === "del" && sel) {
-      if (/^s-/.test(sel)) { const t = musTracks().find(x => x.id === sel); if (t && confirm(`Supprimer « ${t.title} » ?`)) { delete el.dataset.sel; await deleteSong(sel); renderDocs(el); } return; }
-      const d = allDocs().find(x => x.id === sel); if (d && !d.builtin && confirm(`Supprimer « ${d.name} » ?`)) { delete el.dataset.sel; await deleteImage(sel); }
+      if (/^s-/.test(sel)) { const t = musTracks().find(x => x.id === sel); if (t && confirm(`Are you sure you want to delete “${t.title}”?`)) { delete el.dataset.sel; await deleteSong(sel); renderDocs(el); } return; }
+      const d = allDocs().find(x => x.id === sel); if (d && !d.builtin && confirm(`Are you sure you want to delete “${d.name}”?`)) { delete el.dataset.sel; await deleteImage(sel); }
     }
     else if ((k === "up" || k === "back") && el.dataset.dir) { el.dataset.dir = ""; delete el.dataset.sel; renderDocs(el); }
   });
@@ -1375,7 +1470,7 @@ function renderDocs(el, selOnly) {
   const inImg = el.dataset.dir === "img", docs = allDocs(), sel = el.dataset.sel, files = el.querySelector(".files");
   const inMus = el.dataset.dir === "mus", songs = musTracks();
   const list = inMus ? songs.map(t => ({ id: t.id, name: t.title, song: t })) : inImg ? docs
-    : [{ id: "images", name: "Images", folder: true }, { id: "musique", name: "Musique", folder: true }];
+    : [{ id: "images", name: "Pictures", folder: true }, { id: "musique", name: "Music", folder: true }];
   if (selOnly) files.querySelectorAll(".file").forEach(b => b.classList.toggle("sel", b.dataset.id === sel));
   else files.innerHTML = list.map(d => d.song
     ? `<button class="file${d.id === sel ? " sel" : ""}" type="button" role="option" data-id="${d.id}"><img class="fico" src="${ICON.cdplayer}" alt=""><span>${esc(d.name)}</span></button>`
@@ -1387,24 +1482,24 @@ function renderDocs(el, selOnly) {
   el.querySelector("[data-d='del']").disabled = !cur || cur.folder || (cur.song ? !/^s-/.test(cur.id) : cur.builtin);
   el.querySelector("[data-d='up']").disabled = !inImg && !inMus;
   el.querySelector("[data-d='back']").disabled = !inImg && !inMus;
-  el.querySelector("[data-d='import']").querySelector("span").textContent = inMus ? "Ajouter" : "Import";
-  el.querySelector(".mcpath").textContent = inMus ? "C:\\My Documents\\Musique" : inImg ? "C:\\My Documents\\Images" : "C:\\My Documents";
+  el.querySelector("[data-d='import']").querySelector("span").textContent = inMus ? "Add" : "Import";
+  el.querySelector(".mcpath").textContent = inMus ? "C:\\My Documents\\Music" : inImg ? "C:\\My Documents\\Pictures" : "C:\\My Documents";
   el.querySelector(".mcai").src = ICON[inImg || inMus ? "folder" : "docs"];
   el.querySelector(".mcsi").src = ICON.computer;
-  const folderName = inMus ? "Musique" : inImg ? "Images" : "My Documents";
+  const folderName = inMus ? "Music" : inImg ? "Pictures" : "My Documents";
   el.querySelector(".mcbig").src = cur && cur.song ? ICON.cdplayer : cur && !cur.folder ? cur.url() : ICON[inImg || inMus ? "folder" : "docs"];
   el.querySelector(".mcbig").className = "mcbig" + (cur && !cur.folder && !cur.song ? " shot" : "");
   el.querySelector(".mctitle").textContent = cur ? cur.name : folderName;
   el.querySelector(".mcdesc").innerHTML = cur
-    ? (cur.song ? `${esc(cur.song.artist)}${cur.song.album ? "<br>" + esc(cur.song.album) : ""}<br>${mmss(cur.song.dur)} m:s<br>Double-clique pour l’écouter.`
-      : cur.folder ? (cur.id === "musique" ? "Tes morceaux, lus par le CD Player." : "Tes images et tes fonds d’écran.")
-      : `${cur.builtin ? "Fond d’écran d’origine" : "Image importée"}.<br>Double-clique pour la mettre en fond d’écran.`)
-    : inMus ? `${songs.length} morceau${songs.length > 1 ? "x" : ""}.<br>Glisse des fichiers audio ici pour les ajouter.`
-    : inImg ? `${docs.length} image${docs.length > 1 ? "s" : ""}.<br>Glisse des images ici pour les ajouter.` : "Sélectionne un élément pour afficher sa description.";
+    ? (cur.song ? `${esc(cur.song.artist)}${cur.song.album ? "<br>" + esc(cur.song.album) : ""}<br>${mmss(cur.song.dur)} m:s<br>Double-click to play it.`
+      : cur.folder ? (cur.id === "musique" ? "Your songs, played by CD Player." : "Your pictures and wallpapers.")
+      : `${cur.builtin ? "Original wallpaper" : "Imported picture"}.<br>Double-click to set it as wallpaper.`)
+    : inMus ? `${songs.length} song${songs.length > 1 ? "s" : ""}.<br>Drag audio files here to add them.`
+    : inImg ? `${docs.length} picture${docs.length > 1 ? "s" : ""}.<br>Drag pictures here to add them.` : "Select an item to view its description.";
   el.querySelector(".tbar b").textContent = folderName;
   const w = wins.docs; if (w) { const ts = w.task.querySelector("span"); if (ts) ts.textContent = folderName; }
-  el.querySelector(".st1").textContent = cur ? "1 objet(s) sélectionné(s)" : `${n} objet(s)`;
-  el.querySelector(".st2").textContent = cur && cur.song ? "Morceau" : cur && !cur.folder ? "Image" : cur ? "Dossier" : "";
+  el.querySelector(".st1").textContent = cur ? "1 object(s) selected" : `${n} object(s)`;
+  el.querySelector(".st2").textContent = cur && cur.song ? "Song" : cur && !cur.folder ? "Picture" : cur ? "File Folder" : "";
 }
 
 /* ================= Internet Explorer (favoris) ================= */
@@ -1412,22 +1507,23 @@ const IEI = { // petites icônes pixel art de la barre du navigateur
   back: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M11 4v5h10v6H11v5L1 12z" fill="#2f8f3f" stroke="#17521f" stroke-width="1"/><path d="M10 7v3h10v1H9z" fill="#7fe08f" opacity=".75"/></svg>`,
   fwd: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><g transform="matrix(-1 0 0 1 24 0)"><path d="M11 4v5h10v6H11v5L1 12z" fill="#2f8f3f" stroke="#17521f" stroke-width="1"/><path d="M10 7v3h10v1H9z" fill="#7fe08f" opacity=".75"/></g></svg>`,
   reload: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M6 4h12v2H6zM4 6h2v12H4zM6 18h12v2H6zM18 6h2v4h-2z" fill="#1c3c9c"/><path d="M16 9h6l-3 4z" fill="#1c3c9c"/><path d="M7 7h10v10H7z" fill="#e8eefc"/><path d="M9 9h6v2H9zM9 12h5v1H9zM9 14h6v1H9z" fill="#7a8ab8"/></svg>`,
-  stop: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M8 3h8v2h3v3h2v8h-2v3h-3v2H8v-2H5v-3H3V8h2V5h3z" fill="#9a9a9a"/><path d="M9 8h6v8H9z" fill="#d8d8d8"/><path d="M8 9h1v6H8zM15 9h1v6h-1z" fill="#7a7a7a"/></svg>`,
+  stop: `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAD1BMVEUAAACAAAD/AACAgID///8kN7BFAAAAAXRSTlMAQObYZgAAAAFiS0dEBI9o2VEAAAAHdElNRQfiBhoAKi0NCMIvAAAApElEQVQoz3WR2xHEIAhFcdLAGiuQSQFm6GDH/mtaXj5CZvmC472IAiCRcs4fWJFPRKx51gkthiadDqqTUTN5GKZpB8Udl1Zf9jQTdM7x6uZJkkreBRdXcG60NL1UChVIE52iS+AGWKICrORzuuA/eFlWU4rXUhyM4ugUHsejP59PLXzQG4RPFsG+hmIA7mkgW8zhqyQXMLl52WXVAGSx7f+gcf4DIC49kP+gREgAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTgtMDYtMjZUMDA6NDI6NDUtMDQ6MDDiLn1XAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE4LTA2LTI2VDAwOjQyOjQ1LTA0OjAwk3PF6wAAAABJRU5ErkJggg==" alt="">`,
   search: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M3 2h5v1h1v1h1v5H9v1H8v1H3v-1H2V9H1V4h1V3h1z" fill="#203878"/><path d="M3 4h5v5H3z" fill="#b8d0ff"/><path d="M10 10h2v1h1v1h1v2h-2v-1h-1v-1h-1z" fill="#6a4a1a"/></svg>`,
-  print: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M7 3h10v6H7z" fill="#fff" stroke="#000"/><path d="M3 9h18v9H3z" fill="#c0c0c0"/><path d="M3 9h18v1H3zM3 9h1v9H3z" fill="#fff"/><path d="M3 17h18v1H3zM20 9h1v9h-1z" fill="#404040"/><path d="M6 15h12v6H6z" fill="#fff" stroke="#000"/><path d="M8 17h8v1H8zM8 19h6v1H8z" fill="#808080"/><path d="M17 11h2v1h-2z" fill="#0c0"/></svg>`,
+  print: `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAARVBMVEUAAACGhob4+PgAM5nx8fHAwMAAAADq6uqZmZnj4+PX19d3d3eysrLd3d1mZmbMzMwA/wBmmQD/AADMADOWlpagoKT///+1S0UXAAAAAXRSTlMAQObYZgAAAAFiS0dEFnzRqBkAAAAHdElNRQfiBhoAMBd7KeFGAAABL0lEQVQ4y53S23LDIAxF0QgjcbNDL/D/v9ojyZO0KeOH+C2zF8IB325vPER03UMIV0T7FUHfNhVxTWx93LYYWWTVk62P2hc5Z0opYX1Kq55zoFK0LjtyZYCCAeV/99x2DIAp8nJWZyaR/ThsQOP9STxT46NWI7swfvN+l1+rdQVA7yC7WL6fIIRM3D8+QVrtzCzg3JoCMpBgmPvXd6+NkLC6oUMIdjLQuxE8ujdIcyGDxIDubUQn4B+eAluIb4G3U5I1D3oKu65hE0zkkOdQ0Vz4dY7hAC+Q6xwPgXyedyayrAAThgsRkBNEvJcKfkwYIraFAwkxgTjIOkH0rtrzgxJJpegB6ISM1TDt7/cmUg69L55TZNqM1+9BpOoxIs9VdtJ5n+jr7ISvspPL/ObzAwWKEVvw2lTrAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE4LTA2LTI2VDAwOjQ4OjIzLTA0OjAwULPRIwAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxOC0wNi0yNlQwMDo0ODoyMy0wNDowMCHuaZ8AAAAASUVORK5CYII=" alt="">`,
   home: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M8 1 1 8h2v7h4v-4h2v4h4V8h2z" fill="#3a5fcd" stroke="#102060" stroke-width=".8"/><path d="M7 11h2v4H7z" fill="#e8c440"/></svg>`,
   books: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M2 2h5v12H2z" fill="#6a5acd"/><path d="M7 3h4v11H7z" fill="#cd5a5a"/><path d="M11 2h3v12h-3z" fill="#5aa05a"/><path d="M2 5h12v1H2zM2 11h12v1H2z" fill="#f0e0a0"/></svg>`,
   link: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M3 12 11 2l3 2-8 10H3z" fill="#2a8a8a"/><path d="M4 12l7-9 1 1-7 9z" fill="#7ad8d8"/><path d="M2 13h4v1H2z" fill="#000"/></svg>`,
-  page: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M3 1h7l3 3v11H3z" fill="#fff" stroke="#000" stroke-width=".8"/><path d="M5 6h6v1H5zM5 8h6v1H5zM5 10h4v1H5z" fill="#2850c8"/></svg>`,
+  page: `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAhFBMVEUEBAR3d3eGhob///+ZmZlVVVX/+/DMzMzn59YzMzMAZszx8fHq6urAwMAzM8wzZv8zmcwAmf+ZzMxmmcwAzP9m//8zM5lmmZn//5kAAJmZ//+ZmWb/zJnMzJmWlpbMmWZmZswzZpmAgAAzZsxfX18AmcwAZpkAM5kzM2YAAIAEBATj4+O7dIp6AAAAAXRSTlMAQObYZgAAAAFiS0dEAxEMTPIAAAAHdElNRQfiBhgXDQAhclFBAAABQklEQVQ4y22SCW6DMBBF7bDWdsbQAi1N0ywUmtD736/jZSA2+RII6T3NfMswZsN3cVgYnkRJs1jIw6SRsRWK0NgKZWhshSQ0NkL2YrMRBCbBb6mKfZryLBKQmneSS288CsInzxN8pLTGKoDQNlWNG7SZIBUa2crFq+PWkHYCGtnC3/ZCAIComrb2G5QqSYDu/UPbfr2oPlthO0pVLsLCjdE2OCKcAIcvrekQokHBcxL48ZvOUFU1RrgNNIEfT+eLWEdgwgn8dB3gol0H048akPBz0NCR0OtxrCe/gYTr0IHZgRywyKgnz0kYfm897jAtbFXD7QbqAHd264yhI07HvANj82y2GDz9UYNA4DD3MGEMtXztYAyAxB3RcRVOcD+MdFfkadDB/3LuCh11PJog3RUvNBKUzQOMhF3xNA8Tsudh7B80OyDmPnsZjQAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0wNi0yNFQyMzoxMzowMC0wNDowMHHNFnYAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMDYtMjRUMjM6MTM6MDAtMDQ6MDAAkK7KAAAAAElFTkSuQmCC" alt="">`,
   lock: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M5 3h6v1h1v4h-2V5H6v3H4V4h1z" fill="#808080"/><path d="M3 8h10v7H3z" fill="#e8c440" stroke="#7a5a00" stroke-width=".8"/><path d="M7 10h2v3H7z" fill="#7a5a00"/></svg>`,
   plug: `<svg viewBox="0 0 24 16" shape-rendering="crispEdges"><path d="M0 7h7v2H0zM17 7h7v2h-7z" fill="#404040"/><path d="M7 4h4v8H7zM13 4h4v8h-4z" fill="#3a5fcd"/><path d="M11 6h2v1h-2zM11 9h2v1h-2z" fill="#808080"/></svg>`,
-  homebig: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M12 2 1 12h3v9h6v-6h4v6h6v-9h3z" fill="#e8c440" stroke="#000" stroke-width=".8"/><path d="M10 15h4v6h-4z" fill="#8a5a10"/></svg>`,
-  searchbig: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><circle cx="10" cy="10" r="6" fill="#b8d0ff" stroke="#203878" stroke-width="2"/><path d="M15 15l6 6" stroke="#6a4a1a" stroke-width="3"/></svg>`,
-  favbig: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="#f0c020" stroke="#8a6000"/></svg>`,
-  hist: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><circle cx="12" cy="12" r="9" fill="#d8e4f8" stroke="#203878" stroke-width="1.6"/><path d="M12 6v7l5 3" stroke="#203878" stroke-width="2" fill="none"/></svg>`,
-  mail: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M2 5h20v14H2z" fill="#fff" stroke="#000"/><path d="M2 5l10 7 10-7" fill="none" stroke="#c03030" stroke-width="1.4"/></svg>`,
+  homebig: `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAG1BMVEUAAACAgID///8AAADAwMCAAACAgAD/AAD//wB1lid/AAAAAXRSTlMAQObYZgAAAAFiS0dEAmYLfGQAAAAHdElNRQfiBhgXDDr+ZbmyAAAAo0lEQVQoz53QQQ7CIBCF4W56AGgvUGq6Jo4eACWme29gG9O9d5h47I5lBihujG/B4s+XQKiUrOJpE9bZMjRlcLYIh6YIhok2nnYxHQDsBO36c/C8/0R934nZ1q9cDOMUgogZ8ZyLYVyWKRcEECGJDyCSxAYQrYgeeFG02+miMFqp8PcitO4lsPgKAMPzkQd6yvtIoeWHxiD3xyAjefMnlwJDuwIw1E/ANQY2HQAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0wNi0yNFQyMzoxMjo1OC0wNDowMOUAPUsAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMDYtMjRUMjM6MTI6NTgtMDQ6MDCUXYX3AAAAAElFTkSuQmCC" alt="">`,
+  searchbig: `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAKlBMVEUAAACAgID////AwMAA/wAAgAAAAIAAAP8AgIAAAAAA//+AAAD/AAD/AP8n4wKiAAAAAXRSTlMAQObYZgAAAAFiS0dEAmYLfGQAAAAHdElNRQfiBhoAMxNXaXacAAABgklEQVQoz0WRv0/CQBTHj4HBOLXE+GMETEzjIimJaVyE3i62D7jNhbsQJwYO4mYMKWWqkWK60hD5F4hujup/4B/je6Xqd7nc933eN+/eMUYqGCj2r4JRtm0frv7uZqXZ5BzkTW6YWR3aWudA2a5zAFCBirZABfHOsDvWup8DyI+CIFBKElLyCBij2loSYq5yYMKlFNhRsyY8A/y2Bh5hxHoFHawPuerZ9YgZ1mwGVF+0tddEonSyfsGAIDT2pW/7gpmzyR0lGM5ZjPOjsfIwIbivLdMQBxLsyCsfd8fjkmU55zGHhO3VGi4EgblM03ROhFetut3RwCk7jhMScd1wXegMlkSEIAS7rrrotBzrlyhWXY6vo4z1HETEitji+3CAxDSGGA2bE9F6SNfhIRHMJwmdTMMnI05wHx4RQqnksXa2wX1gD0YIjSqdvmZbBg7iWSnVu3z/2JBRBFgQ0BNvFzmCCUpKubj92iI7C5mpH719ZwbbSeieRGz3c5N/b4LKzugHfEqgwqmPL9UAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTgtMDYtMjZUMDA6NTE6MTktMDQ6MDBH132EAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE4LTA2LTI2VDAwOjUxOjE5LTA0OjAwNorFOAAAAABJRU5ErkJggg==" alt="">`,
+  favbig: `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAJFBMVEUAAACZmQAICAj4+Pj//5nMzGb/+/AAAAD/zJkzMwAAAP////+gebovAAAAAXRSTlMAQObYZgAAAAFiS0dECx/XxMAAAAAHdElNRQfiBhgXAy5jJ3EAAAAA1klEQVQoz42RMQ7CMBAEQ0mZIIp0/AGecJFO7kC2FKXmATxikaxUtPS48Ss5XxwnoWI7j3f3fHJV/aFa1KzOuwsRdacFHCjpthjuChbL0U261ipJnDd65IokJhCaGTCzEOZ25SAwaAUgASoOyFFzxWEsEkQGz2BskFJfHMMwWB07AVAXg/QwZscYPzHqXAVicDE4eJ47QOOoHexzhINxQRxIEVkC6I217OGLg9DLIn7qkHHEWiAvEwAdJyQlNKK3gKfcITuxZjzrO+qt2mr/3uj1z1//6AsSG3mwAQQN9wAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0wNi0yNFQyMzowMzo0Ni0wNDowMFfZ8nYAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMDYtMjRUMjM6MDM6NDYtMDQ6MDAmhErKAAAAAElFTkSuQmCC" alt="">`,
+  hist: `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAFVBMVEUAAACAgID///8AAADAwMD//wCAgAC+RHk7AAAAAXRSTlMAQObYZgAAAAFiS0dEAmYLfGQAAAAHdElNRQfiBhgXDDlnbOgIAAAAtklEQVQoz7XRSxKCMAwG4DJegAIegDS4RoLd01YP0Bs4zvT+RzBDNUBdm12++Sd9RKmfqnSuWgBytSXosYCuLaBZxmIG0REA/H+g3gG/xldmA32/oW5IQLs4xcUI9H4Y+PIk0MWJ1WxwHmANfKF3cQ3Y5/iBPMEmAeIR3qYXSQIALyltiRidc48ddGgQ0QjA1U0ccTYfG0KYNeKMSOvHn/g+FIgzJKtRioVI027DFMKhZ6FjL/UGQR40cCrfQ20AAAAldEVYdGRhdGU6Y3JlYXRlADIwMTgtMDYtMjRUMjM6MTI6NTctMDQ6MDATSE2iAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE4LTA2LTI0VDIzOjEyOjU3LTA0OjAwYhX1HgAAAABJRU5ErkJggg==" alt="">`,
+  mail: `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAElBMVEUAAACAgIAAAAD//////wDAwMCfFoyPAAAAAXRSTlMAQObYZgAAAAFiS0dEAxEMTPIAAAAHdElNRQfiBhgXBTYmEU7QAAAAjElEQVQoz72R0Q3DIAxEswKJvEA3iCwPEJ0YAFnsv0rAxoSq3835y8fzgcy2vaO0am/GwY/QjbT0ZzdoQchGyuwvNUMCAcFDSyQouxEI8SAGcikG4UhLmEQuAM7KQUA7QqpBCLikVCFBtBOptSWoE7knWmUnFBxlTyeePST2MR0zngm/5WeFny/9599uplo1j43vrn4AAAAldEVYdGRhdGU6Y3JlYXRlADIwMTgtMDYtMjRUMjM6MDU6NTQtMDQ6MDAB8pOGAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE4LTA2LTI0VDIzOjA1OjU0LTA0OjAwcK8rOgAAAABJRU5ErkJggg==" alt="">`,
+  cal: `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAKlBMVEUAAAAzZswAAABmmcwzM5mZzP9mZgCZmWb////MzJn//8z//5lmZjOZM2axrq50AAAAAXRSTlMAQObYZgAAAAFiS0dECIbelXoAAAAHdElNRQfiBBMBIBygM1xCAAAA10lEQVQoz22SzQ2CMBiGPz3I2b+7cQU3MI6gC3DQDUCNA0Dr2fTHATqBKYknp0ATdvFrgdKKT8OBl/d9egGgx2DsMwGYrnzWAPOdxzYGCBazf8EmAINjxswhgjAlr12gmBKUPV0gTEPbxolzXlVvbrk3jZJ8sCGpc5SqRAfTrQO/Y4M2jT8Oc4PIJO0c9V63DmIbVPoOh3GcCav3tvHCSbs352Eb7juVOIl8Bb9gQHOa66J5Dhjowr0WOQbBrbc0hn1A8iNNMRgFDXRAlHokC4Dh0qf/M3wBbSXTo4liZKUAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTgtMDQtMTlUMDE6MzI6MjgtMDQ6MDAY/+NZAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE4LTA0LTE5VDAxOjMyOjI4LTA0OjAwaaJb5QAAAABJRU5ErkJggg==" alt="">`,
   go: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M2 6h7V3l5 5-5 5v-3H2z" fill="#1aa01a" stroke="#0a600a"/></svg>`,
-  globe: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><circle cx="8" cy="8" r="6" fill="#3a6fd8"/><path d="M4 5h3v3H4zM9 9h3v2H9z" fill="#3fae3a"/></svg>`,
+  globe: `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAIVBMVEUAAACAgID////AwMAA/wAAgAAAAIAAAP8AgIAAAAAA//8hGBbuAAAAAXRSTlMAQObYZgAAAAFiS0dEAmYLfGQAAAAHdElNRQfiBhoAOCLlQ69tAAABS0lEQVQoz02RvW7CMBSF3YGBkaAuHSGVKkZkXgDioVtFchO8dYmtPEBs2h1FZcpCUB4AlcfsuSa0PdP1uZ+Pf64QQRNI/OlhMpMyo7ffdTTfbJQi8z4YUehT7twAzORKEZFtbHsD5sCLerd3rhoA8L5pGmsNI9OUgT2UO8NIdBmAgzJGY8dycVAByHJHqkXE9UIF+rWypVzBWByPxP0ud+kGxPTl+o2A5gtnZDLTIjoePjnB145wfxiXtGDCp8QP0OIpnT3vQNQyPLAXj8t1QgB8BoCJNI6Tnd97XwNgYrtOEiq892WI0GIbJ8Fxd2IUJ1yAyDiiFSNsQVW4WsM/wZCKicLa84mYEBlLO+iDECFEyoS2kOlxiMAeDmMiN334ZVKkzwDK1/CDQIg6BkptbmMQxAnGmK4aJjfuTFDV3oc77nndt//m30O36gfeQZVRgJ2bgwAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0wNi0yNlQwMDo1NjozNC0wNDowMIb5AEAAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMDYtMjZUMDA6NTY6MzQtMDQ6MDD3pLj8AAAAAElFTkSuQmCC" alt="">`,
   cmp: [
     `<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><circle cx="8" cy="8" r="6" fill="#3a6fd8"/><path d="M5 5h3v3H5zM9 9h3v2H9z" fill="#3fae3a"/></svg>`,
     `<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M1 3h14v10H1z" fill="#fff" stroke="#000" stroke-width=".8"/><path d="M1 3l7 5 7-5" fill="none" stroke="#c03030"/></svg>`,
@@ -1456,13 +1552,13 @@ function ieHtml() {
       <span class="ielinks">Links <b>»</b></span>
     </div>
     <div class="wbody iebody">
-      <aside class="iefav" hidden><div class="mcth"><span>Favorites</span><button class="x" type="button" data-ie="nofav" aria-label="Fermer le volet"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></div>
+      <aside class="iefav" hidden><div class="mcth"><span>Favorites</span><button class="x" type="button" data-ie="nofav" aria-label="Close pane"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></div>
         <div class="favtree">
           <div class="favfolder"><img data-icon="favfolder" alt=""><span>Mes collections</span></div>
           ${FAVS.map(f => `<a class="favrow" href="${f.url}" target="_blank" rel="noopener" data-pl="${f.id}"><img data-icon="${f.icon}" alt=""><span>${f.name}</span></a>`).join("")}
         </div></aside>
       <div class="iepage"><div class="web">
-        <div class="portal">
+        <div class="portal" lang="fr">
           <div class="plogo"><span class="ph">HOBBYS<i>!</i></span><em>FRANCE</em></div>
           <form class="psearch" autocomplete="off">
             <input type="text" name="q" aria-label="Rechercher sur le Web" placeholder="">
@@ -1482,7 +1578,7 @@ function ieHtml() {
     </div>
     <div class="iestatus">
       <span class="st1">Done</span>
-      <span class="st2"><span class="iedate"></span></span>
+      <span class="st2">${IEI.cal}<span class="iedate"></span></span>
       <span class="st3">${IEI.globe}<span>Internet</span></span>
     </div>`;
 }
@@ -1505,15 +1601,15 @@ function initIe(el) {
     netActivity(true); st.textContent = "Recherche en cours…";
     setTimeout(() => {
       window.open("https://www.google.com/search?q=" + encodeURIComponent(q), "_blank", "noopener");
-      netActivity(false); st.textContent = "Résultats ouverts dans un nouvel onglet";
+      netActivity(false); st.textContent = "Results opened in a new tab";
       setTimeout(() => { st.textContent = "Done"; }, 2500);
     }, 600);
   });
-  el.querySelector(".iedate").textContent = new Date().toLocaleDateString("fr-FR");
+  el.querySelector(".iedate").textContent = new Date().toLocaleDateString("en-GB");
   const load = (ms, after) => {
-    netActivity(true); st.textContent = "Connexion au site…"; page.style.visibility = "hidden";
+    netActivity(true); st.textContent = "Connecting to site…"; page.style.visibility = "hidden";
     setTimeout(() => {
-      st.textContent = "Chargement…";
+      st.textContent = "Loading…";
       setTimeout(() => { page.style.visibility = ""; page.scrollTop = 0; st.textContent = "Done"; netActivity(false); if (after) after(); }, ms * .5);
     }, ms * .5);
   };
@@ -1530,7 +1626,7 @@ function initIe(el) {
     else if (/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(q)) url = "https://" + q;
     else url = "https://www.google.com/search?q=" + encodeURIComponent(q);
     netActivity(true);
-    setTimeout(() => { window.open(url, "_blank", "noopener"); netActivity(false); inp.value = IE_HOME; st.textContent = "Ouvert dans un nouvel onglet"; setTimeout(() => { st.textContent = "Done"; }, 2500); }, 600);
+    setTimeout(() => { window.open(url, "_blank", "noopener"); netActivity(false); inp.value = IE_HOME; st.textContent = "Opened in a new tab"; setTimeout(() => { st.textContent = "Done"; }, 2500); }, 600);
   };
   el.querySelector(".ieaddr").addEventListener("submit", e => { e.preventDefault(); go(inp.value); });
   inp.addEventListener("focus", () => inp.select());
@@ -1546,17 +1642,20 @@ function initIe(el) {
 }
 
 const FS = {
-  root: { name: "My Computer", icon: "computer", addr: "My Computer", desc: "Sélectionne un élément pour afficher sa description.", items: ["a", "c", "printers"] },
-  a: { name: "3½ Floppy (A:)", icon: "floppy", desc: "Lecteur de disquettes 3½ pouces", notReady: true },
-  printers: { name: "Printers", icon: "printer", desc: "Ajoute, supprime et configure les imprimantes.", box: "printers" },
-  c: { name: "(C:)", icon: "hdd", addr: "C:\\", desc: "Disque local\nCapacité : 2,01 Go\nEspace libre : 812 Mo", items: ["docs", "progs"] },
-  docs: { name: "My Documents", icon: "docs", addr: "C:\\My Documents", desc: "Tes images et tes fonds d’écran.", app: "docs" },
-  progs: { name: "Program Files", icon: "folder", addr: "C:\\Program Files", desc: "Les programmes installés.", items: ["vinyls", "films", "cards", "manga"] },
-  vinyls: { name: "Vinyls", icon: "vinyl", desc: "My Discollection : ma collection de vinyles.", app: "vinyls" },
-  films: { name: "Films", icon: "dvd", desc: "Ma Vidéothèque : mes DVD et Blu-ray.", app: "films" },
+  root: { name: "My Computer", icon: "computer", addr: "My Computer", desc: "Select an item to view its description.", items: ["a", "c", "printers"] },
+  a: { name: "3½ Floppy (A:)", icon: "floppy", desc: "3½-inch floppy disk drive", notReady: true },
+  printers: { name: "Printers", icon: "printer", desc: "Adds, removes and configures printers.", box: "printers" },
+  c: { name: "(C:)", icon: "hdd", addr: "C:\\", desc: "Local Disk\nCapacity: 2.01 GB\nFree space: 812 MB", items: ["docs", "progs"] },
+  docs: { name: "My Documents", icon: "docs", addr: "C:\\My Documents", desc: "Your pictures and wallpapers.", app: "docs" },
+  progs: { name: "Program Files", icon: "folder", addr: "C:\\Program Files", desc: "Installed programs.", items: ["vinyls", "films", "cards", "manga"] },
+  vinyls: { name: "Vinyls", icon: "vinyl", desc: "My Discollection: my vinyl collection.", app: "vinyls" },
+  films: { name: "Films", icon: "dvd", desc: "Ma Vidéothèque: my DVDs and Blu-rays.", app: "films" },
   cards: { name: "Cards", icon: "card", desc: "Ma Collection de Cartes.", app: "cards" },
-  manga: { name: "Mangas", icon: "mangaCover", desc: "Ma Mangathèque : mes séries et mes tomes.", app: "manga" }
+  manga: { name: "Mangas", icon: "mangaCover", desc: "Ma Mangathèque: my series and volumes.", app: "manga" }
 };
+Object.assign(ICON, {"tComp": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAS1BMVEUAAACZmZnAwMApKSn/////+/Dq6uqGhoZmZmYiIiIAMzPn59YAmZlmZv8zM/8AZmbMzP9mzJlmmcxmmZmZZswAgIDx8fEcHBytqZCDR4QnAAAAAXRSTlMAQObYZgAAAAFiS0dEBI9o2VEAAAAHdElNRQfiBBMBJCt84jxJAAAAZ0lEQVQY013ORxKAIAxAUYJKMSJYMN7/pGpQij8r3jABIe6gJPgsc9Ax9NyglDY2wZjCApNzbvY1hBCWBtZl22uI0Udf4MA3bYnh/CKTwOQk/X7KN4DA8pA2DwBhHj6jwvwItRt5wQV4XQe9v2MxrAAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0wNC0xOVQwMTozNjo0My0wNDowMNV8Hl4AAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMDQtMTlUMDE6MzY6NDMtMDQ6MDCkIabiAAAAAElFTkSuQmCC", "tFloppy": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAJFBMVEUAAAAEBASGhoZ3d3eZ//8EBAT////M///MzMzAwMCysrL/AAAsdKkTAAAAAnRSTlMAAHaTzTgAAAABYktHRAZhZrh9AAAAB3RJTUUH4gYYFwghEGy1WgAAAGZJREFUCNc9yLsJgEAQhOFBsBBHFC73mWtusiW4HchVIrgFGFiC3ekt4p/MxwBvGVmkRTNNs6NTlQ9xc/Txw3BcJ0ByJHdkZja03YlaVVeRBeF97C4TSLMEijD4o+oPvQrIJbXg7wG9Dx193wAPegAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0wNi0yNFQyMzowODozMy0wNDowMPfELz8AAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMDYtMjRUMjM6MDg6MzMtMDQ6MDCGmZeDAAAAAElFTkSuQmCC", "tHdd": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAElBMVEUAAACAgIDAwMAAAAD///8AgADPISvXAAAAAXRSTlMAQObYZgAAAAFiS0dEBI9o2VEAAAAHdElNRQfiBhgXChEEg+d0AAAAOElEQVQI12NgIAYIgoEAA6MSGAgziLiAgKMwgxCIr6oIZSiBGGC1IAZYDZAB0S1owMBsDAb4bAIAUboJB1T7tl4AAAAldEVYdGRhdGU6Y3JlYXRlADIwMTgtMDYtMjRUMjM6MTA6MTctMDQ6MDCT95NlAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE4LTA2LTI0VDIzOjEwOjE3LTA0OjAw4qor2QAAAABJRU5ErkJggg==", "tFolder": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAElBMVEUAAACAgIDAwMD//wD///8AAACbprkxAAAAAXRSTlMAQObYZgAAAAFiS0dEBI9o2VEAAAAHdElNRQfiBhgXARJ+fm8FAAAAPUlEQVQI12NggANBQQEwzaisrAhmCBkZGQkKCjIwiLiAgGMAg4gRCBgCGcogoEiiiCAEBDCwhoJBAAMGAABWtxBh3fHKpgAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0wNi0yNFQyMzowMToxOC0wNDowMEvzV3IAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMDYtMjRUMjM6MDE6MTgtMDQ6MDA6ru/OAAAAAElFTkSuQmCC", "tPrinter": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAFVBMVEUAAACAgID///8AAADAwMAA/wD/AAA+rmXRAAAAAXRSTlMAQObYZgAAAAFiS0dEAmYLfGQAAAAHdElNRQfiBhoAMBd7KeFGAAAAWklEQVQI1yWMwQ3AMAgDiToBZIKSBYgyAapX6Ardf4SaxJ87WQYRpqmcmB9r7r6K5j42KVFE2nhCDC+yZ+cFPqRS4OQW3Fqi2EXwfS1myAXNPtnIwiEtD2nFH5aiDinVlqzuAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE4LTA2LTI2VDAwOjQ4OjIzLTA0OjAwULPRIwAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxOC0wNi0yNlQwMDo0ODoyMy0wNDowMCHuaZ8AAAAASUVORK5CYII=", "tBin": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAM1BMVEUAAACGhoZVVVX4+PgAAACtqZDMzMxNTU3n59YzmTNmZmYAgADAwMB3d3dmmWYpKSn////Nz7fpAAAAAXRSTlMAQObYZgAAAAFiS0dEEJWyDSwAAAAHdElNRQfiBhoAMBmckcxBAAAAeUlEQVQY003PWxbDIAgEUEYtYLDN/nebQT2m8wVXfIkwYOQNUFDrIaC1UvA5xMUlugma1RRWMIF7VnXOYIF776TccpmkxHDEUPYLesSIcGXfJgxOMPolzIu9j/DIAdvgEfEjrD5f4jxBL9sgZpo5/SaY3X9fNq7PgQfsmQQmcjO+TgAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0wNi0yNlQwMDo0ODoyNS0wNDowMDNj5BkAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMDYtMjZUMDA6NDg6MjUtMDQ6MDBCPlylAAAAAElFTkSuQmCC"});
+Object.assign(ICON, { share: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAA2ElEQVR4nO2XzRGDIBCFH5kUQhEUYAEWkZMpQygjniwlBVhEOiGHZBz5CcKC4yH7bjLuvm/chUWAxfp3ie2D1rC5gVq7sVRd/YVxfOwGGXNv4Q0AuDTLRBS5BDXali9SgmMZjHFbJwAApkMBfJ3eAwzAAAzAAKcDBMOo7wcoFR7HyzI0M1VqWn39S4UFAPt6BkFCds1AfIB1/MWMf4GkXimB+QLMAG5ZALsJP4DZEJFxXGVcLDJAwrCoBGSAVKOWyDkHqJ9RyK5ZCYSQHeVSSP5HcLZhTSKq3qt8Kx7TNDY3AAAAAElFTkSuQmCC", share16: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACRklEQVR4nI2TwUtUURTGf/fd9+Y5TxkcBwbJsSmToJ055q4Ioo3SynXLViFUC4k2IggRIgT+A23cWItqE7NI1KJFNOAigwSnyWhsSkcdU8fevHtazIyoCfbBgXs553znnO/cCzWIoKBqB84n4kCQPuIygPwfweAg7sQEbi1DAcRiSDqdKmcyxyfm85lgZARjAyQSDXfm5/sfGONWKpWK1tpTi4vvSz09mfaTOrABjNFh141HfN8VrQNlWR6O09o4OioPPc8ti/hKKVWfx3iesQqFxZnh4cqsDWDbronHL4vWEd/3/zgAyeRVPTDg3j9cTwAL2GF8/OYjKFYJLMvQ0lJQsKtgT1WDDKD8fwlcH0qOUub3/ghV6Bq7ruloATjHd6CdeoC17xIBDCL19Z1kVViAMgaU0oCLUiHEHCv4IQZjTH0LSqJRzPZOibW1DQRDsr21xn3wIQWqeq84gAqFXAvA7uyUyMy0DheWM3hNSfzSFpvBHF2XIlgWGCN44ZDpOBP/WS77Hig/Gm1wenv7d+EJ9tJS8tuNK9fdu7dvEba1g0D2Y5bnr6dpagxjRILscj4Ymns6NDZ27UUut6G7u5uDWKxlD8AWOR051dpGOO4F5H4JToiOrnPcu3ieZ5MvqYhYs+/SzsLCj/W+vsnSUWEsCEt67sNe4VNWr25u28XVol3M5e2Vz0t24mybXShtWSi+Tk1NvRIRJbL/W6G68AsC2ceJmLcijhMTTAAopVTQ3NKs81++v1nf2XmbSqV2M5mMf7SDvxoP+A+YlnDOAAAAAElFTkSuQmCC" });
+const TREE_ICON = { root: "tComp", a: "tFloppy", c: "tHdd", docs: "tFolder", progs: "tFolder", printers: "tPrinter" };
 const FS_PARENT = (() => { const m = {}; for (const k in FS) (FS[k].items || []).forEach(c => { m[c] = k; }); return m; })();
 const MCI = {
   up: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M3 8h7l2 2h9v11H3z" fill="#e8c440" stroke="#000"/><path d="M12 11l5 5h-3v4h-4v-4H7z" fill="#000"/></svg>`,
@@ -1584,10 +1683,10 @@ function compHtml(tree) {
     <div class="iebar iepers mcaddr"><span class="grab" aria-hidden="true"></span><span class="lbl">Address</span>
       <span class="ieurl"><img class="mcai" alt=""><span class="mcpath"></span><button type="button" class="iecombo" tabindex="-1" aria-hidden="true"><svg viewBox="0 0 7 4"><path d="M0 0h7L3.5 4z"/></svg></button></span></div>
     <div class="wbody mcbody${tree ? " withtree" : ""}">
-      ${tree ? `<div class="mctree"><div class="mcth"><span>All Folders</span><button class="x" type="button" data-mc="notree" aria-label="Fermer le volet"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></div><div class="mctb"></div></div>` : ""}
+      ${tree ? `<div class="mctree"><div class="mcth"><span>All Folders</span><button class="x" type="button" data-mc="notree" aria-label="Close pane"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></div><div class="mctb"></div></div>` : ""}
       <div class="mcmain">
         <aside class="mcside"><img class="mcbig" alt=""><h2 class="mctitle"></h2><i class="mcline"></i><p class="mcdesc"></p></aside>
-        <div class="mcgrid" role="listbox" aria-label="Contenu du dossier"></div>
+        <div class="mcgrid" role="listbox" aria-label="Folder contents"></div>
       </div>
     </div>
     <div class="iestatus"><span class="st1"></span><span class="st2"></span><span class="st3"><img class="mcsi" alt=""><span class="mcloc"></span></span></div>`;
@@ -1606,19 +1705,28 @@ function initComp(el, tree) {
     const box = el.querySelector(".mctb"); if (!box) return;
     const open = new Set(); for (let k = cur; k; k = parentOf(k)) open.add(k);
     const rows = [];
-    const walk = (id, depth) => {
+    /* lignes pointillées comme sous Windows 98 : une colonne par niveau ; « last » mémorise si chaque ancêtre est le dernier de sa fratrie */
+    const box9 = (kids, exp) => kids ? `<span class="tpm${exp ? "" : " plus"}"></span>` : "";
+    const walk = (id, depth, last) => {
       const n = FS[id], kids = n.items || [], exp = open.has(id);
-      rows.push(`<button class="trow${id === cur ? " on" : ""}" type="button" data-t="${id}" style="--d:${depth}">${kids.length ? `<span class="tpm">${exp ? "−" : "+"}</span>` : `<span class="tpm empty"></span>`}<img data-icon="${n.icon}" alt=""><span class="lb">${esc(n.name)}</span></button>`);
-      if (exp) kids.forEach(k => walk(k, depth + 1));
+      let cells = "";
+      if (depth === 0) cells = `<span class="tc">${box9(kids.length, exp)}</span>`;
+      else {
+        cells = `<span class="tc"></span>`;
+        for (let k = 1; k < depth; k++) cells += `<span class="tc">${last[k] ? "" : `<i class="v"></i>`}</span>`;
+        cells += `<span class="tc"><i class="${last[depth] ? "up" : "v"}"></i><i class="hz"></i>${box9(kids.length, exp)}</span>`;
+      }
+      rows.push(`<button class="trow${id === cur ? " on" : ""}" type="button" data-t="${id}">${cells}<img data-icon="${TREE_ICON[id] || n.icon}" alt=""><span class="lb">${esc(n.name)}</span></button>`);
+      if (exp) kids.forEach((k, j) => walk(k, depth + 1, { ...last, [depth + 1]: j === kids.length - 1 }));
     };
-    walk("root", 0);
-    rows.push(`<button class="trow" type="button" data-t="" disabled><span class="tpm empty"></span><img data-icon="bin" alt=""><span class="lb">Recycle Bin</span></button>`);
+    walk("root", 0, {});
+    rows.push(`<button class="trow" type="button" data-t="" disabled><img data-icon="tBin" alt="" style="margin-left:3px"><span class="lb">Recycle Bin</span></button>`);
     box.innerHTML = rows.join(""); fillIcons(box);
     box.querySelectorAll("[data-t]").forEach(b => b.addEventListener("click", () => { if (b.dataset.t) go(b.dataset.t); }));
   }
   function draw() {
     const n = FS[cur];
-    grid.innerHTML = n.items.map(k => `<button type="button" class="mci" data-k="${k}" role="option"><img data-icon="${FS[k].icon}" alt=""><span>${FS[k].name}</span></button>`).join("") || `<p class="mcempty">Ce dossier est vide.</p>`;
+    grid.innerHTML = n.items.map(k => `<button type="button" class="mci" data-k="${k}" role="option"><img data-icon="${FS[k].icon}" alt=""><span>${FS[k].name}</span></button>`).join("") || `<p class="mcempty">This folder is empty.</p>`;
     fillIcons(grid);
     $c(".mcbig").src = ICON[n.icon]; $c(".mctitle").textContent = n.name; $c(".mcpath").textContent = n.addr || n.name;
     $c(".mcai").src = ICON[n.icon]; $c(".mcsi").src = ICON[n.icon]; $c(".mcloc").textContent = n.name;
@@ -1634,12 +1742,12 @@ function initComp(el, tree) {
     $c(".mcdesc").innerHTML = sel ? `<b>${esc(n.name)}</b><br>${esc(n.desc || "").replace(/\n/g, "<br>")}` : esc(cur === "root" ? FS.root.desc : (n.desc || "")).replace(/\n/g, "<br>");
     grid.querySelectorAll(".mci").forEach(b => b.classList.toggle("sel", b.dataset.k === sel));
     const count = (FS[cur].items || []).length;
-    $c(".st1").textContent = sel ? "1 objet(s) sélectionné(s)" : `${count} objet(s)`;
-    $c(".st2").textContent = !sel ? "" : FS[sel].app ? "Programme" : FS[sel].notReady ? "Lecteur de disquettes" : FS[sel].box ? "Dossier système" : sel === "c" ? "Disque local" : "Dossier";
+    $c(".st1").textContent = sel ? "1 object(s) selected" : `${count} object(s)`;
+    $c(".st2").textContent = !sel ? "" : FS[sel].app ? "Application" : FS[sel].notReady ? "3½ Floppy" : FS[sel].box ? "System Folder" : sel === "c" ? "Local Disk" : "File Folder";
   }
   function openItem(k) {
     const n = FS[k];
-    if (n.notReady) { playSnd("chord"); return sysBox("floppy", "Erreur", `<div style="display:flex;gap:12px;align-items:flex-start"><span class="mmi">✕</span><p style="margin:0;line-height:1.5">A:\\ n’est pas accessible.<br><br>Le périphérique n’est pas prêt.</p></div>`, [["Recommencer", true], ["Annuler"]]); }
+    if (n.notReady) { playSnd("chord"); return sysBox("floppy", "Error", `<div style="display:flex;gap:12px;align-items:flex-start"><span class="mmi">✕</span><p style="margin:0;line-height:1.5">A:\\ is not accessible.<br><br>The device is not ready.</p></div>`, [["Retry", true], ["Cancel"]]); }
     if (n.box === "printers") return printersBox();
     if (n.items) return go(k);
     if (n.app) openApp(n.app);
@@ -1668,7 +1776,7 @@ let musList = null;
 function musTracks() {
   if (musList) return musList;
   const base = (window.MUSIC || []).map((m, i) => ({ id: "m" + i, src: "musique/" + encodeURIComponent(m.f), name: m.f, artist: m.a || "Artiste inconnu", title: m.t || m.f, album: m.al || "", dur: m.d || 0 }));
-  musList = [...base, ...userSongs.map(u => ({ id: u.id, src: null, blob: u.blob, name: u.name, artist: u.artist || "Mes fichiers", title: u.title || u.name, album: "", dur: u.dur || 0 }))];
+  musList = [...base, ...userSongs.map(u => ({ id: u.id, src: null, blob: u.blob, name: u.name, artist: u.artist || "My files", title: u.title || u.name, album: "", dur: u.dur || 0 }))];
   return musList;
 }
 let userSongs = [];
@@ -1713,33 +1821,33 @@ function cdHtml() {
   return `<div class="menubar cdmenu">
       <span class="mwrap"><button class="mbtn" type="button" data-mm="disc" aria-haspopup="menu" aria-expanded="false"><u>D</u>isc</button>
         <div class="drop" role="menu" data-for="disc" hidden>
-          <button type="button" role="menuitem" data-cm="open"><span></span><span>Ajouter des morceaux…</span><span></span></button>
-          <button type="button" role="menuitem" data-cm="docs"><span></span><span>Ouvrir le dossier Musique</span><span></span></button><hr>
-          <button type="button" role="menuitem" data-cm="quit"><span></span><span>Quitter</span><span></span></button>
+          <button type="button" role="menuitem" data-cm="open"><span></span><span>Add Songs…</span><span></span></button>
+          <button type="button" role="menuitem" data-cm="docs"><span></span><span>Open Music Folder</span><span></span></button><hr>
+          <button type="button" role="menuitem" data-cm="quit"><span></span><span>Exit</span><span></span></button>
         </div></span>
       <span class="mwrap"><button class="mbtn" type="button" data-mm="view" aria-haspopup="menu" aria-expanded="false"><u>V</u>iew</button>
         <div class="drop" role="menu" data-for="view" hidden>
-          <button type="button" role="menuitemradio" data-cm="t-track"><span class="ck"></span><span>Temps de la piste</span><span></span></button>
-          <button type="button" role="menuitemradio" data-cm="t-left"><span class="ck"></span><span>Temps restant</span><span></span></button>
-          <button type="button" role="menuitemradio" data-cm="t-disc"><span class="ck"></span><span>Temps du disque</span><span></span></button>
+          <button type="button" role="menuitemradio" data-cm="t-track"><span class="ck"></span><span>Track Time Elapsed</span><span></span></button>
+          <button type="button" role="menuitemradio" data-cm="t-left"><span class="ck"></span><span>Track Time Remaining</span><span></span></button>
+          <button type="button" role="menuitemradio" data-cm="t-disc"><span class="ck"></span><span>Disc Time Remaining</span><span></span></button>
         </div></span>
       <span class="mwrap"><button class="mbtn" type="button" data-mm="opt" aria-haspopup="menu" aria-expanded="false"><u>O</u>ptions</button>
         <div class="drop" role="menu" data-for="opt" hidden>
-          <button type="button" role="menuitemcheckbox" data-cm="shuffle"><span class="ck"></span><span>Lecture aléatoire</span><span></span></button>
-          <button type="button" role="menuitemcheckbox" data-cm="repeat"><span class="ck"></span><span>Répéter</span><span></span></button><hr>
+          <button type="button" role="menuitemcheckbox" data-cm="shuffle"><span class="ck"></span><span>Random Order</span><span></span></button>
+          <button type="button" role="menuitemcheckbox" data-cm="repeat"><span class="ck"></span><span>Continuous Play</span><span></span></button><hr>
           <button type="button" role="menuitem" data-cm="vol"><span></span><span>Volume…</span><span></span></button>
         </div></span>
       <span class="mwrap"><button class="mbtn" type="button" data-mm="help2" aria-haspopup="menu" aria-expanded="false"><u>H</u>elp</button>
         <div class="drop" role="menu" data-for="help2" hidden>
-          <button type="button" role="menuitem" data-cm="about"><span></span><span>À propos du CD Player</span><span></span></button>
+          <button type="button" role="menuitem" data-cm="about"><span></span><span>About CD Player</span><span></span></button>
         </div></span>
     </div>
     <div class="cdbody">
       <div class="cdtop">
         <div class="lcd"><span class="lcdnum"></span></div>
         <div class="cdpad">
-          <div class="cdrow">${bt("play", "Lecture", tri('<path d="M3 1l10 6-10 6z"/>'))}${bt("pause", "Pause", tri('<path d="M3 1h4v12H3zM9 1h4v12H9z"/>'))}${bt("stop", "Arrêt", tri('<path d="M2 2h11v10H2z"/>'))}</div>
-          <div class="cdrow">${bt("first", "Première piste", tri('<path d="M2 1h2v12H2zM14 1v12L5 7z"/>'))}${bt("prev", "Reculer", tri('<path d="M8 1v12L1 7zM15 1v12L8 7z"/>'))}${bt("next", "Avancer", tri('<path d="M1 1l7 6-7 6zM8 1l7 6-7 6z"/>'))}${bt("last", "Dernière piste", tri('<path d="M12 1h2v12h-2zM2 1l9 6-9 6z"/>'))}${bt("eject", "Éjecter", tri('<path d="M8 1l6 7H2zM2 10h12v3H2z"/>'))}</div>
+          <div class="cdrow">${bt("play", "Play", tri('<path d="M3 1l10 6-10 6z"/>'))}${bt("pause", "Pause", tri('<path d="M3 1h4v12H3zM9 1h4v12H9z"/>'))}${bt("stop", "Stop", tri('<path d="M2 2h11v10H2z"/>'))}</div>
+          <div class="cdrow">${bt("first", "Previous Track", tri('<path d="M2 1h2v12H2zM14 1v12L5 7z"/>'))}${bt("prev", "Skip Backwards", tri('<path d="M8 1v12L1 7zM15 1v12L8 7z"/>'))}${bt("next", "Skip Forwards", tri('<path d="M1 1l7 6-7 6zM8 1l7 6-7 6z"/>'))}${bt("last", "Next Track", tri('<path d="M12 1h2v12h-2zM2 1l9 6-9 6z"/>'))}${bt("eject", "Eject", tri('<path d="M8 1l6 7H2zM2 10h12v3H2z"/>'))}</div>
         </div>
       </div>
       <div class="cdrows">
@@ -1768,7 +1876,7 @@ function initCd(el, opts = {}) {
     order = tracks.map((_, k) => k);
     if (shuffle) for (let k = order.length - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [order[k], order[j]] = [order[j], order[k]]; }
     i = Math.max(0, tracks.findIndex(t => t.id === curId));
-    $c(".cdsel").innerHTML = tracks.map((t, k) => `<option value="${k}">${String(k + 1).padStart(2, "0")} — ${esc(t.title)}</option>`).join("") || `<option>Aucun morceau</option>`;
+    $c(".cdsel").innerHTML = tracks.map((t, k) => `<option value="${k}">${String(k + 1).padStart(2, "0")} — ${esc(t.title)}</option>`).join("") || `<option>No songs</option>`;
     if (!keep) show();
   }
   function show() {
@@ -1833,11 +1941,11 @@ function initCd(el, opts = {}) {
     else if (k === "shuffle") { shuffle = !shuffle; saveCd(); syncCd(); refresh(true); }
     else if (k === "repeat") { repeat = !repeat; saveCd(); syncCd(); }
     else if (k === "vol") volBox();
-    else if (k === "about") alert("CD Player pour Hobbys97.\nLit les morceaux du dossier C:\\My Documents\\Musique.");
+    else if (k === "about") alert("CD Player for Hobbys97.\nPlays the songs in C:\\My Documents\\Music.");
   }));
   function volBox() {
     const m = sysBox("vol32", "Volume", `<label style="display:flex;align-items:center;gap:10px">Volume<input type="range" id="cdVol" min="0" max="100" value="${sndVol}" style="flex:1"><span id="cdVolVal" style="width:38px;text-align:right">${sndVol} %</span></label>
-      <label class="sndline" style="margin-top:10px"><input type="checkbox" id="cdMute"${sndOn ? "" : " checked"}> Muet</label>`, [["OK", true]]);
+      <label class="sndline" style="margin-top:10px"><input type="checkbox" id="cdMute"${sndOn ? "" : " checked"}> Mute</label>`, [["OK", true]]);
     m.querySelector("#cdVol").addEventListener("input", e => { setVol(+e.target.value); m.querySelector("#cdVolVal").textContent = sndVol + " %"; });
     m.querySelector("#cdMute").addEventListener("change", e => setSound(!e.target.checked));
   }
@@ -1885,18 +1993,21 @@ function setVol(v) {
   applyCdVolume(); refreshVolUI();
 }
 function refreshVolUI() {
-  const i = $("#volIcon"); if (i) { i.src = ICON[sndOn && sndVol > 0 ? "vol16" : "volmute16"]; i.title = sndOn && sndVol > 0 ? `Volume : ${sndVol} %` : "Son coupé"; }
+  const i = $("#volIcon"); if (i) { i.src = ICON[sndOn && sndVol > 0 ? "vol16" : "volmute16"]; i.title = sndOn && sndVol > 0 ? `Volume: ${sndVol} %` : "Muted"; }
   document.querySelectorAll(".volpop input[type=range]").forEach(r => { r.value = sndVol; });
   document.querySelectorAll(".volpop input[type=checkbox]").forEach(c => { c.checked = !sndOn || sndVol === 0; });
   const chk = document.querySelector("#sndChk"); if (chk) chk.checked = sndOn;
   document.querySelectorAll("#sndSlider").forEach(r => { r.value = sndVol; });
 }
-/* le son de démarrage : au chargement si le navigateur l’autorise, sinon à la première action */
+/* ouverture de session : le bureau s’ouvre (avec le son de démarrage) en cliquant sur OK */
 (() => {
-  let done = false;
-  const boot = () => { if (done) return; done = true; playSnd("boot"); removeEventListener("pointerdown", boot); removeEventListener("keydown", boot); };
-  addEventListener("pointerdown", boot, { once: false }); addEventListener("keydown", boot, { once: false });
-  setTimeout(() => { if (!sndOn) return; const a = new Audio(SND.boot); a.volume = sndVol / 100; a.play().then(() => { done = true; }).catch(() => {}); }, 400);
+  const lg = $("#logon"); if (!lg) return;
+  const ok = lg.querySelector("[data-l=ok]");
+  const enter = () => { if (lg.hidden) return; lg.hidden = true; document.body.classList.remove("locked"); playSnd("boot"); };
+  ok.addEventListener("click", enter);
+  lg.querySelectorAll("[data-l=cancel],[data-l=x],[data-l=help]").forEach(b => b.addEventListener("click", () => playSnd("ding")));
+  addEventListener("keydown", e => { if (lg.hidden) return; if (e.key === "Enter") { e.preventDefault(); enter(); } else if (e.key !== "Tab") e.preventDefault(); e.stopImmediatePropagation(); }, true);
+  setTimeout(() => ok.focus(), 50);
 })();
 
 /* ================= Calculatrice (standard et scientifique) ================= */
@@ -1907,17 +2018,17 @@ function calcHtml() {
   return `<div class="menubar cmenu">
       <span class="mwrap"><button class="mbtn" type="button" data-mm="edit" aria-haspopup="menu" aria-expanded="false"><u>E</u>dit</button>
         <div class="drop" role="menu" data-for="edit" hidden>
-          <button type="button" role="menuitem" data-km="copy"><span></span><span>Copier</span><kbd>Ctrl+C</kbd></button>
-          <button type="button" role="menuitem" data-km="paste"><span></span><span>Coller</span><kbd>Ctrl+V</kbd></button>
+          <button type="button" role="menuitem" data-km="copy"><span></span><span>Copy</span><kbd>Ctrl+C</kbd></button>
+          <button type="button" role="menuitem" data-km="paste"><span></span><span>Paste</span><kbd>Ctrl+V</kbd></button>
         </div></span>
       <span class="mwrap"><button class="mbtn" type="button" data-mm="view" aria-haspopup="menu" aria-expanded="false"><u>V</u>iew</button>
         <div class="drop" role="menu" data-for="view" hidden>
           <button type="button" role="menuitemradio" data-km="std"><span class="ck2"></span><span>Standard</span><span></span></button>
-          <button type="button" role="menuitemradio" data-km="sci"><span class="ck2"></span><span>Scientifique</span><span></span></button>
+          <button type="button" role="menuitemradio" data-km="sci"><span class="ck2"></span><span>Scientific</span><span></span></button>
         </div></span>
       <span class="mwrap"><button class="mbtn" type="button" data-mm="help3" aria-haspopup="menu" aria-expanded="false"><u>H</u>elp</button>
         <div class="drop" role="menu" data-for="help3" hidden>
-          <button type="button" role="menuitem" data-km="about"><span></span><span>À propos de la calculatrice</span><span></span></button>
+          <button type="button" role="menuitem" data-km="about"><span></span><span>About Calculator</span><span></span></button>
         </div></span>
     </div>
     <div class="calcbody">
@@ -1966,7 +2077,7 @@ function initCalc(el) {
   let acc = 0, cur = "0", op = null, fresh = true, mem = 0, open = [];
   let sci = LS.get(CALC_KEY) === "sci";
   const fmt = n => {
-    if (!isFinite(n)) return "Erreur";
+    if (!isFinite(n)) return "Error";
     const base = $c("input[name=base]:checked").value;
     if (base !== "dec") { const i = Math.trunc(n); return (i < 0 ? "-" : "") + Math.abs(i).toString({ hex: 16, oct: 8, bin: 2 }[base]).toUpperCase(); }
     let t = String(+n.toPrecision(15));
@@ -2076,7 +2187,7 @@ function initCalc(el) {
     if (k === "std" || k === "sci") setView(k);
     else if (k === "copy") { try { navigator.clipboard.writeText(out.textContent.replace(/\.$/, "")); } catch {} }
     else if (k === "paste") { navigator.clipboard.readText().then(t => { cur = String(parseFloat(t) || 0); fresh = false; show(fmt(parse(cur))); }).catch(() => {}); }
-    else if (k === "about") sysBox("calc", "À propos", `<p style="margin:0;line-height:1.55">Calculatrice de Hobbys97.<br>Vue standard ou scientifique dans le menu View.</p>`, [["OK", true]]);
+    else if (k === "about") sysBox("calc", "About Calculator", `<p style="margin:0;line-height:1.55">Calculator for Hobbys97.<br>Choose Standard or Scientific in the View menu.</p>`, [["OK", true]]);
   }));
   show("0."); setView(sci ? "sci" : "std");
 }
@@ -2084,9 +2195,9 @@ document.addEventListener("keydown", e => { const w = wins.calc; if (w && w.el.c
 
 /* ================= Démineur ================= */
 const LEVELS = [
-  { name: "Débutant", rows: 9, cols: 9, mines: 10 },
-  { name: "Intermédiaire", rows: 16, cols: 16, mines: 40 },
-  { name: "Expert", rows: 16, cols: 30, mines: 99 }
+  { name: "Beginner", id: "Débutant", rows: 9, cols: 9, mines: 10 },
+  { name: "Intermediate", id: "Intermédiaire", rows: 16, cols: 16, mines: 40 },
+  { name: "Expert", id: "Expert", rows: 16, cols: 30, mines: 99 }
 ];
 const SEG = { 0: "abcdef", 1: "bc", 2: "abged", 3: "abgcd", 4: "fgbc", 5: "afgcd", 6: "afgedc", 7: "abc", 8: "abcdefg", 9: "abcdfg", "-": "g" };
 function ledDigit(ch) {
@@ -2111,15 +2222,15 @@ function minesHtml() {
   return `<div class="menubar">
       <button class="mbtn" type="button" data-mm aria-haspopup="menu" aria-expanded="false"><u>G</u>ame</button>
       <div class="drop" role="menu" hidden>
-        <button type="button" role="menuitem" data-ms="new"><span></span><span>Nouvelle partie</span><kbd>F2</kbd></button><hr>
+        <button type="button" role="menuitem" data-ms="new"><span></span><span>New</span><kbd>F2</kbd></button><hr>
         ${LEVELS.map((L, i) => `<button type="button" role="menuitemradio" data-ms="lvl" data-l="${i}"><span class="ck"></span><span>${L.name}</span><span></span></button>`).join("")}<hr>
         <button type="button" role="menuitem" data-ms="best"><span></span><span>Meilleurs temps…</span><span></span></button><hr>
-        <button type="button" role="menuitem" data-ms="quit"><span></span><span>Quitter</span><span></span></button>
+        <button type="button" role="menuitem" data-ms="quit"><span></span><span>Exit</span><span></span></button>
       </div>
     </div>
     <div class="ms">
-      <div class="ms-top"><div class="led" data-led="left" aria-label="Mines restantes"></div><button class="face" type="button" aria-label="Nouvelle partie"></button><div class="led" data-led="time" aria-label="Temps"></div></div>
-      <div class="ms-wrap"><div class="grid" role="grid" aria-label="Champ de mines"></div></div>
+      <div class="ms-top"><div class="led" data-led="left" aria-label="Mines left"></div><button class="face" type="button" aria-label="New game"></button><div class="led" data-led="time" aria-label="Time"></div></div>
+      <div class="ms-wrap"><div class="grid" role="grid" aria-label="Minefield"></div></div>
     </div>
     <div class="mspanel" hidden><div></div></div>`;
 }
@@ -2211,19 +2322,19 @@ function initMines(el) {
     state = "won"; clearInterval(timer); setFace("cool"); playSnd("tada");
     for (let k = 0; k < R * C; k++) if (mine[k] && !flag[k]) { flag[k] = 1; paintCell(k); }
     flags = M; setLeft();
-    const b = best(), key = LEVELS[lvl].name;
-    if (!b[key] || secs < b[key].t) askName(key, secs);
+    const b = best(), key = LEVELS[lvl].id;
+    if (!b[key] || secs < b[key].t) askName(key, secs, LEVELS[lvl].name);
   }
-  function askName(key, t) {
-    panel.firstElementChild.innerHTML = `<h4>Nouveau record en niveau ${key} : ${t} s</h4><label for="msName">Ton nom :</label><input type="text" id="msName" maxlength="20" value="${esc(LS.get("h97-mines-name") || "Anonyme")}"><div class="btns"><button class="btn default" type="button" data-p="save">OK</button></div>`;
+  function askName(key, t, lvName) {
+    panel.firstElementChild.innerHTML = `<h4>You have the fastest time for ${lvName} level: ${t} s</h4><label for="msName">Please enter your name:</label><input type="text" id="msName" maxlength="20" value="${esc(LS.get("h97-mines-name") || "Anonymous")}"><div class="btns"><button class="btn default" type="button" data-p="save">OK</button></div>`;
     panel.hidden = false; const inp = panel.querySelector("#msName"); inp.select();
-    const save = () => { const n = inp.value.trim() || "Anonyme"; LS.set("h97-mines-name", n); const b = best(); b[key] = { t, n }; try { localStorage.setItem(BEST, JSON.stringify(b)); } catch {} showBest(); };
+    const save = () => { const n = inp.value.trim() || "Anonymous"; LS.set("h97-mines-name", n); const b = best(); b[key] = { t, n }; try { localStorage.setItem(BEST, JSON.stringify(b)); } catch {} showBest(); };
     panel.querySelector("[data-p=save]").onclick = save; inp.onkeydown = e => { if (e.key === "Enter") save(); };
   }
   function showBest() {
     const b = best();
-    panel.firstElementChild.innerHTML = `<h4>Meilleurs temps</h4><table>${LEVELS.map(L => `<tr><td>${L.name} :</td><td>${b[L.name] ? b[L.name].t + " s" : "999 s"}</td><td>${b[L.name] ? esc(b[L.name].n) : "Anonyme"}</td></tr>`).join("")}</table>
-      <div class="btns"><button class="btn" type="button" data-p="reset">Réinitialiser</button><button class="btn default" type="button" data-p="ok">OK</button></div>`;
+    panel.firstElementChild.innerHTML = `<h4>Fastest Mine Sweepers</h4><table>${LEVELS.map(L => `<tr><td>${L.name}:</td><td>${b[L.id] ? b[L.id].t + " s" : "999 s"}</td><td>${b[L.id] ? esc(b[L.id].n) : "Anonymous"}</td></tr>`).join("")}</table>
+      <div class="btns"><button class="btn" type="button" data-p="reset">Reset Scores</button><button class="btn default" type="button" data-p="ok">OK</button></div>`;
     panel.hidden = false;
     panel.querySelector("[data-p=ok]").onclick = () => { panel.hidden = true; };
     panel.querySelector("[data-p=reset]").onclick = () => { try { localStorage.removeItem(BEST); } catch {} showBest(); };
@@ -2288,28 +2399,28 @@ function solSlices() { // découpe la planche une seule fois : chaque carte devi
 const sOf = id => Math.floor(id / 13), rOf = id => id % 13 + 1, redOf = id => sOf(id) % 2 === 1;
 const SOL_BACKS = [[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [9, 4], [0, 5], [1, 5], [3, 5], [6, 5]];
 const SOL_LEVELS = [
-  { name: "Facile", recycles: Infinity, undo: Infinity, txt: "Le talon se reforme autant de fois que tu veux et tu peux annuler tous tes coups." },
-  { name: "Moyen", recycles: Infinity, undo: 1, txt: "Le talon se reforme sans limite et tu peux annuler ton dernier coup." },
-  { name: "Difficile", recycles: 2, undo: 0, txt: "Tu ne peux parcourir le talon que trois fois et l’annulation est désactivée." }
+  { name: "Easy", recycles: Infinity, undo: Infinity, txt: "The deck can be turned over as many times as you like, and every move can be undone." },
+  { name: "Medium", recycles: Infinity, undo: 1, txt: "The deck can be turned over without limit, and your last move can be undone." },
+  { name: "Hard", recycles: 2, undo: 0, txt: "You can only go through the deck three times, and Undo is disabled." }
 ];
 
 function solHtml() {
   return `<div class="menubar">
       <span class="mwrap"><button class="mbtn" type="button" data-mm="game" aria-haspopup="menu" aria-expanded="false"><u>G</u>ame</button>
       <div class="drop" role="menu" data-for="game" hidden>
-        <button type="button" role="menuitem" data-sm="deal"><span></span><span>Distribuer</span><kbd>F2</kbd></button><hr>
-        <button type="button" role="menuitem" data-sm="undo"><span></span><span>Annuler</span><kbd>Ctrl+Z</kbd></button><hr>
-        <button type="button" role="menuitem" data-sm="backs"><span></span><span>Dos des cartes…</span><span></span></button>
+        <button type="button" role="menuitem" data-sm="deal"><span></span><span>Deal</span><kbd>F2</kbd></button><hr>
+        <button type="button" role="menuitem" data-sm="undo"><span></span><span>Undo</span><kbd>Ctrl+Z</kbd></button><hr>
+        <button type="button" role="menuitem" data-sm="backs"><span></span><span>Deck…</span><span></span></button>
         <button type="button" role="menuitem" data-sm="opts"><span></span><span>Options…</span><span></span></button><hr>
-        <button type="button" role="menuitem" data-sm="quit"><span></span><span>Quitter</span><span></span></button>
+        <button type="button" role="menuitem" data-sm="quit"><span></span><span>Exit</span><span></span></button>
       </div></span>
       <span class="mwrap"><button class="mbtn" type="button" data-mm="help" aria-haspopup="menu" aria-expanded="false"><u>H</u>elp</button>
       <div class="drop" role="menu" data-for="help" hidden>
-        <button type="button" role="menuitem" data-sm="help"><span></span><span>Aide du Solitaire</span><kbd>F1</kbd></button>
-        <button type="button" role="menuitem" data-sm="about"><span></span><span>À propos de Solitaire</span><span></span></button>
+        <button type="button" role="menuitem" data-sm="help"><span></span><span>Help Topics</span><kbd>F1</kbd></button>
+        <button type="button" role="menuitem" data-sm="about"><span></span><span>About Solitaire</span><span></span></button>
       </div></span>
     </div>
-    <div class="felt" aria-label="Table de jeu"></div>
+    <div class="felt" aria-label="Game table"></div>
     <div class="statusbar solstat"><span class="st1"></span><span class="st2"></span></div>`;
 }
 
@@ -2365,7 +2476,7 @@ function initSol(el) {
     G.stock = ids; hist = []; secs = 0; started = false; won = false; clearInterval(timer); timer = null;
     C.forEach(c => { c.style.visibility = ""; });
     felt.classList.add("nofx"); layout(); requestAnimationFrame(() => felt.classList.remove("nofx"));
-    status(`${L().name} : ` + (matchMedia("(pointer:coarse)").matches ? "touche une carte pour la jouer, ou fais-la glisser" : "glisse les cartes, double-clic pour les envoyer sur les As"));
+    status(`${L().name}: ` + (matchMedia("(pointer:coarse)").matches ? "tap a card to play it, or drag it" : "drag the cards, double-click to send them to the Aces"));
   }
   const find = id => {
     if (G.stock.includes(id)) return { p: "stock", a: G.stock };
@@ -2388,10 +2499,10 @@ function initSol(el) {
   }
   function scoreText() {
     if (rules.scoring === "none") return "";
-    if (rules.scoring === "vegas") return "Score : " + money(opts.keep ? vt : G.score);
-    return "Score : " + G.score;
+    if (rules.scoring === "vegas") return "Score: " + money(opts.keep ? vt : G.score);
+    return "Score: " + G.score;
   }
-  function status(hint) { if (hint !== undefined) st1.textContent = hint; st2.textContent = [scoreText(), opts.timed ? "Temps : " + secs : ""].filter(Boolean).join("  "); }
+  function status(hint) { if (hint !== undefined) st1.textContent = hint; st2.textContent = [scoreText(), opts.timed ? "Time: " + secs : ""].filter(Boolean).join("  "); }
 
   function move(ids, from, toP, toI) {
     remember(); startClock();
@@ -2409,7 +2520,7 @@ function initSol(el) {
       remember(); startClock();
       for (let k = 0; k < rules.draw && G.stock.length; k++) { const id = G.stock.pop(); G.up[id] = 1; G.waste.push(id); }
     } else if (G.waste.length) {
-      if (G.recycles >= maxRecycles()) { status("Plus de passage possible dans le talon"); return; }
+      if (G.recycles >= maxRecycles()) { status("No more passes through the deck"); return; }
       remember(); startClock();
       while (G.waste.length) { const id = G.waste.pop(); G.up[id] = 0; G.stock.push(id); }
       G.recycles++; if (rules.scoring === "standard") add(rules.draw === 1 ? -100 : -20);
@@ -2418,7 +2529,7 @@ function initSol(el) {
   }
   function undo() {
     if (won) return;
-    if (L().undo === 0) { status("L’annulation est désactivée en Difficile"); return; }
+    if (L().undo === 0) { status("Undo is disabled in Hard"); return; }
     if (!hist.length) return;
     const prev = JSON.parse(hist.pop()), diff = prev.score - G.score; G = prev;
     if (rules.scoring === "vegas" && opts.keep && diff) { vt += diff; LS.set(VKEY, String(vt)); }
@@ -2539,7 +2650,7 @@ function initSol(el) {
     if (G.f.some(p => p.length < 13)) return;
     won = true; clearInterval(timer); timer = null; playSnd("tada");
     if (rules.scoring === "standard" && opts.timed && secs >= 30) G.score += Math.floor(700000 / secs);
-    status("Gagné ! Clique pour passer l’animation"); cascade();
+    status("You won! Click to skip the animation"); cascade();
   }
   function cascade() {
     const cv = document.createElement("canvas"), r = devicePixelRatio || 1; cv.className = "solcv";
@@ -2570,8 +2681,8 @@ function initSol(el) {
   function finishAnim() {
     stopAnim();
     G.f.flat().forEach(id => { C[id].style.visibility = "hidden"; });
-    panel("Solitaire", `<p>Bravo, tu as gagné (${L().name}) !<br>${[scoreText(), opts.timed ? "Temps : " + secs + " s" : ""].filter(Boolean).join(" · ")}</p><p>Une autre partie ?</p>`,
-      [["Oui", () => deal(), true], ["Non", () => { G.f.flat().forEach(id => { C[id].style.visibility = ""; }); status("Partie terminée"); }]]);
+    panel("Solitaire", `<p>Congratulations, you won (${L().name})!<br>${[scoreText(), opts.timed ? "Time: " + secs + " s" : ""].filter(Boolean).join(" · ")}</p><p>Deal again?</p>`,
+      [["Yes", () => deal(), true], ["No", () => { G.f.flat().forEach(id => { C[id].style.visibility = ""; }); status("Game over"); }]]);
   }
 
   /* boîtes de dialogue dans la fenêtre */
@@ -2579,7 +2690,7 @@ function initSol(el) {
   function panel(title, html, buttons, cls = "") {
     closePanel();
     const m = document.createElement("div"); m.className = "solmsg " + cls;
-    m.innerHTML = `<h4>${title}<button class="tbtn x" type="button" aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></h4><div class="sb">${html}</div><div class="btns">${buttons.map((b, i) => `<button class="btn${b[2] ? " default" : ""}" type="button" data-b="${i}">${b[0]}</button>`).join("")}</div>`;
+    m.innerHTML = `<h4>${title}<button class="tbtn x" type="button" aria-label="Close"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></h4><div class="sb">${html}</div><div class="btns">${buttons.map((b, i) => `<button class="btn${b[2] ? " default" : ""}" type="button" data-b="${i}">${b[0]}</button>`).join("")}</div>`;
     felt.appendChild(m);
     m.querySelector(".tbtn").onclick = () => m.remove();
     m.querySelectorAll("[data-b]").forEach(b => { b.onclick = () => { const r = buttons[+b.dataset.b][1](m); if (r !== false) m.remove(); }; });
@@ -2587,8 +2698,8 @@ function initSol(el) {
   }
   function chooseBack() {
     let pick = back;
-    const m = panel("Choisir le dos des cartes", `<div class="backs">${SOL_BACKS.map((b, i) => `<button type="button" class="bk${i === back ? " on" : ""}" data-k="${i}" style="--bx:${b[0]};--by:${b[1]}" aria-label="Dos ${i + 1}"></button>`).join("")}</div>`,
-      [["OK", () => { back = pick; LS.set("h97-sol-back", String(back)); setBack(); }, true], ["Annuler", () => {}]], "wide");
+    const m = panel("Select Card Back", `<div class="backs">${SOL_BACKS.map((b, i) => `<button type="button" class="bk${i === back ? " on" : ""}" data-k="${i}" style="--bx:${b[0]};--by:${b[1]}" aria-label="Back ${i + 1}"></button>`).join("")}</div>`,
+      [["OK", () => { back = pick; LS.set("h97-sol-back", String(back)); setBack(); }, true], ["Cancel", () => {}]], "wide");
     m.querySelector(".backs").addEventListener("click", e => { const b = e.target.closest(".bk"); if (!b) return; pick = +b.dataset.k; m.querySelectorAll(".bk").forEach(x => x.classList.toggle("on", x === b)); });
     m.querySelector(".backs").addEventListener("dblclick", e => { if (e.target.closest(".bk")) m.querySelector("[data-b='0']").click(); });
   }
@@ -2599,18 +2710,18 @@ function initSol(el) {
     const get = (mm, name) => mm.querySelector(`input[name=${name}]:checked`).value;
     const m = panel("Options", `
       <div class="og2">
-        <fieldset><legend>Tirage</legend>${radios("od", [[1, "Tirer une carte"], [3, "Tirer trois cartes"]], opts.draw)}</fieldset>
-        <fieldset><legend>Score</legend>${radios("os", [["standard", "Standard"], ["vegas", "Vegas"], ["none", "Aucun"]], opts.scoring)}</fieldset>
+        <fieldset><legend>Draw</legend>${radios("od", [[1, "Draw One"], [3, "Draw Three"]], opts.draw)}</fieldset>
+        <fieldset><legend>Score</legend>${radios("os", [["standard", "Standard"], ["vegas", "Vegas"], ["none", "None"]], opts.scoring)}</fieldset>
       </div>
-      <fieldset><legend>Difficulté</legend><div class="og3">${radios("ol", SOL_LEVELS.map((x, i) => [i, x.name]), opts.level)}</div><p class="oh"></p></fieldset>
-      ${chk("oTimed", "Partie chronométrée", opts.timed)}${chk("oBar", "Barre d’état", opts.statusbar)}${chk("oOut", "Déplacement par contour", opts.outline)}${chk("oKeep", "Conserver le score", opts.keep)}`,
+      <fieldset><legend>Difficulty</legend><div class="og3">${radios("ol", SOL_LEVELS.map((x, i) => [i, x.name]), opts.level)}</div><p class="oh"></p></fieldset>
+      ${chk("oTimed", "Timed game", opts.timed)}${chk("oBar", "Status bar", opts.statusbar)}${chk("oOut", "Outline dragging", opts.outline)}${chk("oKeep", "Keep score", opts.keep)}`,
       [["OK", mm => {
         const n = { draw: +get(mm, "od") === 1 ? 1 : 3, scoring: get(mm, "os"), level: +get(mm, "ol"), timed: mm.querySelector("#oTimed").checked, statusbar: mm.querySelector("#oBar").checked, outline: mm.querySelector("#oOut").checked, keep: mm.querySelector("#oKeep").checked };
         if (n.keep && !opts.keep && rules.scoring === "vegas") { vt = (+LS.get(VKEY) || 0) + G.score; LS.set(VKEY, String(vt)); }
         const changed = n.draw !== rules.draw || n.level !== rules.level || n.scoring !== rules.scoring;
         Object.assign(opts, n); saveOpts(); applyDisplay();
-        if (changed) { if (!started) deal(); else status("Les nouveaux réglages de tirage, de score et de difficulté s’appliqueront à la prochaine partie (F2)."); }
-      }, true], ["Annuler", () => {}]], "opts");
+        if (changed) { if (!started) deal(); else status("The new draw, scoring and difficulty settings will apply to the next game (F2)."); }
+      }, true], ["Cancel", () => {}]], "opts");
     const sync = () => {
       const k = m.querySelector("#oKeep"), v = get(m, "os") === "vegas";
       k.disabled = !v; k.closest("label").classList.toggle("dis", !v);
@@ -2626,16 +2737,16 @@ function initSol(el) {
     status();
   }
   function help() {
-    panel("Aide du Solitaire", `
-      <p><b>But du jeu :</b> ranger les 52 cartes sur les quatre piles en haut à droite, une pile par couleur, de l’As au Roi.</p>
-      <p><b>Les colonnes :</b> on y empile les cartes en ordre décroissant et en alternant rouge et noir (un 6 rouge sur un 7 noir). On peut déplacer une suite entière. Seul un Roi peut aller dans une colonne vide.</p>
-      <p><b>Le talon :</b> clique dessus pour retourner des cartes. Quand il est vide, un rond vert permet de le reformer ; une croix rouge indique qu’il ne peut plus l’être.</p>
-      <p><b>Commandes :</b> glisse les cartes à la souris ou au doigt. Double-clic sur une carte : elle part sur les As. Clic droit : tout ce qui peut aller sur les As y va. Sur téléphone, toucher une carte la joue au meilleur endroit. F2 : nouvelle partie. Ctrl+Z : annuler.</p>
-      <p><b>Options (menu Game) :</b> tirage d’une ou de trois cartes, mode de score, difficulté, partie chronométrée, barre d’état, déplacement par contour (une silhouette suit la souris à la place des cartes). Les changements de tirage, de score et de difficulté s’appliquent à la prochaine partie.</p>
-      <p><b>Difficulté :</b></p><ul>${SOL_LEVELS.map(x => `<li><b>${x.name}</b> : ${x.txt}</li>`).join("")}</ul>
-      <p><b>Score Standard :</b> +10 pour une carte posée sur les As, +5 pour une carte de la défausse posée sur une colonne et pour une carte retournée, −15 pour une carte reprise des As, −2 toutes les 10 secondes (partie chronométrée), et un bonus de temps en cas de victoire.</p>
-      <p><b>Score Vegas :</b> la partie coûte 52 $, chaque carte posée sur les As rapporte 5 $. Le talon ne se parcourt qu’une fois (tirage d’une carte) ou trois fois (tirage de trois cartes). « Conserver le score » cumule tes gains d’une partie à l’autre.</p>
-      <p><b>Score Aucun :</b> pas de score.</p>`,
+    panel("Solitaire Help", `
+      <p><b>Goal:</b> move all 52 cards onto the four piles at the top right, one pile per suit, from Ace to King.</p>
+      <p><b>Columns:</b> stack cards in descending order, alternating red and black (a red 6 on a black 7). You can move a whole run at once. Only a King can go into an empty column.</p>
+      <p><b>Deck:</b> click it to turn over cards. When it’s empty, a green circle lets you turn it over again; a red cross means it can’t be turned over any more.</p>
+      <p><b>Controls:</b> drag cards with the mouse or your finger. Double-click a card to send it to the Aces. Right-click: everything that can go to the Aces goes there. On a phone, tapping a card plays it to the best spot. F2: new game. Ctrl+Z: undo.</p>
+      <p><b>Options (Game menu):</b> draw one or three cards, scoring mode, difficulty, timed game, status bar, outline dragging (an outline follows the mouse instead of the cards). Changes to draw, scoring and difficulty apply to the next game.</p>
+      <p><b>Difficulty:</b></p><ul>${SOL_LEVELS.map(x => `<li><b>${x.name}:</b> ${x.txt}</li>`).join("")}</ul>
+      <p><b>Standard scoring:</b> +10 for a card moved to the Aces, +5 for a card moved from the waste to a column and for each card turned over, −15 for a card taken back from the Aces, −2 every 10 seconds (timed game), and a time bonus when you win.</p>
+      <p><b>Vegas scoring:</b> each game costs $52, and each card moved to the Aces earns $5. The deck can be gone through only once (Draw One) or three times (Draw Three). “Keep score” carries your winnings over from one game to the next.</p>
+      <p><b>No scoring:</b> no score is kept.</p>`,
       [["OK", () => {}, true]], "help");
   }
 
@@ -2652,7 +2763,7 @@ function initSol(el) {
     const b = e.target.closest("[data-sm]"); if (!b || b.disabled) return; closeDrops(); const k = b.dataset.sm;
     if (k === "deal") deal(); else if (k === "undo") undo(); else if (k === "quit") closeWin("sol");
     else if (k === "backs") chooseBack(); else if (k === "help") help();
-    else if (k === "about") panel("À propos de Solitaire", `<p><b>Solitaire</b> pour Hobbys97.</p><p>D’après le Solitaire de Windows 98, avec ses cartes et ses dos d’origine.</p>`, [["OK", () => {}, true]]);
+    else if (k === "about") panel("About Solitaire", `<p><b>Solitaire</b> for Hobbys97.</p><p>Based on Windows 98 Solitaire, with its original cards and card backs.</p>`, [["OK", () => {}, true]]);
     else if (k === "opts") openOptions();
   }));
   el._keys = e => {
@@ -2671,59 +2782,59 @@ document.addEventListener("keydown", e => { const w = wins.sol; if (w && w.el.cl
 function settingsHtml() {
   return `
   <div class="tabs" role="tablist">
-    <button class="tab" role="tab" data-tab="bg" aria-selected="true">Arrière-plan</button>
+    <button class="tab" role="tab" data-tab="bg" aria-selected="true">Background</button>
     <button class="tab" role="tab" data-tab="vin" aria-selected="false">Vinyls</button>
     <button class="tab" role="tab" data-tab="fil" aria-selected="false">Films</button>
     <button class="tab" role="tab" data-tab="man" aria-selected="false">Mangas</button>
-    <button class="tab" role="tab" data-tab="acc" aria-selected="false">Compte</button>
+    <button class="tab" role="tab" data-tab="acc" aria-selected="false">Account</button>
   </div>
   <div class="tabpane" data-pane="bg">
     <div class="monitor"><div class="screen" id="pvScreen"></div></div>
-    <div class="colrow"><span>Couleur unie</span><div class="sws" role="group" aria-label="Couleur unie">${SOLID.map(c => `<button type="button" class="sw" data-c="${c}" style="background:${c}" aria-label="Couleur ${c}" aria-pressed="false"></button>`).join("")}</div><button class="btn" type="button" id="wpOtherBtn">Autre…</button><input type="color" id="wpOther" class="vh" tabindex="-1" aria-hidden="true"></div>
-    <p class="hint" style="margin:8px 0 0"><label class="sndline"><input type="checkbox" id="sndChk"> Sons de Windows 98</label></p>
+    <div class="colrow"><span>Solid color</span><div class="sws" role="group" aria-label="Solid color">${SOLID.map(c => `<button type="button" class="sw" data-c="${c}" style="background:${c}" aria-label="Color ${c}" aria-pressed="false"></button>`).join("")}</div><button class="btn" type="button" id="wpOtherBtn">Other…</button><input type="color" id="wpOther" class="vh" tabindex="-1" aria-hidden="true"></div>
+    <p class="hint" style="margin:8px 0 0"><label class="sndline"><input type="checkbox" id="sndChk"> Windows 98 sounds</label></p>
     <div class="wprow">
-      <div><label for="wpList">Papier peint (images de My Documents)</label><div class="listbox" id="wpList" role="listbox" tabindex="0"></div></div>
-      <div class="side"><button class="btn" type="button" id="wpBrowse">Importer…</button><label for="wpMode">Affichage</label><select id="wpMode">${Object.entries(MODES).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select></div>
+      <div><label for="wpList">Wallpaper (pictures from My Documents)</label><div class="listbox" id="wpList" role="listbox" tabindex="0"></div></div>
+      <div class="side"><button class="btn" type="button" id="wpBrowse">Browse…</button><label for="wpMode">Display</label><select id="wpMode">${Object.entries(MODES).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select></div>
     </div>
   </div>
   <div class="tabpane" data-pane="vin" hidden>
-    <p class="hint">Ta collection de vinyles se synchronise avec My Discollection grâce à ton projet Supabase. Mets les mêmes réglages que sur l’autre site.</p>
-    <fieldset><legend>Serveur</legend>
-      <div class="row"><label for="sUrl">Adresse du projet</label><input type="url" id="sUrl" placeholder="https://abcd1234.supabase.co" spellcheck="false" autocomplete="off"></div>
-      <div class="row"><label for="sKey">Clé publique</label><input type="text" id="sKey" placeholder="Clé « anon » ou « publishable »" spellcheck="false" autocomplete="off"></div>
-      <div class="btns"><button class="btn" id="sCfg" type="button" title="Fichier à mettre sur GitHub à côté d’index.html">Créer config.js…</button><button class="btn" id="sSave" type="button">Enregistrer</button></div>
+    <p class="hint">Your vinyl collection syncs with My Discollection through your Supabase project. Use the same settings as on the other site.</p>
+    <fieldset><legend>Server</legend>
+      <div class="row"><label for="sUrl">Project URL</label><input type="url" id="sUrl" placeholder="https://abcd1234.supabase.co" spellcheck="false" autocomplete="off"></div>
+      <div class="row"><label for="sKey">Public key</label><input type="text" id="sKey" placeholder="“anon” or “publishable” key" spellcheck="false" autocomplete="off"></div>
+      <div class="btns"><button class="btn" id="sCfg" type="button" title="File to put on GitHub next to index.html">Create config.js…</button><button class="btn" id="sSave" type="button">Save</button></div>
     </fieldset>
-    <fieldset><legend>Compte</legend>
+    <fieldset><legend>Account</legend>
       <div id="acct"></div>
     </fieldset>
-    <p class="hint" style="margin-top:8px">Pour ne plus rien ressaisir sur un autre appareil : clique sur « Créer config.js… » et envoie ce fichier sur GitHub à côté d’index.html. Il ne contient que l’adresse et la clé publique du serveur ; ensuite, il suffit de te connecter avec ton e-mail et ton mot de passe, et ta clé TMDB revient toute seule depuis ton compte.</p>
+    <p class="hint" style="margin-top:8px">To avoid typing everything again on another device, click “Create config.js…” and upload that file to GitHub next to index.html. It only contains the server URL and public key; after that, just sign in with your e-mail and password, and your TMDB key comes back from your account automatically.</p>
     <p class="status" id="sStatus" role="status"></p>
   </div>
   <div class="tabpane" data-pane="fil" hidden>
-    <p class="hint">Ma Vidéothèque utilise une clé TMDB pour retrouver les affiches et les fiches des films.</p>
+    <p class="hint">Ma Vidéothèque uses a TMDB key to fetch film posters and details.</p>
     <fieldset><legend>TMDB</legend>
-      <div class="row"><label for="tKey">Clé d’API TMDB</label><input type="text" id="tKey" spellcheck="false" autocomplete="off"></div>
-      <div class="btns"><button class="btn" id="tSave" type="button">Enregistrer</button></div>
+      <div class="row"><label for="tKey">TMDB API key</label><input type="text" id="tKey" spellcheck="false" autocomplete="off"></div>
+      <div class="btns"><button class="btn" id="tSave" type="button">Save</button></div>
     </fieldset>
     <p class="status" id="tStatus" role="status"></p>
   </div>
   <div class="tabpane" data-pane="man" hidden>
-    <p class="hint">Importe dans Mangas les tomes que tu possèdes sur Mangacollec. Rien n’est supprimé, et rien n’est modifié sur Mangacollec.</p>
+    <p class="hint">Imports into Mangas the volumes you own on Mangacollec. Nothing is deleted, and nothing is changed on Mangacollec.</p>
     <fieldset><legend>Mangacollec</legend>
-      <div class="row"><label for="mUser">Pseudo (profil public)</label><input type="text" id="mUser" spellcheck="false" autocomplete="off"></div>
-      <p class="hint">Ou, si ton profil est privé :</p>
+      <div class="row"><label for="mUser">Username (public profile)</label><input type="text" id="mUser" spellcheck="false" autocomplete="off"></div>
+      <p class="hint">Or, if your profile is private:</p>
       <div class="row"><label for="mMail">E-mail</label><input type="email" id="mMail" autocomplete="username"></div>
-      <div class="row"><label for="mPass">Mot de passe</label><input type="password" id="mPass" autocomplete="current-password"></div>
-      <div class="btns"><button class="btn" type="button" id="mGoogle">Avec Google</button><button class="btn" type="button" id="mGo">Importer</button></div>
+      <div class="row"><label for="mPass">Password</label><input type="password" id="mPass" autocomplete="current-password"></div>
+      <div class="btns"><button class="btn" type="button" id="mGoogle">With Google</button><button class="btn" type="button" id="mGo">Import</button></div>
     </fieldset>
     <p class="status" id="mStatus" role="status"></p>
   </div>
   <div class="tabpane" data-pane="acc" hidden>
-    <p class="hint">Un seul compte pour Cards, Films et Mangas : connecte-toi ici une fois, et les trois se synchronisent entre tes appareils.</p>
-    <fieldset><legend>Compte de synchronisation</legend><div id="fbAcct"><p class="hint">Chargement…</p></div></fieldset>
+    <p class="hint">One account for Cards, Films and Mangas: sign in here once, and all three sync across your devices.</p>
+    <fieldset><legend>Sync account</legend><div id="fbAcct"><p class="hint">Loading…</p></div></fieldset>
     <p class="status" id="aStatus" role="status"></p>
   </div>
-  <div class="dlgfoot"><button class="btn default" type="button" data-w="ok">OK</button><button class="btn" type="button" data-w="cancel">Annuler</button><button class="btn" type="button" data-w="apply" disabled>Appliquer</button></div>`;
+  <div class="dlgfoot"><button class="btn default" type="button" data-w="ok">OK</button><button class="btn" type="button" data-w="cancel">Cancel</button><button class="btn" type="button" data-w="apply" disabled>Apply</button></div>`;
 }
 /* Display… n’affiche que l’arrière-plan ; Passwords… que les connexions */
 function setSettingsMode(el, mode) {
@@ -2744,7 +2855,7 @@ function renderWallList(el) {
   const list = el.querySelector("#wpList"); if (!list) return;
   const p = el._pending, docs = allDocs();
   if (p.id && !docs.some(d => d.id === p.id)) p.id = "";
-  list.innerHTML = `<button type="button" role="option" data-wp="" aria-selected="${!p.id}">(Aucun)</button>` +
+  list.innerHTML = `<button type="button" role="option" data-wp="" aria-selected="${!p.id}">(None)</button>` +
     docs.map(d => `<button type="button" role="option" data-wp="${d.id}" aria-selected="${d.id === p.id}"><img data-icon="img" alt="">${esc(d.name)}</button>`).join("");
   fillIcons(list);
   el.querySelector("#wpMode").value = p.mode; el.querySelector("#wpMode").disabled = !p.id;
@@ -2795,63 +2906,63 @@ function initSettings(el, opts = {}) {
 
   q("#sSave").addEventListener("click", async () => {
     const url = q("#sUrl").value.trim().replace(/\/+$/, ""), key = q("#sKey").value.trim();
-    if (!url && !key) { LS.set("mv-sb-url", ""); LS.set("mv-sb-key", ""); sbClient = null; sbUser = null; renderAcct(el); reloadApp("vinyls"); return say("#sStatus", "Synchronisation désactivée sur ce site."); }
-    if (/supabase\.com\/dashboard/.test(url)) return say("#sStatus", "C’est l’adresse du tableau de bord. Colle plutôt la « Project URL » (Project Settings, puis Data API), du type https://abcd1234.supabase.co.", "err");
-    if (!/^https:\/\/[a-z0-9-]+\.supabase\.(co|in)$/i.test(url) && !/^https:\/\/\S+$/.test(url)) return say("#sStatus", "L’adresse du projet doit commencer par https:// (par exemple https://abcd1234.supabase.co).", "err");
-    if (key.length < 20) return say("#sStatus", "Colle la clé publique complète du projet.", "err");
-    if (/^sb_secret_/.test(key) || /service_role/.test(key)) return say("#sStatus", "C’est la clé secrète : colle plutôt la clé « anon » ou « publishable ».", "err");
+    if (!url && !key) { LS.set("mv-sb-url", ""); LS.set("mv-sb-key", ""); sbClient = null; sbUser = null; renderAcct(el); reloadApp("vinyls"); return say("#sStatus", "Sync turned off on this site."); }
+    if (/supabase\.com\/dashboard/.test(url)) return say("#sStatus", "That’s the dashboard address. Paste the “Project URL” instead (Project Settings, then Data API), like https://abcd1234.supabase.co.", "err");
+    if (!/^https:\/\/[a-z0-9-]+\.supabase\.(co|in)$/i.test(url) && !/^https:\/\/\S+$/.test(url)) return say("#sStatus", "The project URL must start with https:// (for example https://abcd1234.supabase.co).", "err");
+    if (key.length < 20) return say("#sStatus", "Paste the project’s full public key.", "err");
+    if (/^sb_secret_/.test(key) || /service_role/.test(key)) return say("#sStatus", "That’s the secret key: paste the “anon” or “publishable” key instead.", "err");
     LS.set("mv-sb-url", url); LS.set("mv-sb-key", key); sbClient = null;
-    say("#sStatus", "Réglages enregistrés. Vérification…");
+    say("#sStatus", "Settings saved. Checking…");
     await connect(); renderAcct(el); reloadApp("vinyls");
-    say("#sStatus", sbClient ? "Serveur trouvé." : "Supabase ne répond pas : vérifie l’adresse et ta connexion.", sbClient ? "ok" : "err");
+    say("#sStatus", sbClient ? "Server found." : "Supabase isn’t responding: check the URL and your connection.", sbClient ? "ok" : "err");
   });
 
   initAccountTabs(el);
 
   q("#sCfg").addEventListener("click", () => {
     const url = LS.get("mv-sb-url"), key = LS.get("mv-sb-key");
-    if (!url || !key) return say("#sStatus", "Enregistre d’abord l’adresse et la clé du serveur.", "err");
-    const txt = `/* Hobbys97 : réglages communs à tous tes appareils (adresse et clé publique Supabase, sans risque à publier) */\nwindow.H97_CONFIG = ${JSON.stringify({ sbUrl: url, sbKey: key }, null, 2)};\n`;
+    if (!url || !key) return say("#sStatus", "Save the server URL and key first.", "err");
+    const txt = `/* Hobbys97: settings shared by all your devices (Supabase URL and public key, safe to publish) */\nwindow.H97_CONFIG = ${JSON.stringify({ sbUrl: url, sbKey: key }, null, 2)};\n`;
     const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([txt], { type: "text/javascript" })); a.download = "config.js";
     document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-    say("#sStatus", "config.js téléchargé : envoie-le sur GitHub à côté d’index.html.", "ok");
+    say("#sStatus", "config.js downloaded: upload it to GitHub next to index.html.", "ok");
   });
 
   q("#tSave").addEventListener("click", async () => {
     const k = q("#tKey").value.trim(); LS.set("videotheque.tmdbkey", k); reloadApp("films"); syncKeys();
-    if (!k) return say("#tStatus", "Clé supprimée.");
-    say("#tStatus", "Vérification…");
+    if (!k) return say("#tStatus", "Key removed.");
+    say("#tStatus", "Checking…");
     try {
       const u = new URL("https://api.themoviedb.org/3/configuration"), h = { accept: "application/json" };
       if (k.length > 40) h.Authorization = "Bearer " + k; else u.searchParams.set("api_key", k);
       const r = await fetch(u, { headers: h });
-      say("#tStatus", r.ok ? "Clé enregistrée et valide." : "Clé enregistrée, mais TMDB la refuse. Vérifie-la.", r.ok ? "ok" : "err");
-    } catch { say("#tStatus", "Clé enregistrée. TMDB n’a pas répondu pour la vérifier.", ""); }
+      say("#tStatus", r.ok ? "Key saved and valid." : "Key saved, but TMDB rejects it. Please check it.", r.ok ? "ok" : "err");
+    } catch { say("#tStatus", "Key saved. TMDB didn’t respond to verify it.", ""); }
   });
 
   q("#acct").addEventListener("click", async e => {
     const b = e.target.closest("[data-acct]"); if (!b) return;
     if (b.dataset.acct === "out") {
       try { await sbClient.auth.signOut(); } catch {}
-      sbUser = null; renderAcct(el); reloadApp("vinyls"); setNet(); return say("#sStatus", "Déconnecté.");
+      sbUser = null; renderAcct(el); reloadApp("vinyls"); setNet(); return say("#sStatus", "Signed out.");
     }
     const email = q("#aMail").value.trim(), password = q("#aPass").value;
-    if (!email || !password) return say("#sStatus", "Saisis ton adresse e-mail et ton mot de passe.", "err");
+    if (!email || !password) return say("#sStatus", "Enter your e-mail address and password.", "err");
     if (!sbClient) await connect();
-    if (!sbClient) return say("#sStatus", "Enregistre d’abord l’adresse et la clé du serveur.", "err");
-    say("#sStatus", "Connexion…");
+    if (!sbClient) return say("#sStatus", "Save the server URL and key first.", "err");
+    say("#sStatus", "Signing in…");
     let res;
     try { res = await sbClient.auth.signInWithPassword({ email, password }); } catch (err) { res = { error: err }; }
     const error = res.error;
     if (error) {
       const m = String(error.message || error);
-      return say("#sStatus", /invalid login/i.test(m) ? "E-mail ou mot de passe incorrect."
-        : /failed to fetch|network|load failed/i.test(m) ? "Impossible de joindre le serveur Supabase : vérifie l’adresse du projet, que le projet n’est pas en pause, et qu’aucune extension ne bloque supabase.co."
-        : /email not confirmed/i.test(m) ? "Ton adresse n’est pas encore confirmée : clique sur le lien reçu par e-mail." : m, "err");
+      return say("#sStatus", /invalid login/i.test(m) ? "Incorrect e-mail or password."
+        : /failed to fetch|network|load failed/i.test(m) ? "Can’t reach the Supabase server: check the project URL, that the project isn’t paused, and that no extension is blocking supabase.co."
+        : /email not confirmed/i.test(m) ? "Your address isn’t confirmed yet: click the link you received by e-mail." : m, "err");
     }
     sbUser = res.data.user; renderAcct(el); reloadApp("vinyls"); setNet();
-    if (await syncKeys()) { q("#tKey").value = LS.get("videotheque.tmdbkey"); say("#tStatus", "Clé TMDB récupérée depuis ton compte.", "ok"); }
-    say("#sStatus", "Connecté : ta collection de vinyles va se synchroniser.", "ok");
+    if (await syncKeys()) { q("#tKey").value = LS.get("videotheque.tmdbkey"); say("#tStatus", "TMDB key restored from your account.", "ok"); }
+    say("#sStatus", "Signed in: your vinyl collection will now sync.", "ok");
   });
 
   renderAcct(el);
@@ -2871,7 +2982,7 @@ function fbAuth() {
     return firebase.auth();
   })().catch(e => { fbAuthP = null; throw e; }));
 }
-const fbErrMsg = e => ({ "auth/invalid-credential": "E-mail ou mot de passe incorrect.", "auth/wrong-password": "E-mail ou mot de passe incorrect.", "auth/user-not-found": "Aucun compte avec cet e-mail : clique sur « Créer un compte ».", "auth/email-already-in-use": "Un compte existe déjà avec cet e-mail.", "auth/weak-password": "Le mot de passe doit faire au moins 6 caractères.", "auth/operation-not-allowed": "Ce mode de connexion n’est pas activé dans Firebase (Authentication > Sign-in method).", "auth/unauthorized-domain": "Ce site n’est pas dans les domaines autorisés de Firebase.", "auth/popup-blocked": "Autorise les fenêtres pop-up pour ce site." })[e && e.code] || (e && e.message) || "Erreur";
+const fbErrMsg = e => ({ "auth/invalid-credential": "Incorrect e-mail or password.", "auth/wrong-password": "Incorrect e-mail or password.", "auth/user-not-found": "No account with this e-mail: click “Create account”.", "auth/email-already-in-use": "An account already exists with this e-mail.", "auth/weak-password": "The password must be at least 6 characters long.", "auth/operation-not-allowed": "This sign-in method isn’t enabled in Firebase (Authentication > Sign-in method).", "auth/unauthorized-domain": "This site isn’t in Firebase’s authorized domains.", "auth/popup-blocked": "Allow pop-up windows for this site." })[e && e.code] || (e && e.message) || "Error";
 const reloadSynced = () => ["cards", "films", "manga"].forEach(reloadApp);
 const MCAPI = "https://api.mangacollec.com", MCID = "38fee110b53a75af6cc72f6fb66fa504fc6241e566788f4b2f5b21c25ba2fefb", MCSEC = "060658630f7d199c19ab1cf34ed4e50935c748267e318a24e048d6ab45871da2";
 function openMangaImport() {
@@ -2885,23 +2996,23 @@ function initAccountTabs(el) {
   const sayM = (t, k = "") => { const s = q("#mStatus"); s.textContent = t; s.className = "status " + k; };
   const box = q("#fbAcct");
   const draw = user => {
-    box.innerHTML = user ? `<div class="who"><img data-icon="computer" alt=""><span>Connecté en tant que<br><b>${esc(user.email || "ton compte Google")}</b></span></div><div class="btns"><button class="btn" type="button" data-f="out">Se déconnecter</button></div>`
-      : `<div class="btns" style="justify-content:stretch;margin-bottom:8px"><button class="btn" type="button" data-f="google" style="flex:1">Continuer avec Google</button></div>
+    box.innerHTML = user ? `<div class="who"><img data-icon="computer" alt=""><span>Signed in as<br><b>${esc(user.email || "your Google account")}</b></span></div><div class="btns"><button class="btn" type="button" data-f="out">Sign out</button></div>`
+      : `<div class="btns" style="justify-content:stretch;margin-bottom:8px"><button class="btn" type="button" data-f="google" style="flex:1">Continue with Google</button></div>
          <div class="row"><label for="fMail">E-mail</label><input type="email" id="fMail" autocomplete="username"></div>
-         <div class="row"><label for="fPass">Mot de passe</label><input type="password" id="fPass" autocomplete="current-password"></div>
-         <div class="btns"><button class="btn" type="button" data-f="new">Créer un compte</button><button class="btn default" type="button" data-f="in">Se connecter</button></div>`;
+         <div class="row"><label for="fPass">Password</label><input type="password" id="fPass" autocomplete="current-password"></div>
+         <div class="btns"><button class="btn" type="button" data-f="new">Create account</button><button class="btn default" type="button" data-f="in">Sign in</button></div>`;
     fillIcons(box);
   };
-  fbAuth().then(a => a.onAuthStateChanged(draw)).catch(() => { box.innerHTML = `<p class="hint">Connexion à Firebase impossible pour le moment.</p>`; });
+  fbAuth().then(a => a.onAuthStateChanged(draw)).catch(() => { box.innerHTML = `<p class="hint">Can’t connect to Firebase right now.</p>`; });
   box.addEventListener("click", async e => {
     const b = e.target.closest("[data-f]"); if (!b) return;
-    let a; try { a = await fbAuth(); } catch { return sayA("Connexion à Firebase impossible pour le moment.", "err"); }
+    let a; try { a = await fbAuth(); } catch { return sayA("Can’t connect to Firebase right now.", "err"); }
     try {
       if (b.dataset.f === "google") { sayA(""); await a.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
       else if (b.dataset.f === "out") await a.signOut();
-      else { const m = q("#fMail").value.trim(), p = q("#fPass").value; if (!m || !p) return sayA("Saisis ton e-mail et ton mot de passe.", "err"); sayA("Connexion…"); b.dataset.f === "new" ? await a.createUserWithEmailAndPassword(m, p) : await a.signInWithEmailAndPassword(m, p); }
+      else { const m = q("#fMail").value.trim(), p = q("#fPass").value; if (!m || !p) return sayA("Enter your e-mail and password.", "err"); sayA("Signing in…"); b.dataset.f === "new" ? await a.createUserWithEmailAndPassword(m, p) : await a.signInWithEmailAndPassword(m, p); }
       playSnd("notify");
-      sayA(b.dataset.f === "out" ? "Déconnecté." : "Connecté : Cards, Films et Mangas se synchronisent.", "ok"); reloadSynced();
+      sayA(b.dataset.f === "out" ? "Signed out." : "Signed in: Cards, Films and Mangas are syncing.", "ok"); reloadSynced();
     } catch (err) { if (err.code !== "auth/popup-closed-by-user") sayA(fbErrMsg(err), "err"); }
   });
   /* Mangacollec */
@@ -2911,36 +3022,36 @@ function initAccountTabs(el) {
     const u = q("#mUser").value.trim(), m = q("#mMail").value.trim(), p = q("#mPass").value;
     try {
       if (m && p) {
-        sayM("Connexion à Mangacollec…");
+        sayM("Connecting to Mangacollec…");
         const r = await fetch(MCAPI + "/oauth/token", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ grant_type: "password", client_id: MCID, client_secret: MCSEC, username: m, password: p }) });
-        if (!r.ok) return sayM("E-mail ou mot de passe Mangacollec incorrect.", "err");
+        if (!r.ok) return sayM("Incorrect Mangacollec e-mail or password.", "err");
         sessionStorage.setItem("h97-mc-token", (await r.json()).access_token); q("#mPass").value = "";
       } else if (u) {
         let d = {}; try { d = JSON.parse(localStorage.getItem("h97-manga-v1")) || { v: 1, series: {} }; } catch { d = { v: 1, series: {} }; }
         d.mcUser = u; localStorage.setItem("h97-manga-v1", JSON.stringify(d));
-      } else return sayM("Indique ton pseudo, ou ton e-mail et ton mot de passe.", "err");
-      sayM("Import lancé dans la fenêtre Mangas.", "ok"); openMangaImport();
-    } catch { sayM("Mangacollec ne répond pas pour le moment.", "err"); }
+      } else return sayM("Enter your username, or your e-mail and password.", "err");
+      sayM("Import started in the Mangas window.", "ok"); openMangaImport();
+    } catch { sayM("Mangacollec isn’t responding right now.", "err"); }
   });
   q("#mGoogle").addEventListener("click", async () => {
     try {
       const a = await fbAuth(); const pr = new firebase.auth.GoogleAuthProvider(); pr.addScope("email"); pr.addScope("profile");
-      sayM("Connexion avec Google…");
+      sayM("Signing in with Google…");
       const res = await a.signInWithPopup(pr), g = res.credential && res.credential.accessToken;
       const r = await fetch(MCAPI + "/session", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ provider: "google", assertion: g, client: "web" }) });
       const j = r.ok ? await r.json() : null;
-      if (!j || !j.access_token) return sayM("Mangacollec a refusé la connexion Google depuis ce site : utilise ton pseudo (profil public), ou crée un mot de passe sur Mangacollec.", "err");
-      sessionStorage.setItem("h97-mc-token", j.access_token); sayM("Import lancé dans la fenêtre Mangas.", "ok"); openMangaImport(); ["cards", "films"].forEach(reloadApp);
+      if (!j || !j.access_token) return sayM("Mangacollec refused the Google sign-in from this site: use your username (public profile), or create a password on Mangacollec.", "err");
+      sessionStorage.setItem("h97-mc-token", j.access_token); sayM("Import started in the Mangas window.", "ok"); openMangaImport(); ["cards", "films"].forEach(reloadApp);
     } catch (err) { if (err && err.code !== "auth/popup-closed-by-user") sayM(fbErrMsg(err), "err"); }
   });
 }
 
 function renderAcct(el) {
   const box = el && el.querySelector("#acct"); if (!box) return;
-  if (!LS.get("mv-sb-url") || !LS.get("mv-sb-key")) { box.innerHTML = `<p class="hint">Enregistre d’abord l’adresse et la clé du serveur.</p>`; return; }
+  if (!LS.get("mv-sb-url") || !LS.get("mv-sb-key")) { box.innerHTML = `<p class="hint">Save the server URL and key first.</p>`; return; }
   if (sbUser) {
-    box.innerHTML = `<div class="who"><img data-icon="vinyl" alt=""><span>Connecté en tant que<br><b>${esc(sbUser.email || "")}</b></span></div>
-      <div class="btns"><button class="btn" type="button" data-acct="out">Se déconnecter</button></div>`;
+    box.innerHTML = `<div class="who"><img data-icon="vinyl" alt=""><span>Signed in as<br><b>${esc(sbUser.email || "")}</b></span></div>
+      <div class="btns"><button class="btn" type="button" data-acct="out">Sign out</button></div>`;
     fillIcons(box);
   } else {
     box.innerHTML = `<div class="row"><label for="aMail">E-mail</label><input type="email" id="aMail" autocomplete="username"></div>
@@ -2988,7 +3099,7 @@ function setNet() {
   const i = $("#netIcon");
   if (netBusy) return;
   i.src = netIcon(!!sbUser);
-  i.title = sbUser ? `Connecté (${sbUser.email || ""})` : "Hors connexion";
+  i.title = sbUser ? `Connected (${sbUser.email || ""})` : "Offline";
 }
 /* pendant un chargement : les deux écrans clignotent, comme la connexion d’époque */
 function netActivity(on) {
@@ -2996,7 +3107,7 @@ function netActivity(on) {
   netBusy = Math.max(0, netBusy + (on ? 1 : -1));
   document.documentElement.classList.toggle("busy", netBusy > 0);
   if (netBusy && !netTimer) {
-    i.title = "Connexion en cours…";
+    i.title = "Connecting…";
     netTimer = setInterval(() => { netFrame ^= 1; i.src = ICON[netFrame ? "net1" : "net2"]; }, 320);
   } else if (!netBusy && netTimer) { clearInterval(netTimer); netTimer = null; setNet(); }
 }
