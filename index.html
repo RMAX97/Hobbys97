@@ -238,7 +238,7 @@ input[type=text],input[type=email],input[type=password],input[type=url]{cursor:t
 .mbtn u{text-decoration:underline}
 .drop{position:absolute;left:0;top:100%;z-index:5;min-width:190px;background:var(--face);box-shadow:var(--raised);padding:3px}
 .drop[hidden]{display:none}
-.drop button{display:grid;grid-template-columns:16px 1fr auto;gap:4px;align-items:center;width:100%;padding:3px 10px 3px 4px;border:0;background:none;text-align:left;font:inherit}
+.drop button{display:grid;grid-template-columns:14px 1fr auto;gap:4px;align-items:center;width:100%;padding:3px 10px 3px 4px;border:0;background:none;text-align:left;font:inherit}
 .drop button:hover,.drop button:focus-visible{background:var(--navy);color:#fff;outline:none}
 .drop kbd{font:inherit}
 .drop hr{border:0;height:2px;margin:3px 1px;box-shadow:inset 0 1px var(--shadow),inset 0 -1px var(--white)}
@@ -316,7 +316,8 @@ input[type=text],input[type=email],input[type=password],input[type=url]{cursor:t
 .mcpath{flex:1;padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mcside{flex:0 0 170px;padding:14px 12px;background:linear-gradient(160deg,#c8dcf4 0,#eef4fb 28%,#fff 55%);overflow:hidden}
 .mcbig{width:32px;height:32px;display:block;margin-bottom:6px}
-.mctitle{margin:0;font:bold 24px/1.05 Verdana,Tahoma,Arial,sans-serif;color:#000;overflow-wrap:anywhere}
+.mctitle{margin:0;font:bold 24px/1.05 Verdana,"DejaVu Sans",Tahoma,Geneva,sans-serif;color:#000;overflow-wrap:anywhere}
+.web h1,.favhead h1{font-family:Verdana,"DejaVu Sans",Tahoma,Geneva,sans-serif}
 .mcline{display:block;height:2px;margin:6px 0 12px;background:linear-gradient(90deg,#c00 0 25%,#f0c000 25% 50%,#2a8a2a 50% 75%,#2050c8 75%)}
 .mcdesc{margin:0;font-size:11px;line-height:1.45}
 .mcgrid{flex:1;display:grid;grid-template-columns:repeat(auto-fill,82px);grid-auto-rows:min-content;gap:10px 4px;padding:12px;align-content:start;overflow:auto;outline:0}
@@ -363,6 +364,7 @@ html,*{scrollbar-color:auto;scrollbar-width:auto}
 .solmsg.opts fieldset{margin:0 0 8px;padding:8px 10px}
 .solmsg.opts label{display:flex;align-items:center;gap:6px;margin:3px 0;cursor:var(--cur)}
 .solmsg.opts label.ck{margin:5px 2px}
+.drop .ck,.drop .ck2{display:inline;width:auto;height:auto;min-width:0;padding:0;background:none;box-shadow:none;font:inherit;color:inherit;text-align:center}
 .solmsg.opts label.dis{color:#808080;text-shadow:1px 1px #fff}
 .og2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .og3{display:flex;gap:14px;flex-wrap:wrap}
@@ -463,7 +465,8 @@ body.shut{background:#000;display:grid;place-items:center}
 .sysbox .tbtns{display:flex;gap:2px}
 
 /* ---------- Calculatrice ---------- */
-.win.calc{min-width:0;min-height:0}
+.win.calc{min-width:0;min-height:0;width:max-content}
+.win.calc .calcgrid{justify-content:flex-start}
 .calcbody{padding:6px;background:var(--face)}
 .calcout{height:24px;line-height:20px;margin:2px 2px 8px;padding:1px 6px;background:#fff;box-shadow:var(--sunken);text-align:right;font-size:13px;overflow:hidden}
 .sciline{display:none;gap:8px;margin:0 2px 8px}
@@ -481,17 +484,43 @@ body.shut{background:#000;display:grid;place-items:center}
 .colmem,.colop{display:grid;grid-template-rows:repeat(4,1fr);gap:4px}
 .colnum{display:grid;grid-template-columns:repeat(4,minmax(34px,1fr));gap:4px}
 .colsci{display:none;grid-template-columns:repeat(3,1fr);gap:4px}
-.win.calc.sci .colsci{display:grid;order:2}
-.colmem{order:1}
+.colstat{order:0}
+.win.calc.sci .colsci{display:grid;order:1}
+.colmem{order:2}
 .colnum{order:3}
-.colop{order:4}
-.ck{min-width:34px;height:24px;padding:0 4px;border:0;background:var(--face);box-shadow:var(--raised);font:inherit;font-weight:bold;color:#0000c0}
-.ck:active{box-shadow:var(--pressed)}
-.ck.red{color:#c00000}
-.ck.pink{color:#c000c0}
-.ck.num{color:#0000c0}
-.topbtns .ck{min-width:62px}
+.colop{order:4;display:none}
+.colstd{order:5}
+.cbtn{min-width:34px;height:24px;padding:0 4px;border:0;background:var(--face);box-shadow:var(--raised);font:inherit;font-weight:bold;color:#0000c0}
+.cbtn:active{box-shadow:var(--pressed)}
+.cbtn.red{color:#c00000}
+.cbtn.pink{color:#c000c0}
+.cbtn.num{color:#0000c0}
+.topbtns .cbtn{min-width:62px}
 @media (max-width:560px){.calcgrid{flex-wrap:wrap}.sciline{flex-direction:column;gap:4px}}
+
+/* ---------- Calculatrice : vue scientifique ---------- */
+.scionly{display:none!important}
+.win.calc.sci .scionly{display:grid!important}
+.win.calc.sci .seg.scionly,.win.calc.sci .memind.scionly{display:flex!important}
+.win.calc.sci .cbtn.scionly{display:block!important}
+.win.calc.sci .colstd{display:none}
+.invhyp{gap:14px;padding:5px 10px}
+.invhyp input{-webkit-appearance:none;appearance:none;width:12px;height:12px;margin:0;background:#fff;box-shadow:var(--sunken)}
+.invhyp input:checked{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='7' shape-rendering='crispEdges'%3E%3Cpath d='M6 0h1v2H6v1H5v1H4v1H3v1H2V5H1V4H0V2h1v1h1v1h1V3h1V2h1V1h1z'/%3E%3C/svg%3E") no-repeat center}
+.win.calc.sci .std-mem{display:none}
+.memind{width:32px;height:22px}
+.colstat{display:grid;grid-template-rows:repeat(5,1fr);grid-template-columns:42px;gap:4px}
+.win.calc.sci .colsci{grid-template-columns:repeat(3,42px);grid-auto-rows:1fr}
+.win.calc.sci .colmem{grid-template-rows:repeat(5,1fr);grid-template-columns:42px}
+.win.calc.sci .colnum{flex:none;grid-template-columns:repeat(4,52px);grid-auto-rows:1fr}
+.win.calc.sci .colop{display:grid!important;grid-template-columns:repeat(2,42px);grid-auto-rows:1fr;gap:4px}
+.cbtn.grey,.cbtn.dis{color:#808080;text-shadow:1px 1px #fff}
+.cbtn.blue{color:#0000c0}
+.cbtn.hex{display:none}
+.win.calc.sci .cbtn.hex{display:block;color:#808080;text-shadow:1px 1px #fff}
+.win.calc.sci.hexon .cbtn.hex{color:#0000c0;text-shadow:none}
+.win.calc.sci .calcgrid{gap:5px}
+.win.calc.sci .cbtn{min-width:30px;height:26px;font-size:12px}
 
 @media (max-width:640px){
   .tasks .task span{display:none}
@@ -602,6 +631,7 @@ ICON.manga = px(32, (p, g) => {
 });
 Object.assign(ICON, {"progs": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABSUlEQVR4nO1XW27EIAycqXovuBn2zdiTuR9NooBDwyPSfnRHShCWgYkzNgC8GTx3RMRWJhMR3nuV+K4NKaWpxVUVAAzVR93ha2q1BkRkJ/EeAjHGYRKPEgghDJNwGlgB6X7/rSYei0BKCWZ2PDnnrnGP/oIZfAh8CHSl4VZmh1HXg61fpGV3Hfgd+zweLUQ7zBJIwsyKdolAzrGbwOv1Qs7ZtTH6OYYiEEIYcXekrjCeBSRAupBSFTyJdXMD+beA59Kw2ueoClwdZDr2w2ER8nhVUAUEwMFDu85GwwQuFS1Xnmdj+5g3lYZmVvX9ArVPC3MaIFx4VQnVyngh1nUCBGDlpKr0GiS7RDhMQKFQChRleqmW5Zobhzs4DbQKxo60lVkASJu4VvaJgoA0ZqrtXoQ+1r0irCPQCpoB99GZQe81aunOOLnmP8EPFut5dEqTrZUAAAAASUVORK5CYII=", "progs16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAvElEQVR4nI1TWxIDIQhLOj0YNxNvxp4s/dCq2/XRzDgDioGg0N2FA9ydu0PtEBHaJXmdsgNASgkrkvfpspmNrgDc5BwrkARJiIjp+V8SdnhIyDkvg90dKDKaP+1BiXsiwmBmiIjWmymBlJZVSKpkhWTdAxJkaThzBqs0EiC7zDXB+OqOrstz3TgRQK1cKXU7dftAwPZlciaaw8H+ElzX1Va/L3AI5JfMvdk1zU0t3P33+y5hZpiN6XG8R3wAKEBvDqSx3boAAAAASUVORK5CYII=", "favfolder": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAvElEQVR4nO1XQQ6EIAwc9mU8bZ5WXlYPhJXoQSgV3SyTkElMSsdpUQr8O8LxAUm9CiJ5inMBSW1Bi8iB5FARuWRXEb3JPUUEkhpjNG8gIqY4kgAQmuvuDQAKQD+VGUgpTeNsAPb699Teg8nsgLkBR/kkYDlg2QSwO2d2oE4KqFnMkAMl2ZGn9gCg3zWtB+qk9dtbxPymA6/ogVecgke/A168/gXLgSIg5JttuR/NBblPRv6DRhvumbAWerABlOTYcmIjTxAAAAAASUVORK5CYII=", "favfolder16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAnklEQVR4nMVS2w0DMQgz1e11jObRYDL3p7kmIZXS60ctRUZBvAzAj7BmkNTsJGnz3xIkFRGSMPAqaemApNwd5+nIjMIR8amoXdW/xaszAcCjlyMzt7jH0Yy5fTNBsot7P/Ae6+qgzp4wIyKyJC8bkDSoD6i8xXY0jNBXaMq7ByJ84eeuBn5fgxY0B88a2M61rUASAKwt9VYSzEfxFzwBPTvsFrf60s4AAAAASUVORK5CYII=", "settings": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABmUlEQVR4nO1WSZLDMAhspvIw/Qz0M+llzAFrsTYr9tRcEi6qkkXTNEsCfO3TjdoLEdEngCIyxJ3Za3TpnLsVPITwts+QwC4gMyPG+HbQbQJAlrSzO9neIgAAque2eJp1bT/vOsQYb/fIyLYUAAAiQggBzjmoKmKM8N7/HwFVBRHlcoQQwMz5+11ltggQEUQAkXP9VwqkfSIiy51wSUBV4T3BkjUVDuA8hoOJUGYBoInIlMSyCZ1zVcaGo6qYTOZBDLAqLePuEahBvacMyjzf1kkpgLDTo5cEenlLGUZmnxLZBwRCcAjBARCIpMxwmoSR2bQYiUopnTFaNmEtZ90DNhUy9DGCOL1P/kTUNcaUQMGnfFpGaxJ1cCKgTOG4bNuLKP3M1yRqZdpzd0luT4EqcnAik9qCWFDvyz2gYMblyCbvJphoWqnpTCDMOGQt72tS7b331BLo4nUlmDXXKHjB7JeO7Y118CGBycPTCCUStqCKS32/Exy48X/gAKcJKAGgq7q3DruWVKh9tMmaLt4/IrAi9Vd4X/tA+wV17cnfZEvvrQAAAABJRU5ErkJggg==", "settings16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA0ElEQVR4nJ2TWRLDMAhDRaf3im+GfDPnZOqHg5c4mTblyxtvkAxGUngQJAHAYv8GgJTSE8YUr78zxwoiSinTpbtj3/ffAUDTuMDu4lKCJJSSkLM12B3wEhBlu3eD3b2tSQiAFoC7QxK2bQMJ5Azo9MlkBUdMHuSc49kBFMwMhy0NMKq9NTH6RQpIPZeE6CPySx+YdYjUk836m6UCoLqeUoJUfSArJH5FCjhsArg7/HAoTOyae9kDREZSV7MQZ1ENuRhYVf4yjVwzbVw8Gucz4AOi9mxZN5Kj6AAAAABJRU5ErkJggg==", "docs": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABIUlEQVR4nNWXaQ6EIAyFH3MxvJn1ZvVknR8OyK6ymWli3CLv47XUAPx7EJG0fP9pFV+WBQCaIKrFTTCz1EKoK5Hcu3Vdvft93/Fzozjm7XBn6EbueasTSXFmFhHYc0m8G8QTcaAzRK14CsRAEJF33AJoFQ8h/G8LzoQOPBG/SoeZFBHyEK4DteKldBzj+gDJTrhtFK1zpQCRZ9cmtNZgZu+ZHdfMHIBpJENCa+02K6udbTg9AzhTGi3R4wWipdfz/HM4qgkLMFLcFDSC6rQQMxwQwbsOuF0x2aZTHXBUGpwjBphRiMlOOMOBMw0vOWAKMfsvmJmGIsDEQpzvgLME33GgCDAvDTcAxhaiD6BCAICScD2D6NRO7WJm7PP67J56xBeMY1smuHEJ/AAAAABJRU5ErkJggg==", "docs16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAo0lEQVR4nJWTyxHEIAxDH9sYdIZLsyvzHvLDCQmgi5kBJFkGGEBE/Gv/N7pcSgF4JUlfarVWAMyMnSicf6i546rq2zpCVb3nJLRgpqjqqQyQds2cM6oK4N1cROShDLHenDhAGqV8R601ZtLr9wvH+cNJk0HCzCZqZyqXi20Ko9pmEAhmLrvzTjDrYA8+hr9C0hKklmBlnCIC1zs7sULy/i9W8AfjtFGT45MlwQAAAABJRU5ErkJggg==", "printer": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAD/0lEQVR4nN2Xv0srWRiGH1dRMcGJ7UKqVGIlSSEjiCzLhdxCVlCEZSVWW8QuTSB/wICNpRARiXCRdS28iKxgNdci5IIXmxhJERLQxkBuMkMMyUCYLXLn7EwyZuOqXNgPApkf5zzv937fOSeB7xxDrzmZoiim9T2RSAw098hrwmOxmP2W+RwhL4Y3m03Xj6Iopt2ZN4UTTJoEkz0iNE17GyFumWuaJoRommZqmmaqqmrSKcnrCVAUxSyXy66ZW+AuuGs8uwmTyaQJUKlUANB1nfL5MmNjY4zPHwBQPl8GIJfLsbi4CH1W28AdaoEjkQjb29usr68D4P/lLwfUikHgMIADdnCxWCSTyTie3318z+TkJNJPf4jrQqEwELzvC93gh4cH0uk0mqYxPz/P7OysyP7u43vHWL/fj6Io4rrfXtDjgFvGFliSJLa2tgA4PT2l8OfPHaBNSKFQAEDTNMLhMLquix3STYi48VTG9sn8fj+GYQAwPT0thMzMzABwc3PD0tISqqoCiPGyLKPrOmdnZ+zu7jq4I/0ytjLIZrOk02nW1taE8qurKwBCoZAQYkU3+PDw8KkKdEoQiUQAuLy8pFKpIMsyXq+XUDDE77vwq6yi6zpHR0domsbGxgYA9XpdZLu4uIiiKMTjcWRZBuD8/NwVqiiKaZVD9ICu6wBYB0omk0H9pOINegmGQnwhyI9XSTweD6lUCkmSHCBFUUTGdnC1WmVqaopqtSruybIs+qKnCbPZLABzc3NCyCdVxev1AvD4+Mjq6ir1el1YHQ6HhRBJkhzzWXC7iFwuB0AikegV4PF4nhQC4PV6OT4+djhgCZEkSawWTdN6RFhRq9VIJBIAQz0CRkdHMQzDVcjBwQGVSkVknE6n8fl8jvGDiLDgAD+0223HBNYye8qRWCxGPp+nVLrH5/NRq9UcIuzw7nJ8W4ICDt96YH9/n5WVlW4zgE7N7VEsFhkb89Bo6ExMTAIIEbVazdUBa/PqhgOMRKPRoWQyae7t7fUF26PVemRiYpJGo7Ny7E7YRVjgeDzuJuQfBwA2Nze5vr7m5OQEgOXlZYeIer0uvtsdaDR0B9zn8xGNRgFQFMXRB25h2WE2m01arRatVotcLic6+927d0JAPp9nYWGBz5+/0Go9Yu8fW2c7DiK7E7gcfpYDQ+Pj4yZAuVwmEAgQCAQoFApcXFwAiCVnRbvdZnh4mHa7LTLe2dkRYv4N3O+BCXB3d4dhGBiG4TiYZFmmVLoHYGPjNwBSqQ+iH+xO9AMP8oIJcHt7K3rB2v0sQCr1AUD0wXPAz3nRhM7pV6/X0XWdr1918bDR0EUJngP+LwNMAFVVKZXuXwx+yUD7T+y3/9v1v4+/AWyr3Qb9Xgd2AAAAAElFTkSuQmCC", "printer16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABq0lEQVR4nI2TMYviQBSAv8BiCoX8ALG5NLf1NlaHlWBpke6KVNvY2QTS2A3kJ9xV+gsEG9upgojbLew2woKXQrHIYIQYkLnGZJPVXTbVhJnve+/Ne2PwjU8IofO17/tGee/uO/BgMADANE0AfUv0KbzZbPRut9NKKZ2mqU7TVK/Xa30R6ZsZ5Cn3+32yLMM0TU6nEwD7/R7btgGMqxJycDgcMhqN2G63ALRaLWq1GofDoQIXizIYRRFZlgEwnU5RStHr9QDodDpIKZnP5wAEQWDcCSF0DkZRhP3D5vEvPD6s6Ha71Ot1xuMxlmXdqvb9DprNJgAvry/wC37e3/PEA8fVHxzHIUkShBCEYYhlWSilqNzBYrEAoN1uA/C0WhVhlstlJWwOVwSNRuNKNJlMMM06AHEcF3A5A0MIoZVSuK7L8XgEIEkSAN7e/nE6HTmfzxWJ7/tFE4ou5EbHcQpJWRDHcQF6nkcQBO8CQEspAYoWOY7D8/MrAK77m0sglFI5DKV5gMtozmYzLaXUnucV4yqEqPyXoVsPQgNIKQnD8Krmj4e/elHlSJ+e+w/B9evH73cN1AAAAABJRU5ErkJggg==", "display": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACAElEQVR4nLVXWZKFIBALU3MvuJnhZu3JMh+AG4vr5BWlpU+SphcahwZIqvX8K5B05f63RR5CeEUQfIDNVj333iPGCAAC4ADg52vyHjbkOywrQFLTNL0mcskwhBAgrZ5skS8CCvk8z6/Igw8A1vW9Ml8VA2b2XIFPlxgJkssqjIS0gvC5gClZH0FgGWNUAhKeZSGjQ/L0NfKBAABykBNc9w8NASzeL+TnIn56L+QEpzv0AOEgCcy/Fy7IVcLdd0V0tWiz0BXTXYGnCGaYAJSKEqPDNPWDuy9AwL0ISPDeL/ckUGobOcgwkpIkM1OmlgDly+VBQFL6iISk9Vru0/yHNGsJeDKKgC2plAgLed5pFwGfx0Dx+d7Avgu+FUDsyJ0DYhz7/zMBZLJ8u+kVy0f7yycCCjmQVmBr+XZL/hcBW/L1WRpX0KiEBNBuHmpyVj4v5EvPdVeAdK0rKtEe47HY3NtLKwFXuhizUPl8F3CbvvI4X86Guivu9Ww12M/zpljrkh+hszGqcABEQGa2lMbGHM8xqu2lvHYEDDEM1PWE1I/2ssRmBpAIZvA5BtwFjmZDUojXQ4ohRsM0Mb+vK1wIAYb7aB7NegeUGAmAw/LqNxmQMSwJp5VwnuclldKKsEsezOAym8O1Fr+nTECyctvhnAkt32BPPoyBs2r5JnUu9XN/ZmOePpu7eeUAAAAASUVORK5CYII=", "display16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA3UlEQVR4nJWSUZKDMAxDn3d6L3IzxM3EybQfkG3TtLSrGX+QsWVJuDghKfwDkgrg1odba5cDbWl4N8uysG0bQIBCUj6BkIQkie2cagPw0zdU1dtiO3rOzQN+xs+8LoUqkPSJoAt7fioCCHjO6jZ110wAsNvgRlaouiuZFbyB3VhXJitfEWzi5TAMFsRf3A+QdB/myMD2SLDvO3a7lG0bXxzb9O+k43iABI4DGnuAewbVSxK68PzQO3lNP2vbpwrFdnKq0NP2zoakrOtKz2POwiCB1BXVQPCQwzcY5P8CFXGscN8YVOwAAAAASUVORK5CYII=", "passwords": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABTklEQVR4nO2UUXLDIAxEH53ey9ys65uJk6kfgE1sJ8GO4340O6NBg8fsagWCDz54EZIc8D8jd3c3s+tFVPKKS0W0ldcWXCZiZbtKXCFio+c5d6a9t4loey7JHVyQWzA58EYnWgEU8iqiktegONMj4uuIGDNDwIgQAM44inGEEPL3YRiOHH0fN88Omuq8xFz521pgZpkta1iIOEa+uwXJjBAypZlhZkCYbE8pEWMECHvPfgRvow6gtuKjtj9VKeESSGr2cp6rn3F65Srve66WMgduHWniPEj1smUB7TtvRLyM73vkPz9O62ZKBsAwRCBQvneLkHa0plbvzsrupRO94E6Lup5hZYTZibyG7igXdiViswUVKRkxQgjZvfzWIynNa4t2b5nvgsR06x+tbMyHJ/ku9JCv/unIb/DsZvpy2MC5A6fnkC31p875D/43fgEIPh8kPO3ilAAAAABJRU5ErkJggg==", "passwords16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAw0lEQVR4nJWSW67DIBBDD9XdV9lZ3J3NrMz9IEkhvdDWUpQJih8YYAFJBrz6Z0m27Yj4XeQgHwl+EjnIgDFGfC/SxxbYYAnbc5HbVAwoGMmUAi3UO/4VuNdKRAClydhkJrVW9sUTf1dyZkIEtd5P1xl5WJCw1Obm/sKMfEJd0+34OMr62HyR8LaZUgoSbBuAeTyWhqX/sM3gaq+fPtXtojwgM8iMt3nvyGeCtvfRpbs0s7l1sL/9oXlP5uForm3PW+zwBB6U0mrykuM+AAAAAElFTkSuQmCC"});
 Object.assign(ICON, {"winupdate": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABuElEQVR4nO1XUW7DIAw11e613izuzbKTeR9gMPaDkDRSpWmuLJoE+z0/A22I/u3Dli7EyA05QrAsJPLAo1yn7AGITMEF3p3GTu3LBNsK9HqCFyOZuZvCxER8TRlBLsXrPf2U633f2z02TjJUp1sDQiQJ91Jcsf0Tm+UFojthUpfCrwHNo4BacZyEbh6CV5rBfK9FkOT1UWmJoGdiZEfOYvGcArlXKetUfUYedler5uP1pwRcGk2rrC8YJ6LNkyg9YoQZCFiP8hNsg2mB7gTiJr3uihbTEN3YCmEOoEO32w6Bi9mqHEkgIhFESpXi1bFJ/aLLhDrwAQGCwGKkZXM9c6uEB58oECy3ICeS3HF3wg3ADRgELwQehwyIiDiRbEKJUl4/23HI/rMTbXl8fj/zBtgIH1Zz8FZ5VUAOFEA9D78PJxTQypM/jDk1BxYqt8pxHtZaUEhU88mUTNX31c9D8vMqcp4cFhaW1Wy7dub3c4z85wjMwAmB29HNXd2ChyQ6AgjcOgZf/7vEA8asX4TW9loNSOcIIBLcJVxOYnHffC84A17ndpjvvFTIGgkMfAcBR2Rod2D8YfsF+nYNOsKOvcYAAAAASUVORK5CYII=", "winupdate16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAsElEQVR4nKVTSQ7DMAgc/PHSl08PBgw2jiLVEQfQbAIF+PPJZc632GHgTGBR0EdRDFOWLHQgdR8kAQLk5LhQzZvIqtqm8HwuxNWCZJqpFZbQMB4FEAnjasTD94MskmAs7l4rhWM09pWuIBaibGB27QH1iMqzuKUx99hFf9q57QBxlc/8uwkUkG7OPrME4yIg+OZePBrKHPd/AeawiA0AgPQJPEXgdqKG+T1BfXlZhfMDAuOFOvuAw9sAAAAASUVORK5CYII=", "shutdown": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACxElEQVR4nO2WvWrbUBiGn5RWAkFE4iGmwSZBU0NaMGjLNeQKvGQIeAh0yBTwlsWQuUNAUwK9hF6A0yFDQeAhMgJDkGqRWIE6igwGpxR1UCTbiY//GujidzmH8/c+Ovr4vgMLLfSftTTvxmq1GgHk83kALMvC8zwODg5mOlO4uFqtRvl8nmazmZokWl5eTvudTgeAx8dHABqNBp7npfOTgEZO3t3dRfV6nWw2iyRJaJrG9fV12oogEhD/nQ8ehGFIux3S7YZCmDcisjAMaTQaWJbFxcUFALZto2nakGmn00nHEmV/Z9N+JqOiKCq1Wo29vb3ouc9bEQDA8e06JQBusCwLiK9YVVXIQfZXfEO2bSNJUrrP933CMMTzPGq12jiL8QCYOgYAOrpuogOybNNuh+CAg5d+paqq1Ot1XNfl/v5+7LHTAwyymBAjgB437Mh2+n+vrq5wHGdq45kBeDJPYABMPgCwX/gxs3EiYRD2Zfa7pVE8A/Nj1Ov15gXQn4zN/qfrie905gCyLM8LABhm3zQ1fx1NB/DcvDQ7Ra/X4/z8fPpElKo04JW0hgmlkmDDaI0ynw7AGAzCJPJMMIyZAESaAJDcewJj8KoBIAJYW1tbardDPu/Y6Pq/GxqGIayIwhu4ufkJxNkuBgFd10XLR2p1dXWsOUx4kFQqlQhgZWUFRVGBOO9/u11P15imyX7hD0EQDKXiYrEIwOXlJeVyWegzNhUnGyuVSuS6LhsbG3S7ITtKXOMVRWV39/3QAwTg8PAQYKhCijRVHiiXy0tbW59QFJVcLsfmZo4gCPjy8TvH68cv1vu+jyRJNJtNHh4exp490/vt7OxrlMmobG9vA6BpGqenpwRBAIDjOBQKBRRFpdsNcV2Xk5OT+WNABJGUYNd10/FWq4Usy2nRkWV5YgDOBTCoo6OjqNVqvRgXZb2FFhqlvzU6IPaVR6WQAAAAAElFTkSuQmCC", "shutdown16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABq0lEQVR4nJ2TPYsaURSGn2uCKRamUFCUuCwBYcvIrTJk06exSRdSWE0hWAtDarv8gEw3f2LBNFqlCFwQUqxghFGGm3EgKH4sOBAmhXEcI25C3mrumfO89z0HruCM+v1+XKlUAIiiiNFoBEC9XhfpPjEej+N04dllnuG37+TzeQBWqxVRFAEwm81YLpf4vg9As9kUIgzD+Pb2E7mcgWEYFItFstlsYriHATabDev1Gs/zubv7ShAEPAZofL5GIpFSYXoqAXI5g1qtlpj0ej0mkwnz+fwwQhiG8ev3U0ACoMq7H1ZJYT4Zcn+/BGAwGJzsabvd7hKkJTWAQmlAXsMjeP7zy+mWfytzUrEOn0oplFInLecNLA6AJR8EAVzXFccjOGq3CQk4zoOw4zjijwSpm/8SO60MQMsc8uHtem/9zzBAplAoCK2neJ5PyxzSMi+w5Pn5TfNVEj9JYNu2aDTeCa2naD2lVNK0zAv4qHhz9SOBLcvi5uYFnU4nPjLYy7ZtUS5fUq1WuXr5FJzdLhaLRdLT7XbxPC85H72stNrtdgwQBMFR3XXds8x/6ReSFKP7y+HXggAAAABJRU5ErkJggg==", "find": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB2UlEQVR4nMVXbY7rIBAz0bsXczPMzYaT8X4EKAkE6AbtjhTRtCk2ns8YDIxkHP3+EyNp6vt/I3AR2QZsrYX3HgAigELi+GXwxhoFSEbn3DZwAI/gDYEMHkLYSmBkjzGgqq83XzlMl0APnOSX8MSKJxsC3nvQuRKqeeWFxEp2Pvu9SyBHvlhbQDUEGGuhIUCcg4pAVAFmau/tyOBMetXgksHrVQQgUaXyKysKRAA5XB7B8wpAtsADR316AAgz8LTuUuEArt5cAdeNdeIArudYARdr9xKou8OfKZDd8OsKkDT0/isF4H0Kwve1oKRhlnUJvNhatZsSIGlKJVQ983wEToLpivGdCvdEjhmga+l7VS0Ni+S0c9bP1k2NpLnPA5e1xSdEBDYF4blxhIiZdssaXEQyqdhXYLJRJmGASsNxVeyAg2SJga8cqaoQsSfdUkTODyMlavBC+6czoDEegPtoVinxFJj32bAoAODrOVBVIOIB4xoljDHLI113LF+1U23/OX05eCxyz4g0I5lYAQBoGP/xJMDPTUeJ/BI0ItEOpdlNMsW/bPzkjll2NC5QUaho59EZGcHIHXdL6plXMbBOog8OpDTcSeIEAEqKpmp1q7JN+dpOYmCXoPgP1WpvYrB+sVYAAAAASUVORK5CYII=", "find16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA2ElEQVR4nI2T0Q3DIAxEn6vsFW+G2eyYzP1ooNCmFSdZiSXuEcPFmBQRyaYiwgCO2ezuW2ZJAAnY0c2llC1zrXXpj7lprW1BbgGdHBE/lgaS/waUUjAgS8HMeI04q3KnR5/fALX2ekqA7Y/Q97PzRK3h57llHoC8IN2s1vA/n70ArkCk3N9m93GYd9mIiFFdeaUw+7ukhLyKpSS910dE3gkiyRyQWRExAOMaP0MkOW4VsoCBGUjfQXvMjZ/rvJKD1REJ9+/bWQB3h/4J6boO0Hpatn/jSQbwBDEhnT4ZvIFYAAAAAElFTkSuQmCC", "helpbook": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABhUlEQVR4nMWXW47DIAwAJ6vcC26GuVk4GftRoDTlZSLtUlVJQGUGG6wG/rkdT34sSEzX7bl+HsGl3APE9FW1LesCl+aYam61wAi+I6ISWIVrRJYFduArIksCQ7gIzr0fvX/1rYpMBUZwF/sgf/THapGhwCrc+6q/jsaCxLkDr0P8BXFjaA0HjmYhmm44EfwhHyu/iy3AgUYK1Lv9tglz64VfEEReX+A4b4Pr8B54cAoy3Fpb+s5qcBteUjE5fnc4pBRsF5kMnOS+BU/3xylIFKTAZWaRVj8rOCN43d4pSJOVa0ckh9458HP+EA7EcgyttVhryw7Nn3vL+f46gndwimoLbq19V8Kcguu6MMYAEELguq6ygjLhYhuFPcNzIWpWQmMMxhhCCMup2YED/VK8I6KFQ0pBNQMArlVhGKdmB14/1P9u90Q24K2ObZEdeLdTK5JltPDhgFakFliFrwgsi2QBDVwjMBUJIajhT1oEYqqiUUTKM8rXs6eWHxH5i5WPRNQvpgC/0NQZswBEGcgAAAAASUVORK5CYII=", "helpbook16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAtElEQVR4nJ2SQQ7DIAwEhygP42csP/PP3AMlhQSstlyQjGdYLCBYQg541HOEsECIt2QpShHc2Kn+4B6CHbwTpdvBBBf/WGoFpLEXIB1DYb5ZolaoqRVKWSZoQ1zGlsjZrhRdJISGJOfuzcVbAstzbEnknHvJk5D3SAomd4ctG0KcLe1b0PebaAcD6bwiD1MaRRF8vUOSm5n3Jcml9o37mZl59LV9J/oGDkW/wEvRP/BDFDW8AFSDrNhfM2QNAAAAAElFTkSuQmCC", "ent": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABwklEQVR4nM1WUXIDIQh9dHqvcDR6M3Iy+5HFAqLrJtO0b8aYYZEHCCrwx6DFt3ZBt9LfWvcxM9Zasz8nvD/kec0xbxkIxlS1HQv9mOof3pbDfSuR09NUFcwMABARP1ep7IZN18DM3c6EC0CxBZl8gb5NIhL0zYaqntkIDjRbsEtORAP5LnHlAJi5NJjJAYCIpkSWAWY+deYzC04c6JGrajBu8qQ8yDJCBvye+nlG7ouMiIY2PCMHXGWKSJtF7iPxUfuaqaI1RxddNHZBdZiYYe9gzsBD96Gft2eF4ICqdjI/V5mpC6wBINxuty1yoChCOz3v93twLMMyEL/RsPYMxV2wF4WRx+xcz0DhwF4URh4vqzdmoK78N2WAmT3544doWLtzsvYiFJGjoCyK2omKHPDt6jMih20AELdX0pV6BkTk6Ot5BlLaPRPZVlx8yATsPiyWj5M4pNCNMl8D0yhSsa0OeErjFPkgsoLqV66bc7nvotI1Gc0epTmSIZrWWhiAFLJKL9bHzIFTEFEYo+xrKXvZgVW01n4r2asoOkWmHbQYv5OBnWEYruNdxDtACtkennXAMYWD5bIHT2/BCLke/n/AN9ZwwcjL6zFCAAAAAElFTkSuQmCC", "ent16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAyklEQVR4nIVTWw7EIAgcjfeqN+v0Zngy9sNF0dKWhMhjeAYTJun/TYENgQ8AkA1IcvcpSZCEiDwlRCZ5M/rgLypPlY2+kmQDeGCtdUnw1k3Zg3fgeRKtyWMH5RukOA6gtRZ68wQdwygirpO0BJNUv/gyQeJB3QjodRGAoJuIfRUJ8daDYyIA/u1Uk4uILFvH/dpMj+4Fudaagoraq8AzIjnDR6oO9npvH4E8/0LvNaXBU79gO1jldJtXLasBVc9o7LXgNvtocb7v9AMMTHzb0hx5/gAAAABJRU5ErkJggg==", "games": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABBklEQVR4nO1XUQ7DIAiFZffSo73djJ6MfWyutlVETbMfX9K0VuS9oKAS/RncYat3cHgFqOoYPzObPG4BAIYEEBF9xxa5uqZARIYExBirXE8P8cmRCwBc9i0BU3PvEfHwOnxxe7Y8NkMCkmOLwGMzLGAGPeumBE1A9l1DbkOfxasAFEBqX2DFqzhARCiEsDswQp5qR4pCKR1rWaCJLEdytG3bQUSpPoQQiJl/fVYtuJCLiObv8yMi1b7Ur6p56Ku5XIoAxxhPA3Bo7Qvr+L/0DwBZZbw2BUzm7ld32Ivb03AJWAKWgCVgCVgCWvDcC2hm97NuRWYHTdyEiPYTUYOj/0zYieYR7A0YtKBAnJaZUwAAAABJRU5ErkJggg==", "games16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAeklEQVR4nO2TTRKAIAhGH00H42h2M29mi6xBBZ1ax0pkvsePIjiWUirefY2J9XdPrKqRHqAAD2QAAOScXeUCfGWfWc3etLd5oENk6i8BiyqxVYgJFJj3ec+mQiSsQDU3Z+tbcQPo37cXRvZ6Bj9gtGAX9DtguTDmDwCcbiRCDUi9IIQAAAAASUVORK5CYII=", "run": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAkUlEQVR4nO2XUQqAIAxAn9HB7GTuaPNk9SGFFhFBzaC9H4eIe8x9OPg7QUTmXslFhBEgxmieXFUBikCRsC2ESFmHNy5XDagGYDqNV14RuMN4feQ+dU+dxQeBUpqn0OsT+yZcNyyoK9E8QUrJRCDnvMXdm9AFXMAFXMAFXMAFXKCaC2LzUzEVsPwP7glAt9nwEyyJ7CdTzO5p+gAAAABJRU5ErkJggg==", "run16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAaklEQVR4nO2TMQ6AQAgEB+PD+Nnt/YyfYUGjFiZ4lm5DtcOSLLAok5QrgB3A3dvGiEBSAQrSCyKdEjwp0zEzMvMyoQgmKd2diGglqBSnE8YYLfOcE4CtvfamH/ABYIeq5ZseABiw9EzLOgAa1SHhxpkCqwAAAABJRU5ErkJggg==", "accessories": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABIElEQVR4nO1XQY7DIAycVPlX/DOGl9V5mffgQMI2TbNRgD10pEpMkWwz2MYBvuiM4WiTpJ0xQvLQziWQtLO43fli1sxgqmqqesjNzM6q9RF+8nOOt/yqEo/fzkMIlwKf5xmn78yDNQAY940ppknyGsDtnPRfoUAP7CowTVLt5Imr0/4KDMDacESkmWNVAYnhkRyHwCwP4FLdzVX15ZBj2qx9587X/4ociJFogb0rzlVQu+4TJ4l5FgDOm1eBiOdCwrhENQA0EWmixPMZMCwPeJc+EGPM66ITtqsGyT6zAlWmmjcgCdLXhQItXkHvAcw+ixzYZmdNhLAG8PIatskBoFsfSEg5sLNxbSb8Kyd9JPsf88AWPhuwiXPy+MPoiyb4ARdA6STHHq6OAAAAAElFTkSuQmCC", "accessories16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAsklEQVR4nMWTPQ7CMAxGv1QVCzMjLKgSEmsPwcol3I2tp2BjzJnsE2Tr2rkLA+kS0rTqX1Qhvs1y/PIsJcC/o8KCmWxYiwBFoRVm4pvMZE+Hfa9Z1c0iRE0Nh5CxfMHpnB4ATIEFDYjIekBVX5ZY7mbB/dZBU2ayWfZcNWxMCREA6NbyBrvPaxVkmCTm8PV8BBGchQPkuVbGlHgnj98bjFkkALDFovcSY4e1HvwFonjI5rQzzkClnRTfbQAAAABJRU5ErkJggg==", "cdaudio": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABuElEQVR4nO1WUXKFIAxcnHcvczPCzcLJ7IeGRiAgr9NpP946jhoDu6wSAD74Y4Snicx8OPFZH912yj1sbElj5BLPWcq9iNj8Xn/rAiwxx3j18p1qBVgQ0a1zI6DmKbFXj5zLaD3xfagbRNQjnYOZDzTHUU69E5FDRI5L4Y/OzZITEcSx14PR1zzPYgCw2c5o3wGgEjF2MoRQzvp5FisCzu8eByLWHejl1LEi4CTMkJwdEb4L3mh7OXUMAIJ++xq070bQ+Z4T33KY+TayEEIz0hFCCO00VEjORYRkgYiAmZs8b2RP4QqwIjglJW8KCjPfhNnKqLgc7irbesFaxFP0yGfYbEPv+oT4HfIigIggIu71N1Ec8MhjjCAi/c63MsrM6M2gFbwA34EYI3LO2K+6UM8CjnHpH+khXB0fI/Jckew7IWcxBcsXMZoBgK2EC+TAWZzqyvkOdC0IKmJEDgw2Ix0Rs9EXAYoZOfDtwElKN/vfccLuB0JKaUgO+A7UIp6MvpvgLU4K64A2FvNDni/mG15FU4qZOYwqm+cAp3QSL5BPE3V3bB1pHKgWw6fEqw1Gi/z67veD/4QvABl04vAr2FsAAAAASUVORK5CYII=", "cdaudio16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA50lEQVR4nJWTUY7EIAxDX6q5F7lZPTdLTpb9WOhS6Iy0kSqhYBs7Bfh/Vf8AsCeEpHroDextzxZQAZynAMiMay8iBmbwCuA1k3We1LMp3H1tGVDHH1m9u7nfROaIxy76nbzWIancnbjy2uaitXatI2KI1eYgpqG938LdiQgyk4i4Bjm7ebFUZODNkKCqMLOL+FB2PHWLQhJmhiR8ijBifHTQWiMzcfdfBxiFsFZE5nbYIcmG4iCPyoUwnPQZGExDXMl7LLuJ3CL0e16f/vW4t4VhdrXuiy5Uk8V+oq/IG+fra+wP5yv2B3nedKFv1QCSAAAAAElFTkSuQmCC"});
+Object.assign(ICON, {"calc16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAhElEQVR4nMWSSw7DIAxEn6scjJtluBmcbLogpFX/jirFEoxZoHkegLMrAJB86LYUINm2sXM6TL3sGBEbDq9VejiP/gIw+TeDp9VaezvFjQDovadjWCZBSJQPTj8RIGGbiPiqM4RAsteVqDVnrbGlCGDkVEr5N0Gt+7tma9If+8p3059XV9X8gitJz5KuAAAAAElFTkSuQmCC"});
 Object.assign(ICON, {"group": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABSUlEQVR4nO1XW27EIAycqXovuBn2zdiTuR9NooBDwyPSfnRHShCWgYkzNgC8GTx3RMRWJhMR3nuV+K4NKaWpxVUVAAzVR93ha2q1BkRkJ/EeAjHGYRKPEgghDJNwGlgB6X7/rSYei0BKCWZ2PDnnrnGP/oIZfAh8CHSl4VZmh1HXg61fpGV3Hfgd+zweLUQ7zBJIwsyKdolAzrGbwOv1Qs7ZtTH6OYYiEEIYcXekrjCeBSRAupBSFTyJdXMD+beA59Kw2ueoClwdZDr2w2ER8nhVUAUEwMFDu85GwwQuFS1Xnmdj+5g3lYZmVvX9ArVPC3MaIFx4VQnVyngh1nUCBGDlpKr0GiS7RDhMQKFQChRleqmW5Zobhzs4DbQKxo60lVkASJu4VvaJgoA0ZqrtXoQ+1r0irCPQCpoB99GZQe81aunOOLnmP8EPFut5dEqTrZUAAAAASUVORK5CYII=", "group16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAChUlEQVR4nHWSPWiTURSGn/vd/HxJ08+fpikVRSxOFXGIYGl1sDqJoEN1dVAURKqdRAcxKl0s1g4OFpxE6Nr6Q5z861DF2KWUBqVpBwOSVsWkzd93v+MSY2rwhcuBc899z3vPexRAIpE4EovFjhaLRSMimhqUUiYUCunZ2dk34+PjyXg87k+lUlX+xcjIyLD8B8YYGRwcLEej0WNaawCr8a1V67QOuECxFuunVCpVe3t7/f39/VPGmOMiIkBdpa+ByAdIQw4A27bRWnt9fX06k8lMKKU6RaSglFKAbCgGEBE8zwNUbQ4wMDCgAFlaWjJfv+YDNQWmUUEdSilqf226Kpfzks0urFqWqiebCDKZJebmPhPwB/BEUErheR7VqlAsbg6eOZMYTqc/5Gdmnt9Tyio3EczPf+bkySkIOFiuixEPn1Kqe88mduy0bae149rycg7gAdBMEIkESSZP0RWO8su22BoJs7q2RrSjlcK3gkQ7I+6NxPv8w4cfRGtro6cARkNXJEz5apyFT8/I7WrnxOJ7HN82ega38/hF0b8tttX/p76JgKqL60QY6thPtrzG29fL/BwrY9x1KtmLBMwipsE8H4DneRhjRGstnmswYcXLy++Qgkvl4BqHbn2nrTPMj9FDzLVUmFj864IFEA6HLa21AvzBSJBy1sjTczdlfnpBPn4ZlfuPrsvK4qqcvXBepqZfiRNskQ0KJicnS+l0uiAiFdu2nTt3bvtyY4dZj1VoD51m394tRHe3s/PSXXX6xDEmJp4E6stRi0GgBajG4/ErPQd6hpwtrdVKqeL3PHCcVlZWcsTa2qRiPJVMJgupVKrbsqyCgo3b57quHwg1DbcZeUB+A8a5KePxO1kTAAAAAElFTkSuQmCC", "calc": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAy0lEQVR4nO2WQRLCIBRDg+O98GYNN4OTxQUDtggqtcWFvEU/DFD+hHxaYDL5d0xukRq+O2ny5pIEaVgEKAC6pmQMADgXI5ml6Y7kR/MSOQEVg977N/rVuXWu2yqwwlrbvXkIoXtNU4E9L9tDXQGyW8rvSFVAKrUlCcAp/VjysQouKYfSA+URHN1PVD1gzDado/ubMQDxFlwWwLnmxMNhfmB6AMD0wDkeKEHFA81vwVlnXjLEA6/4uQeyAnDu4YmBrLUa/0/4bL3JZDx38iyrQVgogMQAAAAASUVORK5CYII=", "calc16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACJ0lEQVR4nJWTzUtUYRSHn/O+93W+mutHlNMdFIlybTnOP9AiCdy1bN2ivQuNkGoZ0rpWQVD+CbNKCI1yKHS2JrQYm2hMc2b8vPe+b4vRKREhf3B4NufwO5wPoS3BORDhv9XJn5lRSgQF54pjq2NmAM34+NmOpdIJf/oQdnVDrs/O3skVCq/i/X2zVa8rF8enapXW9Pb3IyLgwBPcZuhJ5eHLshd1d9+WXO7S6vQ094eHMb6PjSJEKZy1KKXYiSJeb24SKoUAoiz720mobNzytNatg40NV69Wo4mpKS/d14cVQaII53moOKbWaPBsbg60higCIxD1gI6tp41RO82m3J2clKelkniDg8TVKjqfJ15fR+fz2FqNiZERomoVuRLQ3fzF2+XvaM9oD2tJJxI0FhepLyyQLBbZK5dJjY2dYOaIiUKB1vJnuFrEAR5KsReG9AwNkY0i1MAAxvNQ+fwJShDgG4MLAjLZFKwftgeMtaSMQVer7JbL2DMotRo/5ufZXlvj4NMSuPaGPAvsHhySzQUkbhZwuYDEjdETTBeKbKUvcG/mMTFQUkBTgXMoI6L8i3502bbCrtXl0A+3w66vldAPf3doVlfCHtcKdeVjyJeFMLG2EpKWUJRyYl48f5L82fuo+eY9pFNg3d87/5daQ6PR7jubhkwAH94hjF/zKX17YOhNWuzx7QH2FD26AIiJbcSeApak8xHneMSOjvwERg1wzhg1gP4Dwh36JQOqlM8AAAAASUVORK5CYII="});
 Object.assign(ICON, {"net0": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAhElEQVR4nKWTUQoAIQhEp6WDdbOmm00nc79agnVNWEEI1PGZBfy0EgVJWhALa1ex65LWGVcG0+wTBDXCJZnRT+OeR4hQjyMkKM8CpXxvprX2jyAlEN26JEh6xCSBpNU9IbI9/sqN1nhwFJLWe8ec0+244QLO36kAMMZIoXu2FDMvyN3xDf9EZT26FsRxAAAAAElFTkSuQmCC", "net1": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAmklEQVR4nKVTQQ7DIAwzEw/jZ5ifmZdlh6ltpoYUbZEsFSU2jkyBP6tkTZKW9FLuQQ4h6fjG69GjGcwM8IhWyOz23r921ZxorV38LbtmJ5YrmC1NLKvuDnKM6/CxfxcoZZ1Mc6SfHGwJkFwKSIKkU0wSSFr1A1n5/m02i/EBKCSt9445Z3ijswsE/04FgOEjSqxHdSjuvKAw4zcKi3avesWQPwAAAABJRU5ErkJggg==", "net2": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAi0lEQVR4nKWSYQrFIAyDs4cH82bGm8WTdb/cG5u2hRUKQtr41Qp8jMMTSZqjub2zeZmS5hm/DKbZFgTFwyWZ8U/jxiOYGfDMIEpY8aeMDby91Fq/EaQM2PuqEwAgCZIuM0kgaZfBFHdx11+13hqDxEHSWmsYYyxvvOECi3cuANBXsydHm47xj9ls+QQpr221nl7ljQAAAABJRU5ErkJggg==", "net3": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAnklEQVR4nKWS6w3EIAyD3VMHY7OEzZzJcj9OPCogoF6kSK2CzeemwJ91RUNV9WAWaot42iTLMz5bRne4O9D3LEKEKyKPrDRDSqnpj3Dday8jDKi+hKp1b0+UiDm3lx/+aBDtJXWiVwRHBg/MpgQAkATJakYSqurVoAxX1c+Hs9EaN41LVV1EYGbTGztcYPKdbwDIs+yH0Yrj/o9ZbPkLNOd/JygGMKcAAAAASUVORK5CYII=", "mines": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABlElEQVR4nM2XUW7EIAxEh2rvBTfD3IyczP2JqSEQE4jaWkJsCOt5HiBRHBYj58w5ZwAAEbnVPF+r4t57hBBkiH8V4M34nwDn+nZt7Y2fe2G0DHxz7wog6+u9r8QEyntfzQ8hIOesIbQYMzOIaAhYAYjgcRwAUCBk3HuP4ziqvoVQYszMSCm1blRRHR8iYkkogjpacQFVBRSYM19pI83KATnPkkALPBVXOYfiFwANAfw40IreiYt7VuVDAEu8jVbcsN8GICKWKlbEWwcUgH0KJKy1ltYT33bgrnJJHmNEjLEcu94GHABcXPick8uNGCMAIKXUrSzGeAFrhbS4AeFARKwj58xENOxljlzj5+lXrtv+rn3Ecm3zaG2t9TQqL3P0b3eSlsGR+CyEBpkJeTiUdZkVeEMcgJNT4ARm1uYNcafaJcwNZfVGm4pliNcB/kL8FmKzzYu/JDgF0b4LmIgQQnhylJ6E6UT3EbvTOrmmKNs/rFrdQlxi9E3Hg/tWBb18o1zb0bP4cWx9mr2xUXdt0VUv5foGD9Zl4jnwsioAAAAASUVORK5CYII=", "mines16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAtUlEQVR4nJ2SUQ7DMAhDX6beK9ys7s3oybKfpYOoSadZqiIKtoEEFpDUVvklJLXWWnsSef0jfCsg6dFNUjMzgKuuxEStleM4ANj3nfM8AXB3AMyMj8DFLaN6rRUgkc0Md0dSIo8jlO50Rw4oMdji3LHt3omZISm6xz2VrRNH53gGcoolUe42PyxrhZLm6YucOXdSDNJD+oEMeQdfuHt/SNNvyC/JDAQW/1JrvxSnuDBHuu9Z0Ru7mo/u7QARbwAAAABJRU5ErkJggg=="});
 Object.assign(ICON, {"floppy": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACA0lEQVR4nO2XsYvaYBjGf5bD2wreELhDcSkIuigOGVwPXNQldHbr5u7sP+Dg1k0ENxfP8QaXbA1O6pAqJ4qIQwTDDcmSDtWgxvRitLWl90zf9/k+eX7fm+QLwv+ugF9ju922ADoPDyd7c/M5AIVCIXDjJ3w0GlmVSoVyuYzy+nqy32i1kCSJYrFo+QIAkCQJgG/p9Mnep40X4INfgEvJdwe2+urDcw9o2voyAF98eJ52xlfrwMUA3jtwbgf+7ddQVVVUVb0ewKFms9mbNeFw2BvAdDq1AG5vbx2/6bp+NDybzdrzYDBoj03TpNFo2Gu7EA6A5XJp7YaYpunGeFSNRgNBEMjn857q7YfQ2kjX9aM7/F26gZ+7Ho/HJxk1bc3d3cdf1vR6PQASicTeLdkD6Ha71mAwOCk8Eonw8vId+OSAEATBHqdSKcB5GzVtvfFDYDgcWn5fpVartTcvlUqutbVazbFWr9cDZwEAyLLsWPv8/IwCjB8f7bXVaoWiKPZcUZQAeDwHOp2OJ5hcLgfAPJPhnv0z3+0aewBuRaFQiGg0ymQyYbFYIIqiZ9AtlJscHUgmk3sHCsB0OqXZbGIYBrFYjHg8fvRihz6Afr/vHWBLe2iSZRnDMBBF8WiI17A3AdyUyWTOCjnU9gGEv+FzXK1W/2jg7u5h89csnU5b1wh/F8APmynM11vwAUkAAAAASUVORK5CYII=", "floppy16": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABEklEQVR4nK2TsWqEQBRFjyFYptjCSrsUwUlnIaTyA/wpvyGdIKyQP9jfiNpEDLiioAQrBUubSbNrDKtrYHNhinln3uXdBwM3SrkG9/s3+fr8tMgs4OXjk/trBrvdA++WtcrDLQOAaIPfbRls6WaDzQhfh8PfDeq6lvN7kiQACCFQVXWqj+NImqbAKUJd17IoCjmOI/PTdcPUFAQBuq5fTpBlmSyKYnG8qjoCjwBomkbTNCRJghCCrhuoqiNKlmUyz/PVjHEcL9bLsiQMQ2XagRBigr7v07Yttm3jOA6GYUwsTVM8z/uJMAdn9X2PbduYpolhGL/YxQ6Wiq7rAjAMw2pzFEUKnD6TZVly8dWKzs3/om+8dHKnHtRoFAAAAABJRU5ErkJggg=="});
@@ -1666,8 +1696,8 @@ function pickAudio(cb) {
 /* ================= Calculatrice (standard et scientifique) ================= */
 const CALC_KEY = "h97-calc";
 function calcHtml() {
-  const b = (lb, k, cls = "") => `<button class="ck ${cls}" type="button" data-k="${k}">${lb}</button>`;
-  const num = n => b(n, n, "num");
+  const b = (lb, k, cls = "", attr = "") => `<button class="cbtn ${cls}" type="button" data-k="${k}"${attr}>${lb}</button>`;
+  const rad = (name, items, def) => items.map(x => `<label><input type="radio" name="${name}" value="${x.toLowerCase()}"${x === def ? " checked" : ""}>${x}</label>`).join("");
   return `<div class="menubar cmenu">
       <span class="mwrap"><button class="mbtn" type="button" data-mm="edit" aria-haspopup="menu" aria-expanded="false"><u>E</u>dit</button>
         <div class="drop" role="menu" data-for="edit" hidden>
@@ -1687,31 +1717,44 @@ function calcHtml() {
     <div class="calcbody">
       <div class="calcout" aria-live="polite">0.</div>
       <div class="sciline">
-        <div class="seg" data-g="base">${["Hex", "Dec", "Oct", "Bin"].map(x => `<label><input type="radio" name="base" value="${x.toLowerCase()}"${x === "Dec" ? " checked" : ""}>${x}</label>`).join("")}</div>
-        <div class="seg" data-g="ang">${["Degrees", "Radians", "Gradients"].map(x => `<label><input type="radio" name="ang" value="${x.toLowerCase()}"${x === "Degrees" ? " checked" : ""}>${x}</label>`).join("")}</div>
+        <div class="seg">${rad("base", ["Hex", "Dec", "Oct", "Bin"], "Dec")}</div>
+        <div class="seg">${rad("ang", ["Degrees", "Radians", "Gradients"], "Degrees")}</div>
       </div>
       <div class="calcmid">
-        <span class="memind"></span>
+        <div class="seg scionly invhyp"><label><input type="checkbox" id="cInv">Inv</label><label><input type="checkbox" id="cHyp">Hyp</label></div>
+        <span class="memind std-mem"></span>
+        <span class="memind scionly"></span><span class="memind scionly paren"></span>
         <div class="topbtns">${b("Backspace", "back", "red")}${b("CE", "ce", "red")}${b("C", "c", "red")}</div>
       </div>
       <div class="calcgrid">
-        <div class="colmem">${b("MC", "mc", "red")}${b("MR", "mr", "red")}${b("MS", "ms", "red")}${b("M+", "m+", "red")}</div>
-        <div class="colnum">
-          ${num(7)}${num(8)}${num(9)}${b("/", "/", "red")}
-          ${num(4)}${num(5)}${num(6)}${b("*", "*", "red")}
-          ${num(1)}${num(2)}${num(3)}${b("-", "-", "red")}
-          ${num(0)}${b("+/-", "neg", "num")}${b(".", ".", "num")}${b("+", "+", "red")}
-        </div>
-        <div class="colop">${b("sqrt", "sqrt", "red")}${b("%", "%", "red")}${b("1/x", "inv", "red")}${b("=", "=", "red")}</div>
-        <div class="colsci">
+        <div class="colstat scionly">${b("Sta", "sta", "blue dis", " disabled")}${b("Ave", "ave", "grey dis", " disabled")}${b("Sum", "sum", "grey dis", " disabled")}${b("s", "s", "grey dis", " disabled")}${b("Dat", "dat", "grey dis", " disabled")}</div>
+        <div class="colsci scionly">
+          ${b("F-E", "fe", "pink")}${b("(", "(", "pink")}${b(")", ")", "pink")}
+          ${b("dms", "dms", "pink")}${b("Exp", "exp", "pink")}${b("ln", "ln", "pink")}
           ${b("sin", "sin", "pink")}${b("x^y", "pow", "pink")}${b("log", "log", "pink")}
           ${b("cos", "cos", "pink")}${b("x^3", "cube", "pink")}${b("n!", "fact", "pink")}
-          ${b("tan", "tan", "pink")}${b("x^2", "sqr", "pink")}${b("ln", "ln", "pink")}
-          ${b("(", "(", "pink")}${b(")", ")", "pink")}${b("pi", "pi", "pink")}
+          ${b("tan", "tan", "pink")}${b("x^2", "sqr", "pink")}${b("1/x", "inv", "pink")}
         </div>
+        <div class="colmem">${b("MC", "mc", "red")}${b("MR", "mr", "red")}${b("MS", "ms", "red")}${b("M+", "m+", "red")}${b("pi", "pi", "pink scionly")}</div>
+        <div class="colnum">
+          ${b(7, 7, "num")}${b(8, 8, "num")}${b(9, 9, "num")}${b("/", "/", "red")}
+          ${b(4, 4, "num")}${b(5, 5, "num")}${b(6, 6, "num")}${b("*", "*", "red")}
+          ${b(1, 1, "num")}${b(2, 2, "num")}${b(3, 3, "num")}${b("-", "-", "red")}
+          ${b(0, 0, "num")}${b("+/-", "neg", "num")}${b(".", ".", "num")}${b("+", "+", "red")}
+          ${["A", "B", "C", "D"].map(h => b(h, h.toLowerCase(), "num hex")).join("")}
+        </div>
+        <div class="colop">
+          ${b("Mod", "mod", "red scionly")}${b("And", "and", "red scionly")}
+          ${b("Or", "or", "red scionly")}${b("Xor", "xor", "red scionly")}
+          ${b("Lsh", "lsh", "red scionly")}${b("Not", "not", "red scionly")}
+          ${b("=", "=", "red")}${b("Int", "int", "red scionly")}
+          ${b("E", "e", "num hex")}${b("F", "f", "num hex")}
+        </div>
+        <div class="colstd">${b("sqrt", "sqrt", "red")}${b("%", "%", "red")}${b("1/x", "inv", "red")}${b("=", "=", "red")}</div>
       </div>
     </div>`;
 }
+
 function initCalc(el) {
   const $c = s => el.querySelector(s), out = $c(".calcout");
   let acc = 0, cur = "0", op = null, fresh = true, mem = 0, open = [];
@@ -1727,12 +1770,21 @@ function initCalc(el) {
     const base = $c("input[name=base]:checked").value;
     return base === "dec" ? parseFloat(t) || 0 : parseInt(t, { hex: 16, oct: 8, bin: 2 }[base]) || 0;
   };
-  const show = t => { out.textContent = t; $c(".memind").textContent = mem ? "M" : ""; };
+  const show = t => { out.textContent = t; el.querySelectorAll(".memind:not(.paren)").forEach(m => { m.textContent = mem ? "M" : ""; }); };
+  const parens = () => { const p = el.querySelector(".memind.paren"); if (p) p.textContent = open.length ? "(".repeat(Math.min(3, open.length)) : ""; };
   const ang = v => { const a = $c("input[name=ang]:checked").value; return a === "degrees" ? v * Math.PI / 180 : a === "gradients" ? v * Math.PI / 200 : v; };
+  const unang = v => { const a = $c("input[name=ang]:checked").value; return a === "degrees" ? v * 180 / Math.PI : a === "gradients" ? v * 200 / Math.PI : v; };
+  let expMode = false, feMode = false;
   function apply() {
     const b = parse(cur);
     if (op === "+") acc += b; else if (op === "-") acc -= b; else if (op === "*") acc *= b;
-    else if (op === "/") acc = b === 0 ? NaN : acc / b; else if (op === "pow") acc = Math.pow(acc, b); else acc = b;
+    else if (op === "/") acc = b === 0 ? NaN : acc / b; else if (op === "pow") acc = Math.pow(acc, b);
+    else if (op === "mod") acc = b === 0 ? NaN : acc % b;
+    else if (op === "and") acc = Math.trunc(acc) & Math.trunc(b);
+    else if (op === "or") acc = Math.trunc(acc) | Math.trunc(b);
+    else if (op === "xor") acc = Math.trunc(acc) ^ Math.trunc(b);
+    else if (op === "lsh") acc = Math.trunc(acc) << Math.trunc(b);
+    else acc = b;
     cur = fmt(acc); show(cur); fresh = true;
   }
   function digit(d) {
@@ -1742,9 +1794,16 @@ function initCalc(el) {
   }
   function unary(k) {
     const v = parse(cur); let r = v;
-    if (k === "sqrt") r = Math.sqrt(v); else if (k === "sqr") r = v * v; else if (k === "cube") r = v ** 3;
-    else if (k === "inv") r = v === 0 ? NaN : 1 / v; else if (k === "ln") r = Math.log(v); else if (k === "log") r = Math.log10(v);
-    else if (k === "sin") r = Math.sin(ang(v)); else if (k === "cos") r = Math.cos(ang(v)); else if (k === "tan") r = Math.tan(ang(v));
+    const inv = $c("#cInv") && $c("#cInv").checked, hyp = $c("#cHyp") && $c("#cHyp").checked;
+    if (k === "sqrt") r = Math.sqrt(v); else if (k === "sqr") r = inv ? Math.sqrt(v) : v * v; else if (k === "cube") r = inv ? Math.cbrt(v) : v ** 3;
+    else if (k === "inv") r = v === 0 ? NaN : 1 / v; else if (k === "ln") r = inv ? Math.exp(v) : Math.log(v); else if (k === "log") r = inv ? 10 ** v : Math.log10(v);
+    else if (k === "sin") r = hyp ? (inv ? Math.asinh(v) : Math.sinh(v)) : inv ? unang(Math.asin(v)) : Math.sin(ang(v));
+    else if (k === "cos") r = hyp ? (inv ? Math.acosh(v) : Math.cosh(v)) : inv ? unang(Math.acos(v)) : Math.cos(ang(v));
+    else if (k === "tan") r = hyp ? (inv ? Math.atanh(v) : Math.tanh(v)) : inv ? unang(Math.atan(v)) : Math.tan(ang(v));
+    else if (k === "int") r = Math.trunc(v); else if (k === "not") r = ~Math.trunc(v);
+    else if (k === "dms") r = inv ? Math.trunc(v) + (v % 1) * 100 / 60 : Math.trunc(v) + (v % 1) * 60 / 100;
+    else if (k === "exp") { expMode = true; fresh = false; return; }
+    else if (k === "fe") { feMode = !feMode; }
     else if (k === "fact") { r = 1; const n = Math.trunc(v); if (n < 0 || n > 170) r = NaN; else for (let i = 2; i <= n; i++) r *= i; }
     else if (k === "neg") r = -v; else if (k === "pi") r = Math.PI;
     else if (k === "%") r = acc * v / 100;
@@ -1753,7 +1812,7 @@ function initCalc(el) {
   function press(k) {
     if (/^[0-9a-f]$/i.test(k)) return digit(k.toUpperCase());
     if (k === ".") { if (!cur.includes(".")) { cur = fresh ? "0." : cur + "."; fresh = false; show(cur); } return; }
-    if (["+", "-", "*", "/", "pow"].includes(k)) { if (op && !fresh) apply(); else acc = parse(cur); op = k; fresh = true; return; }
+    if (["+", "-", "*", "/", "pow", "mod", "and", "or", "xor", "lsh"].includes(k)) { if (op && !fresh) apply(); else acc = parse(cur); op = k; fresh = true; return; }
     if (k === "=") { if (op) apply(); op = null; return; }
     if (k === "c") { acc = 0; cur = "0"; op = null; fresh = true; open = []; show("0."); return; }
     if (k === "ce") { cur = "0"; fresh = true; show("0."); return; }
@@ -1762,13 +1821,21 @@ function initCalc(el) {
     if (k === "mr") { cur = fmt(mem); fresh = true; show(cur); return; }
     if (k === "ms") { mem = parse(cur); show(cur); return; }
     if (k === "m+") { mem += parse(cur); show(cur); return; }
-    if (k === "(") { open.push([acc, op]); acc = 0; op = null; cur = "0"; fresh = true; show("0."); return; }
-    if (k === ")") { if (!open.length) return; if (op) apply(); const [a, o] = open.pop(); const v = parse(cur); acc = a; op = o; cur = fmt(v); fresh = true; if (op) { } show(cur); return; }
+    if (k === "(") { open.push([acc, op]); acc = 0; op = null; cur = "0"; fresh = true; show("0."); parens(); return; }
+    if (k === ")") { if (!open.length) return; if (op) apply(); const [a, o] = open.pop(); const v = parse(cur); acc = a; op = o; cur = fmt(v); fresh = true; show(cur); parens(); return; }
     unary(k);
   }
   el.querySelector(".calcgrid").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) press(b.dataset.k); });
   el.querySelector(".calcmid").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) press(b.dataset.k); });
-  el.querySelectorAll("input[name=base]").forEach(r => r.addEventListener("change", () => { cur = fmt(parse(cur)); show(cur); el.classList.toggle("hexon", $c("input[name=base]:checked").value === "hex"); }));
+  el.classList.toggle("hexon", false);
+  let lastBase = "dec";
+  el.querySelectorAll("input[name=base]").forEach(r => r.addEventListener("change", () => {
+    const radix = { hex: 16, dec: 10, oct: 8, bin: 2 }[lastBase];
+    const v = lastBase === "dec" ? parseFloat(cur) || 0 : parseInt(cur, radix) || 0;   // on lit avec l'ancienne base
+    lastBase = $c("input[name=base]:checked").value;
+    cur = fmt(v); fresh = true; show(cur);
+    el.classList.toggle("hexon", lastBase === "hex");
+  }));
   el._keys = e => {
     const k = e.key;
     if (/^[0-9]$/.test(k)) press(k);
@@ -1786,7 +1853,7 @@ function initCalc(el) {
     sci = v === "sci"; LS.set(CALC_KEY, sci ? "sci" : "std");
     el.classList.toggle("sci", sci);
     el.querySelectorAll("[data-km=std] .ck2, [data-km=sci] .ck2").forEach((c, i) => { c.textContent = (i === 0) !== sci ? "✓" : ""; });
-    el.style.width = (sci ? Math.min(640, innerWidth - 12) : 260) + "px";
+    el.style.width = (sci ? "auto" : "262px"); if (sci) el.style.maxWidth = "calc(100vw - 12px)";
     requestAnimationFrame(() => {
       const W = innerWidth, H = innerHeight - 30;
       el.style.left = Math.max(2, Math.round((W - el.offsetWidth) / 2)) + "px";
