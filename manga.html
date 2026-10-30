@@ -185,6 +185,12 @@ legend{padding:0 3px}
   .ov{padding:6px}
 }
 .mnres{display:flex!important;flex-wrap:wrap;align-items:center;justify-content:flex-start!important;gap:4px 8px!important}.mnres .mnth,.mnres .ph{width:28px;height:40px;object-fit:cover;flex:none;font-size:0}.mnres span:not(.ph){flex:1;min-width:0}.mnres small{flex-basis:100%;padding-left:36px}
+.arrange{background:#fff;box-shadow:var(--sunken);padding:8px;margin-top:6px}
+.arow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 2px;border-bottom:1px solid #dcdcdc}
+.arow.hid{opacity:.6}.arow .ath,.arow .ph{width:30px;height:44px;object-fit:cover;flex:none;font-size:0}
+.ainfo{flex:1 1 200px;min-width:0;display:flex;flex-direction:column}.ainfo b{font-weight:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ainfo small{color:#555}
+.arow input[type=number]{width:58px}.arow select{max-width:190px}
+.edren{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:0 0 8px}.edren input{flex:1;min-width:140px}
 </style>
 </head>
 <body>
@@ -306,27 +312,47 @@ function volSub(t, series, n) {
   if (!x || /^\d+$/.test(x) || norm(x) === norm(series)) return "";
   return x;
 }
+/* Scrinis range parfois mal ses tomes (ex. « Log », « 1re édition » ou coffrets mélangés dans l’édition standard).
+   Le titre du tome est plus fiable : quand il nomme une édition, c’est lui qui décide du rangement. */
+const SUBEDS = [
+  [/coffret\s+vide/, "coffret-vide", "Coffrets vides"], [/coffret/, "coffret", "Coffrets"], [/coffre\s+au\s+tresor/, "coffre", "Coffre au trésor"],
+  [/\blog\b/, "log", "Log"], [/(?:1re|1ere|premiere)\s+edition/, "1re", "1re édition"], [/nouvelle\s+edition/, "nouvelle", "Nouvelle édition"],
+  [/\b20\s*ans\b/, "20ans", "Édition 20 ans"], [/hokage/, "hokage", "Édition Hokage"], [/hachette/, "hachette", "Collection Hachette"],
+  [/france\s+loisirs/, "franceloisirs", "France Loisirs"], [/perfect/, "perfect", "Perfect edition"], [/ultimate/, "ultimate", "Ultimate edition"],
+  [/deluxe/, "deluxe", "Édition deluxe"], [/\bgold\b/, "gold", "Édition Gold"], [/\bdouble\b/, "double", "Édition double"], [/\btriple\b/, "triple", "Édition triple"],
+  [/integrale/, "integrale", "Intégrale"], [/collector/, "collector", "Édition collector"], [/\bcouleurs?\b|full\s+colou?r/, "couleur", "Édition couleur"],
+  [/kiosque/, "kiosque", "Édition kiosque"], [/edition\s+originale/, "originale", "Édition originale"]
+];
+function subEd(title, series) {
+  let t = norm(title); const k = norm(series); if (k && t.startsWith(k)) t = t.slice(k.length);
+  for (const [re, id, label] of SUBEDS) if (re.test(t)) return { id, label };
+  return null;
+}
 /* fiche Scrinis → fiche compacte utilisée par la page (éditions françaises papier seulement) */
 function toD(j) {
   const sid = "sc" + j.public_n, title = (j.titles && (j.titles.localized_primary || j.titles.primary)) || "Sans titre";
   const vols = (j.volumes || []).filter(v => v.lang === "fr" && (v.medium || "print") === "print" && v.kind !== "chapter");
-  const byEd = {}; vols.forEach(v => { (byEd[v.edition || "standard"] = byEd[v.edition || "standard"] || []).push(v); });
+  const byEd = {}, labels = {};
+  vols.forEach(v => { const se = subEd(v.title, title); const e = se ? se.id : (v.edition || "standard"); if (se) labels[e] = se.label; (byEd[e] = byEd[e] || []).push(v); });
   const prim = (j.editions || []).find(e => e.lang === "fr" && e.medium === "print" && e.is_primary);
   const editions = [], volumes = [];
   Object.entries(byEd).forEach(([e, list]) => {
-    const seen = new Set();
+    const seen = new Set(), base = new Set(list.filter(v => !v.variant).map(v => v.n == null ? null : +v.n));
     list.sort((a, b) => (a.variant || 0) - (b.variant || 0) || (a.released_on || "").localeCompare(b.released_on || "")).forEach(v => {
-      const n = v.n == null ? null : +v.n; const key = n == null ? "x" + v.public_n : n; if (seen.has(key)) return; seen.add(key);
+      const n = v.n == null ? null : +v.n;
+      // une variante de couverture ne compte que s’il n’existe pas déjà le même tome normal
+      if (v.variant && base.has(n)) return;
+      const key = "v" + v.public_n; if (seen.has(key)) return; seen.add(key);
       volumes.push({ id: "v" + v.public_n, edition_id: e, number: n, title: volSub(v.title, title, n), ft: v.title || "", image_url: v.covers && v.covers[0] ? v.covers[0].url : "", release_date: v.released_on || "", isbn: v.isbn_13 || "", nb_pages: v.page_count || null });
     });
-    editions.push({ id: e, title: edLabel(e), publisher_id: "p", volumes_count: seen.size, follow_editions_count: seen.size + (prim && prim.edition === e ? 1e4 : 0) + (e === "originale" || e === "standard" ? 100 : 0) });
+    editions.push({ id: e, title: labels[e] || edLabel(e), publisher_id: "p", volumes_count: seen.size, follow_editions_count: seen.size + (prim && prim.edition === e ? 1e4 : 0) + (e === "originale" || e === "standard" ? 100 : 0) });
   });
   const cr = (j.credits || []).filter(c => /^(author|artist|writer|story|art)$/i.test(c.role || ""));
   const names = [...new Set(cr.map(c => c.name))];
   const roles = n => cr.filter(c => c.name === n).map(c => c.role.toLowerCase());
   const genres = ((j.taxonomy && j.taxonomy.genres) || []).map(g => g.label || g.slug);
   return {
-    sc: j.public_n, at: Date.now(), status: j.status || "",
+    sc: j.public_n, at: Date.now(), ver: 2, status: j.status || "",
     series: [{ id: sid, title, kinds_ids: genres.map((g, i) => "g" + i) }],
     editions, volumes,
     publishers: [{ id: "p", title: (j.publication && j.publication.publisher) || "" }],
@@ -342,19 +368,38 @@ async function fetchSeries(id) { return toD(await sc("/series/" + encodeURICompo
 const refreshing = new Set();
 async function seriesDetail(sid, force) {
   const s = DB.series[sid];
-  if (s && s.snap && !force) {
+  if (s && s.snap && !force && (s.snap.ver === 2 || !navigator.onLine)) {
     if (Date.now() - (s.snap.at || 0) > 2 * WEEK && navigator.onLine && !refreshing.has(sid)) {
       refreshing.add(sid);
-      fetchSeries(s.snap.sc || sid.slice(2)).then(d => { const x = DB.series[sid]; if (x && !x.del && d.volumes.length) { x.snap = d; touch(sid); save(); if (view.sid === sid && cur && cur.sid === sid) { cur.d = d; drawSeries(true); } } }).catch(() => {}).finally(() => refreshing.delete(sid));
+      fetchSeries(s.snap.sc || sid.slice(2)).then(d => { const x = DB.series[sid]; if (x && !x.del && d.volumes.length) { x.snap = d; touch(sid); save(); if (view.sid === sid && cur && cur.sid === sid) { cur.snap = d; applyView(); drawSeries(true); } } }).catch(() => {}).finally(() => refreshing.delete(sid));
     }
     return s.snap;
   }
-  const d = await fetchSeries(sid.slice(2));
+  let d; try { d = await fetchSeries(sid.slice(2)); } catch (e) { if (s && s.snap) return s.snap; throw e; }
   if (s && !s.del) { s.snap = d; touch(sid); save(); }
   return d;
 }
 async function volumeDetail(vid) { const v = cur && cur.d.volumes.find(x => x.id === vid); return v ? { title: v.ft || v.title, nb_pages: v.nb_pages } : null; }
 const withExtra = (sid, d, edId) => volsOf(d, edId);
+/* tes corrections de rangement (s.fix) appliquées par-dessus la fiche : édition, numéro, tome masqué */
+function viewOf(d, s) {
+  const fix = (s && s.fix) || {}, names = (s && s.edNames) || {};
+  const vols = [], hidden = [];
+  d.volumes.forEach(v => { const f = fix[v.id]; const w = f ? { ...v, edition_id: f.ed || v.edition_id, number: f.n != null ? f.n : v.number, fixed: true } : v; (f && f.hide ? hidden : vols).push(w); });
+  const eds = d.editions.map(e => ({ ...e, title: names[e.id] || e.title }));
+  Object.values(fix).forEach(f => { if (f.ed && !eds.some(e => e.id === f.ed)) eds.push({ id: f.ed, title: names[f.ed] || f.ed, publisher_id: "p", follow_editions_count: 0 }); });
+  eds.forEach(e => { e.volumes_count = vols.filter(v => v.edition_id === e.id).length; });
+  return { ...d, volumes: vols, hidden, editions: eds.filter(e => e.volumes_count || (s && s.ed === e.id)) };
+}
+/* les tomes possédés suivent leur tome s’il change d’édition */
+function regroupOwn(s, d) {
+  if (!s || !s.own) return false;
+  const where = {}; [...d.volumes, ...(d.hidden || [])].forEach(v => { where[v.id] = v.edition_id; });
+  const out = {}; let changed = false;
+  Object.entries(s.own).forEach(([ed, ids]) => ids.forEach(id => { const e = where[id] || ed; if (e !== ed) changed = true; (out[e] = out[e] || []).includes(id) || out[e].push(id); }));
+  if (changed) s.own = out;
+  return changed;
+}
 const edName = e => e ? (e.title || "Édition standard") : "";
 
 /* ---------------- ma collection (navigateur + Firebase) ---------------- */
@@ -404,9 +449,10 @@ function drawHome() {
   $("#hs").onchange = e => { homeSort = e.target.value; drawHome(); };
 }
 
-let cur = null; // { sid, d (fiche), vols (tomes de l’édition affichée) }
+let cur = null, arrange = false; // { sid, snap (fiche Scrinis), d (fiche avec tes corrections), vols (tomes de l’édition affichée) }
 const busy = on => document.documentElement.classList.toggle("h97busy", on);
 async function openSeries(sid, keepScroll) {
+  if (!cur || cur.sid !== sid) arrange = false;
   view = { name: "series", sid }; drawTree(); closeSide();
   const s = DB.series[sid];
   main.innerHTML = `<button class="btn backbtn" type="button" data-go="home">◄ Toutes les séries</button><div class="empty">Chargement de « ${esc(s ? s.title : "")} »…</div>`;
@@ -416,9 +462,14 @@ async function openSeries(sid, keepScroll) {
   if (view.sid !== sid) return;
   const ser = d.series[0];
   if (!s) return;
-  if (!s.ed || !d.editions.some(e => e.id === s.ed)) { s.ed = pickEdition(d, s); save(); }
-  cur = { sid, d };
+  cur = { sid, snap: d, d: null }; applyView();
   drawSeries(keepScroll);
+}
+function applyView() {
+  const s = DB.series[cur.sid]; cur.d = viewOf(cur.snap, s);
+  let ch = regroupOwn(s, cur.d);
+  if (!s.ed || !cur.d.editions.some(e => e.id === s.ed)) { s.ed = pickEdition(cur.d, s); ch = true; }
+  if (ch) { touch(cur.sid); save(); }
 }
 function pickEdition(d, s) {
   const owned = Object.entries((s && s.own) || {}).sort((a, b) => b[1].length - a[1].length)[0];
@@ -428,13 +479,14 @@ function pickEdition(d, s) {
 }
 function volsOf(d, edId) { return d.volumes.filter(v => v.edition_id === edId).sort((a, b) => (a.number ?? 1e9) - (b.number ?? 1e9)); }
 function drawSeries(keepScroll) {
+  applyView();
   const { sid, d } = cur, s = DB.series[sid], ser = d.series[0];
   const ed = d.editions.find(e => e.id === s.ed), pub = d.publishers.find(p => ed && p.id === ed.publisher_id);
   const authors = (d.tasks || []).map(t => { const a = d.authors.find(x => x.id === t.author_id), j = (d.jobs || []).find(x => x.id === t.job_id); return a ? `${[a.first_name, a.name].filter(Boolean).join(" ")}${j && j.title !== "Auteur" ? " (" + j.title.toLowerCase() + ")" : ""}` : ""; }).filter(Boolean);
   const kinds = (ser.kinds_ids || []).map(k => (d.kinds.find(x => x.id === k) || {}).title).filter(Boolean);
   const vols = withExtra(sid, d, s.ed), own = new Set(ownedIds(s));
   cur.vols = vols;
-  const shown = showMissing ? vols : vols.filter(v => own.has(v.id));
+  const shown = showMissing || arrange ? vols : vols.filter(v => own.has(v.id));
   const first = vols.find(v => own.has(v.id)) || vols[0];
   // mémorise la couverture et le nom d’édition pour l’accueil
   const img = (first && coverOf(sid, first)) || (vols[0] && coverOf(sid, vols[0])) || s.img || ""; if (s.img !== img || s.edName !== edName(ed)) { s.img = img; s.edName = edName(ed); save(); }
@@ -451,14 +503,53 @@ function drawSeries(keepScroll) {
       <div class="bar" title="${own.size} / ${vols.length}"><i style="width:${vols.length ? Math.round(own.size / vols.length * 100) : 0}%"></i></div>
     </div></div>
     <div class="toolbar"><label class="chk" style="margin:0"><input type="checkbox" id="missChk"${showMissing ? " checked" : ""}> Afficher aussi les tomes que je n’ai pas</label>
-      <button class="btn" type="button" id="rmSeries" style="margin-left:auto">Retirer la série</button></div>
-    ${shown.length ? `<div class="grid">${shown.map(v => `<button class="tile${own.has(v.id) ? "" : " miss"}" type="button" data-vid="${v.id}">${imgTag(coverOf(sid, v), "Tome " + v.number)}<b>Tome ${numTxt(v.number)}${v.title ? " · " + esc(v.title) : ""}</b><small>${own.has(v.id) ? fmtDate(v.release_date) : "Pas dans ma collection"}</small><span class="own" role="checkbox" tabindex="0" aria-checked="${own.has(v.id)}" aria-label="Je possède le tome ${v.number}" data-own="${v.id}" title="Je possède ce tome"><i></i></span></button>`).join("")}</div>`
+      <button class="btn" type="button" id="arrBtn" style="margin-left:auto"${arrange ? ' aria-pressed="true"' : ""}>${arrange ? "Terminer le rangement" : "Ranger les tomes…"}</button>
+      <button class="btn" type="button" id="rmSeries">Retirer la série</button></div>
+    ${arrange ? arrangeHTML(sid, d, s, vols) : ""}
+    ${arrange ? "" : shown.length ? `<div class="grid">${shown.map(v => `<button class="tile${own.has(v.id) ? "" : " miss"}" type="button" data-vid="${v.id}">${imgTag(coverOf(sid, v), "Tome " + v.number)}<b>Tome ${numTxt(v.number)}${v.title ? " · " + esc(v.title) : ""}</b><small>${own.has(v.id) ? fmtDate(v.release_date) : "Pas dans ma collection"}</small><span class="own" role="checkbox" tabindex="0" aria-checked="${own.has(v.id)}" aria-label="Je possède le tome ${v.number}" data-own="${v.id}" title="Je possède ce tome"><i></i></span></button>`).join("")}</div>`
       : `<div class="empty">Aucun tome de cette édition dans ta collection.<br><button class="btn" type="button" id="showAll">Afficher les tomes pour les cocher</button></div>`}`;
   if (keepScroll) scrollTo(0, y);
   $("#edSel").onchange = e => askEdition(e.target.value);
   $("#missChk").onchange = e => { showMissing = e.target.checked; drawSeries(true); };
   const sa = $("#showAll"); if (sa) sa.onclick = () => { showMissing = true; drawSeries(true); };
+  $("#arrBtn").onclick = () => { arrange = !arrange; drawSeries(true); };
+  if (arrange) bindArrange(sid, s);
   $("#rmSeries").onclick = () => { if (!confirm(`Retirer « ${ser.title} » de ta mangathèque ?`)) return; DB.series[sid] = { title: ser.title, del: true, t: Date.now() }; save(); go("home"); };
+}
+
+/* ranger les tomes : changer un tome d’édition, corriger son numéro, le masquer */
+function arrangeHTML(sid, d, s, vols) {
+  const eds = d.editions, hid = d.hidden || [];
+  const opts = cur => eds.map(e => `<option value="${esc(e.id)}"${e.id === cur ? " selected" : ""}>${esc(edName(e))}</option>`).join("") + `<option value="__new">Nouvelle édition…</option><option value="__hide">Masquer ce tome</option>`;
+  const row = (v, hidden) => `<div class="arow${hidden ? " hid" : ""}">${imgTag(coverOf(sid, v), "", "ath")}<div class="ainfo"><b>${esc(v.ft || ("Tome " + numTxt(v.number)))}</b><small>${fmtDate(v.release_date)}${v.isbn ? " · " + esc(v.isbn) : ""}${v.fixed ? " · <i>modifié</i>" : ""}</small></div>
+    <label>Tome <input type="number" step="any" min="0" data-fixn="${v.id}" value="${v.number == null ? "" : v.number}"></label>
+    ${hidden ? `<button class="btn" type="button" data-unhide="${v.id}">Réafficher</button>` : `<select data-fix="${v.id}" aria-label="Édition du tome">${opts(v.edition_id)}</select>`}
+    ${v.fixed || hidden ? `<button class="btn" type="button" data-reset="${v.id}" title="Revenir au rangement de Scrinis">↺</button>` : ""}</div>`;
+  return `<div class="arrange"><p class="hint" style="margin:0 0 6px">Déplace un tome mal rangé vers la bonne édition, corrige son numéro ou masque-le. Tes corrections sont gardées et synchronisées, même quand la fiche est mise à jour.</p>
+    <div class="edren"><label for="edRen">Nom de l’édition affichée :</label><input type="text" id="edRen" value="${esc(edName(eds.find(e => e.id === s.ed)))}"><button class="btn" type="button" id="edRenOk">Renommer</button></div>
+    ${vols.map(v => row(v, false)).join("") || `<p class="hint">Aucun tome dans cette édition.</p>`}
+    ${hid.length ? `<p class="hint" style="margin:10px 0 4px">Tomes masqués (${hid.length})</p>${hid.map(v => row(v, true)).join("")}` : ""}</div>`;
+}
+function bindArrange(sid, s) {
+  const setFix = (vid, patch) => { s.fix = s.fix || {}; const f = { ...(s.fix[vid] || {}), ...patch }; Object.keys(f).forEach(k => { if (f[k] == null || f[k] === false) delete f[k]; }); if (Object.keys(f).length) s.fix[vid] = f; else delete s.fix[vid]; applyView(); touch(sid); save(); drawSeries(true); drawTree(); };
+  main.querySelectorAll("[data-fix]").forEach(sel => sel.onchange = () => {
+    const vid = sel.dataset.fix, v = sel.value;
+    if (v === "__hide") return setFix(vid, { hide: true });
+    if (v === "__new") {
+      const name = (prompt("Nom de la nouvelle édition :", "") || "").trim(); if (!name) { drawSeries(true); return; }
+      const id = "u-" + norm(name).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 30) + "-" + Date.now().toString(36).slice(-4);
+      s.edNames = s.edNames || {}; s.edNames[id] = name; return setFix(vid, { ed: id });
+    }
+    const orig = cur.snap.volumes.find(x => x.id === vid);
+    setFix(vid, { ed: orig && orig.edition_id === v ? null : v });
+  });
+  main.querySelectorAll("[data-fixn]").forEach(inp => inp.onchange = () => {
+    const vid = inp.dataset.fixn, orig = cur.snap.volumes.find(x => x.id === vid), n = inp.value === "" ? null : +inp.value;
+    setFix(vid, { n: orig && orig.number === n ? null : n });
+  });
+  main.querySelectorAll("[data-unhide]").forEach(b => b.onclick = () => setFix(b.dataset.unhide, { hide: null }));
+  main.querySelectorAll("[data-reset]").forEach(b => b.onclick = () => { delete s.fix[b.dataset.reset]; applyView(); touch(sid); save(); drawSeries(true); drawTree(); });
+  const ren = $("#edRenOk"); if (ren) ren.onclick = () => { const n = $("#edRen").value.trim(); s.edNames = s.edNames || {}; if (n) s.edNames[s.ed] = n; else delete s.edNames[s.ed]; applyView(); touch(sid); save(); drawSeries(true); };
 }
 
 /* changer d’édition */
@@ -631,7 +722,7 @@ document.addEventListener("click", e => {
   const g = e.target.closest("[data-go]"); if (g) return go(g.dataset.go);
   const s = e.target.closest("[data-sid]"); if (s) { showMissing = false; return go("series", s.dataset.sid); }
   const o = e.target.closest("[data-own]"); if (o) { e.stopPropagation(); return toggleOwn(o.dataset.own, o); }
-  const v = e.target.closest("[data-vid]"); if (v) return openVolume(v.dataset.vid);
+  const v = e.target.closest("[data-vid]"); if (v && !arrange) return openVolume(v.dataset.vid);
   const a = e.target.closest("[data-act]"); if (a) { if (a.dataset.act === "add") openAdd(); else openOv("#ovSet"); }
 });
 const openAdd = () => { openOv("#ovAdd"); setTimeout(() => $("#addQ").focus(), 50); };
