@@ -4,6 +4,13 @@
 <script src="config.js"></script>
 <script>try{var c=window.H97_CONFIG||{};if(c.sbUrl&&c.sbKey&&!localStorage.getItem("mv-sb-url")){localStorage.setItem("mv-sb-url",c.sbUrl);localStorage.setItem("mv-sb-key",c.sbKey);}}catch(e){}</script>
 <meta charset="utf-8">
+<script>
+/* sur mobile : un champ de recherche ou de texte ne doit jamais être pris pour un identifiant/mot de passe */
+(function(){function fix(r){if(!r||!r.querySelectorAll)return;r.querySelectorAll('input[type=search],input[type=text],input:not([type])').forEach(function(i){if(i.dataset.h97ok)return;i.dataset.h97ok='1';var a=i.getAttribute('autocomplete');if(a&&a!=='off')return;i.setAttribute('autocomplete','off');i.setAttribute('autocorrect','off');i.setAttribute('autocapitalize','off');i.setAttribute('spellcheck','false');i.setAttribute('data-1p-ignore','');i.setAttribute('data-lpignore','true');i.setAttribute('data-form-type','other');if(!i.name)i.name='h97-'+(i.id||'champ');});}
+function go(){fix(document);new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(function(n){if(n.nodeType===1)fix(n.parentNode||n);});});}).observe(document.documentElement,{childList:true,subtree:true});}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go();})();
+</script>
+<style>body{overflow-x:hidden}</style>
 <!-- sur iPhone : le son suit le bouton silencieux du téléphone -->
 <script>try{if(navigator.audioSession)navigator.audioSession.type="ambient"}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">

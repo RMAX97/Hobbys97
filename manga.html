@@ -2,6 +2,13 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<script>
+/* sur mobile : un champ de recherche ou de texte ne doit jamais être pris pour un identifiant/mot de passe */
+(function(){function fix(r){if(!r||!r.querySelectorAll)return;r.querySelectorAll('input[type=search],input[type=text],input:not([type])').forEach(function(i){if(i.dataset.h97ok)return;i.dataset.h97ok='1';var a=i.getAttribute('autocomplete');if(a&&a!=='off')return;i.setAttribute('autocomplete','off');i.setAttribute('autocorrect','off');i.setAttribute('autocapitalize','off');i.setAttribute('spellcheck','false');i.setAttribute('data-1p-ignore','');i.setAttribute('data-lpignore','true');i.setAttribute('data-form-type','other');if(!i.name)i.name='h97-'+(i.id||'champ');});}
+function go(){fix(document);new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(function(n){if(n.nodeType===1)fix(n.parentNode||n);});});}).observe(document.documentElement,{childList:true,subtree:true});}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go();})();
+</script>
+<style>body{overflow-x:hidden}</style>
 <!-- sur iPhone : le son suit le bouton silencieux du téléphone -->
 <script>try{if(navigator.audioSession)navigator.audioSession.type="ambient"}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -101,7 +108,7 @@ main{flex:1;min-width:0;margin:4px 4px 4px 2px;box-shadow:var(--sunken);backgrou
 .facts{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:0 0 8px;font-size:12px}
 .facts dt{color:#404040}
 .facts dd{margin:0}
-.edrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}
+.edrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;overflow:hidden;padding:1px}
 .edrow select{min-width:0;max-width:100%;flex:1 1 220px;text-overflow:ellipsis}
 .facts dd{overflow-wrap:anywhere}
 .bar{height:16px;background:#fff;box-shadow:var(--sunken);padding:2px;margin-top:8px;max-width:360px}
@@ -175,6 +182,10 @@ legend{padding:0 3px}
   .hero{margin:10px}
   .shead{grid-template-columns:80px minmax(0,1fr);margin:10px}
   .shead .cv{width:80px}
+  .shead>div,.shead dl{min-width:0;max-width:100%}
+  .edrow label{flex:1 1 100%}.edrow select{flex:1 1 100%;width:100%;min-width:0}
+  .bar{max-width:100%;box-sizing:border-box}
+  .toolbar{padding-left:10px;padding-right:10px}.toolbar>*{max-width:100%}
   .volwin{height:min(640px,100%)}
   .vol{grid-template-columns:1fr;height:auto}
   .vol .vc{height:auto}
@@ -185,7 +196,8 @@ legend{padding:0 3px}
   .ov{padding:6px}
 }
 .mnres{display:flex!important;flex-wrap:wrap;align-items:center;justify-content:flex-start!important;gap:4px 8px!important}.mnres .mnth,.mnres .ph{width:28px;height:40px;object-fit:cover;flex:none;font-size:0}.mnres span:not(.ph){flex:1;min-width:0}.mnres small{flex-basis:100%;padding-left:36px}
-.arrange{background:#fff;box-shadow:var(--sunken);padding:8px;margin-top:6px}
+.arrange{background:#fff;box-shadow:var(--sunken);padding:8px;margin:6px 10px 10px;box-sizing:border-box;max-width:calc(100% - 20px)}
+.arrange *{max-width:100%;box-sizing:border-box}
 .arow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 2px;border-bottom:1px solid #dcdcdc}
 .arow.hid{opacity:.6}.arow .ath,.arow .ph{width:30px;height:44px;object-fit:cover;flex:none;font-size:0}
 .ainfo{flex:1 1 200px;min-width:0;display:flex;flex-direction:column;gap:2px}.ainfo input{width:100%}.ainfo small{color:#555}
@@ -251,7 +263,7 @@ legend{padding:0 3px}
   <div class="titlebar"><span id="addTitle">Ajouter une série</span><button class="x" type="button" data-close aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></div>
   <div class="wbody">
     <p class="hint">Cherche une série par son titre, ou tape l’ISBN d’un tome (le code-barres au dos) pour l’ajouter directement. Ensuite, coche les tomes que tu possèdes.</p>
-    <input type="search" id="addQ" placeholder="Titre de la série ou ISBN…" style="width:100%" autocomplete="off">
+    <input type="search" id="addQ" name="manga-recherche" placeholder="Titre de la série ou ISBN…" style="width:100%" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" inputmode="search" data-1p-ignore data-lpignore="true" data-form-type="other">
     <div class="results" id="addRes"><p class="hint" style="margin:6px">Tape au moins trois lettres.</p></div>
   </div>
   <div class="wfoot"><small class="hint" style="margin-right:auto;align-self:center">Données <a href="https://scrin.is" target="_blank" rel="noopener">Scrinis</a></small><button class="btn" type="button" data-close>Fermer</button></div>
@@ -275,9 +287,11 @@ legend{padding:0 3px}
       <div id="fbOut">
         <p class="hint">Même compte que pour Cards et Films : ta mangathèque, tes éditions et tes couvertures se retrouvent sur tous tes appareils.</p>
         <button class="btn" type="button" id="fbGoogle" style="width:100%;margin-bottom:6px">Continuer avec Google</button>
-        <div class="row"><label for="fbMail">E-mail</label><input type="email" id="fbMail" autocomplete="username"></div>
-        <div class="row"><label for="fbPass">Mot de passe</label><input type="password" id="fbPass" autocomplete="current-password"></div>
+        <form id="fbForm" autocomplete="on" onsubmit="return false">
+        <div class="row"><label for="fbMail">E-mail</label><input type="email" id="fbMail" name="email" autocomplete="username"></div>
+        <div class="row"><label for="fbPass">Mot de passe</label><input type="password" id="fbPass" name="password" autocomplete="current-password"></div>
         <div style="display:flex;justify-content:flex-end"><button class="btn" type="button" id="fbLogin">Se connecter</button></div>
+        </form>
       </div>
       <div id="fbIn" hidden><p class="hint">Synchronisé avec <b id="fbWho"></b>.</p><button class="btn" type="button" id="fbLogout">Se déconnecter</button></div>
       <p class="msg" id="fbMsg"></p>
@@ -455,7 +469,7 @@ function drawHome() {
   const list = seriesSorted(), all = Object.values(DB.series).filter(s => !s.del);
   const tomes = all.reduce((n, s) => n + ownCount(s), 0);
   main.innerHTML = `<div class="hero"><h1>Ma Mangathèque</h1><p>${all.length} série${all.length > 1 ? "s" : ""} · ${tomes} tome${tomes > 1 ? "s" : ""}</p></div>
-    <div class="toolbar"><input type="search" id="hq" placeholder="Rechercher une série" value="${esc(homeQ)}">
+    <div class="toolbar"><input type="search" id="hq" name="manga-filtre" placeholder="Rechercher une série" value="${esc(homeQ)}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-1p-ignore data-lpignore="true" data-form-type="other">
       <select id="hs" aria-label="Trier"><option value="title">Titre</option><option value="count">Nombre de tomes</option><option value="added">Ajout récent</option></select>
       <button class="btn" type="button" data-act="add">+ Ajouter une série</button><span class="cnt">${list.length} série${list.length > 1 ? "s" : ""}</span></div>
     ${all.length ? `<div class="grid">${list.map(([sid, s]) => `<button class="tile" type="button" data-sid="${sid}">${imgTag(s.img, s.title)}<b>${esc(s.title)}</b><small>${ownCount(s)} tome${ownCount(s) > 1 ? "s" : ""}${s.edName ? " · " + esc(s.edName) : ""}</small></button>`).join("")}</div>` :
