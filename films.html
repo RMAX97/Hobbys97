@@ -536,6 +536,9 @@ html[data-theme="dark"] .seg.fmt button[data-v="4k"][aria-pressed="true"]{backgr
 @media (max-width:760px){.stagewrap{min-height:calc(min(190px,52vw) * 190 / 135 + 78px)}}
 #covPick{min-height:40px;display:flex;align-items:center;min-width:0}
 .covnote{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;max-width:100%}
+.syncpill{display:inline-flex;align-items:center;gap:6px;margin:8px 0 0;padding:3px 10px;border:1px solid currentColor;border-radius:999px;background:none;font:inherit;font-size:12.5px;opacity:.7;cursor:pointer;color:inherit}
+.syncpill.warn{color:#b0453a;opacity:1}.syncpill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.syncinfo{font-size:12.5px;margin:8px 0 0;line-height:1.5}
 </style>
 <style>html{touch-action:manipulation}</style>
 <style id="h97-scrollbars">
@@ -569,6 +572,7 @@ html{overflow-y:scroll!important;scrollbar-gutter:stable!important}
   <div class="brand">
     <h1>Ma Vidéothèque</h1>
     <p class="stats" id="stats"></p>
+    <button class="syncpill" id="syncPill" type="button" hidden></button>
   </div>
   <div class="actions">
     <button class="btn primary" id="openAdd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>Ajouter un film</span></button>
@@ -1255,7 +1259,7 @@ async function shrinkData(u,w,q){
   try{const bmp=await createImageBitmap(await (await fetch(u)).blob()),sc=Math.min(1,w/bmp.width),c=document.createElement('canvas');
     c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);return c.toDataURL('image/jpeg',q)}catch(e){return u}
 }
-let pushErr=0;
+let pushErr=0,pushErrMsg='',sentN=0,gotN=0,lastSync=0,listenErr='';
 async function cloudPush(){
   if(!fbs.user)return;
   let errs=0;
@@ -1277,7 +1281,8 @@ async function cloudPush(){
       await fitDoc(f,st);
       await fbs.col.doc(String(f.id)).set({...st,t});
       f.st=t;f.ss=sig;lastSig[f.id]=sig;
-    }catch(e){errs++;console.warn('sync',e)}
+      sentN++;lastSync=Date.now();
+    }catch(e){errs++;pushErrMsg=(e&&(e.code||e.message))||'erreur';console.warn('sync',e)}
   }
   pushErr=errs;syncUI();
   try{localStorage.setItem(STORE,JSON.stringify({v:1,saved:Date.now(),films}))}catch(e){}
@@ -1320,12 +1325,13 @@ async function cloudInit(){
       await new Promise(r=>{const wait=()=>imgReady?r():setTimeout(wait,200);wait()});
       fbs.unsub=fbs.col.onSnapshot(async qs=>{
         applying=true;let changed=false;
-        for(const ch of qs.docChanges()){if(ch.doc.metadata.hasPendingWrites)continue;if(await applyRemote(ch.doc.id,ch.doc.data()))changed=true}
+        for(const ch of qs.docChanges()){if(ch.doc.metadata.hasPendingWrites)continue;if(await applyRemote(ch.doc.id,ch.doc.data())){changed=true;gotN++}}
+        lastSync=Date.now();listenErr='';syncUI();
         applying=false;
         if(changed){try{localStorage.setItem(STORE,JSON.stringify({v:1,saved:Date.now(),films}))}catch(e){}try{render()}catch(e){}
           films.forEach(f=>{if(f.cv)for(const k in f.cv){const th=f.th&&f.th[k];if(!th||th.s!==thSig(f.cv[k]))queueThumb(f,k)}})}
         cloudQueue();h97Ready();
-      },e=>{console.warn('sync',e);h97Ready()});
+      },e=>{console.warn('sync',e);listenErr=(e&&(e.code||e.message))||'erreur';syncUI();h97Ready()});
     });
   }catch(e){console.warn('firebase',e);h97Ready()}
 }
@@ -1334,7 +1340,12 @@ function syncUI(){
   const u=fbs.user;
   box.querySelector('[data-s=out]').hidden=!!u;box.querySelector('[data-s=in]').hidden=!u;
   const w=box.querySelector('[data-s=who]');if(w)w.textContent=u?(u.email||'ton compte'):'';
-  const er=box.querySelector('.syncerr');if(er&&u)er.textContent=pushErr?`${pushErr} film${pushErr>1?'s n’ont':' n’a'} pas pu être envoyé${pushErr>1?'s':''} : ils seront renvoyés à la prochaine ouverture.`:'';
+  const pill=document.getElementById('syncPill');
+  if(pill){pill.hidden=!fbs.auth;pill.classList.toggle('warn',!u||!!pushErr||!!listenErr);
+    pill.textContent=!u?'Non synchronisé : connecte-toi pour retrouver tes changements partout':listenErr?'Synchro impossible ('+listenErr+')':pushErr?'Certains changements n’ont pas été envoyés':'Synchronisé'+(lastSync?' · '+new Date(lastSync).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'');}
+  let inf=box.querySelector('.syncinfo');if(!inf){inf=document.createElement('p');inf.className='syncinfo hint';box.querySelector('[data-s=in]').appendChild(inf)}
+  inf.innerHTML=u?`Cet appareil a envoyé ${sentN} film${sentN>1?'s':''} et en a reçu ${gotN} depuis l’ouverture.${listenErr?'<br>Lecture du compte impossible : '+esc(listenErr):''}<br><button class="btn" type="button" data-a="pushall" style="margin-top:8px">Renvoyer toutes mes modifications</button> <button class="btn" type="button" data-a="pullall" style="margin-top:8px">Tout récupérer depuis le compte</button>`:'';
+  const er=box.querySelector('.syncerr');if(er&&u)er.textContent=pushErr?(pushErrMsg?'('+pushErrMsg+') ':'')+`${pushErr} film${pushErr>1?'s n’ont':' n’a'} pas pu être envoyé${pushErr>1?'s':''} : ils seront renvoyés à la prochaine ouverture.`:'';
 }
 (function(){
   const box=document.getElementById('syncBox');if(!box)return;
@@ -1343,7 +1354,28 @@ function syncUI(){
   box.querySelector('[data-a=google]').onclick=async()=>{if(!fbs.auth)return;err.textContent='';try{await fbs.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())}catch(e){if(e.code!=='auth/popup-closed-by-user')err.textContent=m(e)}};
   box.querySelector('[data-a=mail]').onclick=async()=>{if(!fbs.auth)return;err.textContent='Connexion…';const em=box.querySelector('[data-f=mail]').value.trim(),pw=box.querySelector('[data-f=pass]').value;try{await fbs.auth.signInWithEmailAndPassword(em,pw);err.textContent=''}catch(e){err.textContent=m(e)}};
   box.querySelector('[data-a=out]').onclick=()=>fbs.auth&&fbs.auth.signOut();
+  box.addEventListener('click',async e=>{
+    const b=e.target.closest('[data-a=pushall],[data-a=pullall]');if(!b||!fbs.user)return;
+    b.disabled=true;
+    if(b.dataset.a==='pushall'){
+      // tout ce qui diffère de la liste d'origine repart, même si l'appareil croit l'avoir déjà envoyé
+      films.forEach(f=>{if(isCustom(f)){delete lastSig[f.id];delete f.ss}});
+      const before=sentN;err.textContent='Envoi…';await cloudPush();
+      err.textContent=pushErr?err.textContent:`${sentN-before} film${sentN-before>1?'s':''} envoyé${sentN-before>1?'s':''}.`;
+    }else{
+      err.textContent='Récupération…';
+      try{
+        const qs=await fbs.col.get();let n=0;applying=true;
+        for(const d of qs.docs){const r=d.data(),f=films.find(x=>String(x.id)===d.id);if(f){f.st=0;delete f.ss}if(await applyRemote(d.id,r))n++}
+        applying=false;save();renderAll();
+        films.forEach(f=>{if(f.cv)for(const k in f.cv){const th=f.th&&f.th[k];if(!th||th.s!==thSig(f.cv[k]))queueThumb(f,k)}});
+        err.textContent=`${qs.size} fiche${qs.size>1?'s':''} dans le compte, ${n} appliquée${n>1?'s':''}.`;
+      }catch(x){applying=false;err.textContent='Lecture impossible : '+((x&&(x.code||x.message))||'erreur')}
+    }
+    b.disabled=false;
+  });
 })();
+document.getElementById('syncPill').onclick=()=>{try{openSettings()}catch(e){}};
 cloudInit();
 
 </script>
