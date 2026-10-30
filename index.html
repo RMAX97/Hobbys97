@@ -839,7 +839,7 @@ function openApp(id, opts = {}) {
   else if (a.page === "cd") body = cdHtml();
   else if (a.page === "calc") body = calcHtml();
   else body = `<div class="menubar" aria-hidden="true"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>H</u>elp</span></div>
-       <div class="wbody"><p class="loading">Opening ${a.label}…</p><iframe title="${a.title}" src="${a.src}"></iframe><div class="shield"></div></div>`;
+       <div class="wbody"><p class="loading" aria-hidden="true"></p><iframe title="${a.title}" src="${a.src}"></iframe><div class="shield"></div></div>`;
   el.innerHTML = `
     <header class="tbar"><img data-icon="${a.icon}" alt=""><b>${a.title}</b>
       ${a.dialog ? "" : TBTN}

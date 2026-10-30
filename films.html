@@ -912,7 +912,7 @@ function openDetail(id,fromEl){
   $('#flipBtn').onclick=()=>$('#tilt')._flip();
   $('.facts').onclick=e=>{const b=e.target.closest('.lnk');if(!b)return;const k=b.dataset.k;filterBy(k,k==='year'?+b.dataset.v:b.dataset.v)};
   $('#detailFmt').onclick=e=>{const b=e.target.closest('button');if(!b||f.f===b.dataset.v)return;f.f=b.dataset.v;save();$('#detailFmt').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));rebuildBox(f);render()};
-  $('#rmFilm').onclick=()=>{if(!confirm(`Retirer « ${f.t} » de la vidéothèque ?`))return;const i=films.indexOf(f);films.splice(i,1);save();$('#dDetail').close();renderAll();toast(`« ${f.t} » retiré.`,'Annuler',()=>{films.splice(i,0,f);save();renderAll()})};
+  $('#rmFilm').onclick=()=>{if(!confirm(`Retirer « ${f.t} » de la vidéothèque ?`))return;const i=films.indexOf(f);films.splice(i,1);{const g=getGone();g[f.id]={t:Date.now()};setGone(g)}save();$('#dDetail').close();renderAll();toast(`« ${f.t} » retiré.`,'Annuler',()=>{films.splice(i,0,f);{const g=getGone();delete g[f.id];setGone(g)}save();renderAll()})};
   $('#chgPoster').onclick=()=>openPosters(f);
   const dlg=$('#dDetail');
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -959,6 +959,7 @@ function setCover(f,p,msg){
   const old=f.p;f.p=p;
   try{localStorage.setItem(STORE,JSON.stringify({v:1,saved:Date.now(),films}))}
   catch(e){f.p=old;toast("Image trop lourde pour l'espace disponible dans ce navigateur.");return}
+  try{cloudQueue()}catch(e){}
   render();openDetail(f.id);toast(msg);
 }
 /* Jaquette intégrale importée : on réduit l'image et on repère la tranche (deux lignes verticales au centre) */
@@ -1223,35 +1224,77 @@ let fbs={auth:null,db:null,user:null,col:null,unsub:null},lastSig={},pushT=0,app
 const rid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36);
 function syncState(f){
   const cv={};if(f.cv)for(const k in f.cv){const c=f.cv[k];cv[k]={s:c[3]||null,a:c[1],b:c[2],id:c[4]||null}}
-  return {f:f.f||'dvd',p:f.p||null,full:f.full===false?false:true,cv};
+  const st={f:f.f||'dvd',p:f.p||null,full:f.full===false?false:true,cv};
+  // un film ajouté à la main (absent de la liste Letterboxd) voyage avec sa fiche, pour exister aussi sur les autres appareils
+  if(SEEDP[f.id]===undefined)st.m={t:f.t||'',o:f.o||'',y:f.y||null,d:f.d||[],g:f.g||[],r:f.r||0,s:f.s||'',added:f.added||null};
+  return st;
 }
+/* films retirés : gardés en mémoire pour prévenir les autres appareils */
+const GONE='videotheque.gone';
+const getGone=()=>{try{return JSON.parse(localStorage.getItem(GONE))||{}}catch(e){return {}}};
+const setGone=g=>{try{localStorage.setItem(GONE,JSON.stringify(g))}catch(e){}};
+const dirty=f=>f.ss!==undefined&&sigOf(f)!==f.ss;
 const sigOf=f=>JSON.stringify(syncState(f));
-const isCustom=f=>!!(f.cv&&Object.keys(f.cv).length)||f.full===false||(f.f&&f.f!=='dvd')||(f.p&&SEEDP[f.id]!==undefined&&f.p!==SEEDP[f.id]);
+const isCustom=f=>SEEDP[f.id]===undefined||!!(f.cv&&Object.keys(f.cv).length)||f.full===false||(f.f&&f.f!=='dvd')||(f.p&&SEEDP[f.id]!==undefined&&f.p!==SEEDP[f.id]);
 function cloudQueue(){if(!fbs.user||applying)return;clearTimeout(pushT);pushT=setTimeout(cloudPush,900)}
-async function smallImage(ref){
+async function smallImage(ref,w=1000,q=.72){
   const u=IMGURL[ref.slice(4)];if(!u)return null;
-  const bmp=await createImageBitmap(await (await fetch(u)).blob()),sc=Math.min(1,1000/bmp.width),c=document.createElement('canvas');
+  const bmp=await createImageBitmap(await (await fetch(u)).blob()),sc=Math.min(1,w/bmp.width),c=document.createElement('canvas');
   c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
-  return c.toDataURL('image/jpeg',.72);
+  return c.toDataURL('image/jpeg',q);
 }
+/* une fiche en ligne ne peut pas dépasser 1 Mo : on réduit les images jusqu'à ce que ça passe */
+async function fitDoc(f,st){
+  for(const [w,q] of [[800,.66],[600,.6],[420,.55]]){
+    if(JSON.stringify(st).length<900000)return;
+    for(const k in st.cv)if(st.cv[k].img){const img=await smallImage(f.cv[k][0],w,q);if(img)st.cv[k].img=img}
+    if(st.p&&/^data:/.test(st.p)&&st.p.length>300000)st.p=await shrinkData(st.p,w,q);
+  }
+}
+async function shrinkData(u,w,q){
+  try{const bmp=await createImageBitmap(await (await fetch(u)).blob()),sc=Math.min(1,w/bmp.width),c=document.createElement('canvas');
+    c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);return c.toDataURL('image/jpeg',q)}catch(e){return u}
+}
+let pushErr=0;
 async function cloudPush(){
   if(!fbs.user)return;
+  let errs=0;
+  const gone=getGone();let goneChanged=false;
+  for(const id in gone){
+    if(films.some(x=>String(x.id)===id)){delete gone[id];goneChanged=true;continue}
+    if(gone[id].sent)continue;
+    try{await fbs.col.doc(id).set({del:true,t:gone[id].t});gone[id].sent=true;goneChanged=true}catch(e){errs++;console.warn('sync',e)}
+  }
+  if(goneChanged)setGone(gone);
   for(const f of films){
     if(f.cv)for(const k in f.cv){if(!f.cv[k][4]){f.cv[k]=[f.cv[k][0],f.cv[k][1],f.cv[k][2],f.cv[k][3]||null,rid()]}}
     const sig=sigOf(f);
     if(lastSig[f.id]===sig)continue;
-    if(lastSig[f.id]===undefined&&!isCustom(f)){lastSig[f.id]=sig;continue}
+    if(lastSig[f.id]===undefined&&(!isCustom(f)||f.ss===sig)){lastSig[f.id]=sig;continue}
     const st=syncState(f),t=Date.now();
     try{
       for(const k in st.cv){const c=f.cv[k];if(!st.cv[k].s&&/^idb:/.test(c[0])){const img=await smallImage(c[0]);if(img)st.cv[k].img=img}}
+      await fitDoc(f,st);
       await fbs.col.doc(String(f.id)).set({...st,t});
-      f.st=t;lastSig[f.id]=sig;
-    }catch(e){console.warn('sync',e)}
+      f.st=t;f.ss=sig;lastSig[f.id]=sig;
+    }catch(e){errs++;console.warn('sync',e)}
   }
+  pushErr=errs;syncUI();
   try{localStorage.setItem(STORE,JSON.stringify({v:1,saved:Date.now(),films}))}catch(e){}
 }
 async function applyRemote(id,r){
-  const f=films.find(x=>String(x.id)===String(id));if(!f||!r||!(r.t>(f.st||0)))return false;
+  if(!r)return false;
+  let f=films.find(x=>String(x.id)===String(id));
+  if(r.del){
+    if(f&&r.t>(f.st||0)&&!dirty(f)){films.splice(films.indexOf(f),1);const g=getGone();g[id]={t:r.t,sent:true};setGone(g);return true}
+    return false;
+  }
+  if(!f){
+    // film ajouté sur un autre appareil
+    if(!r.m||(getGone()[id]&&getGone()[id].t>=r.t))return false;
+    f={id:/^\d+$/.test(id)?+id:id,t:r.m.t,o:r.m.o||'',y:r.m.y||null,d:r.m.d||[],g:r.m.g||[],p:'',r:r.m.r||0,s:r.m.s||'',f:'dvd',added:r.m.added||r.t};
+    films.push(f);
+  }else if(dirty(f)||!(r.t>(f.st||0)))return false;
   f.f=r.f||'dvd';if(r.p)f.p=r.p;if(r.full===false)f.full=false;else delete f.full;
   const cv={};
   for(const k in (r.cv||{})){
@@ -1260,7 +1303,7 @@ async function applyRemote(id,r){
     try{const ref=x.s?await storeFull(x.s):x.img?await storeFull(await (await fetch(x.img)).blob()):null;if(ref)cv[k]=[ref,x.a,x.b,x.s||null,x.id]}catch(e){if(old)cv[k]=old}
   }
   if(Object.keys(cv).length)f.cv=cv;else delete f.cv;
-  f.st=r.t;lastSig[f.id]=sigOf(f);return true;
+  f.st=r.t;f.ss=sigOf(f);lastSig[f.id]=f.ss;return true;
 }
 function fbLoad(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
 window.h97Ready=window.h97Ready||function(){try{if(parent!==window)parent.postMessage({h97:"ready"},"*")}catch(e){}};
@@ -1291,6 +1334,7 @@ function syncUI(){
   const u=fbs.user;
   box.querySelector('[data-s=out]').hidden=!!u;box.querySelector('[data-s=in]').hidden=!u;
   const w=box.querySelector('[data-s=who]');if(w)w.textContent=u?(u.email||'ton compte'):'';
+  const er=box.querySelector('.syncerr');if(er&&u)er.textContent=pushErr?`${pushErr} film${pushErr>1?'s n’ont':' n’a'} pas pu être envoyé${pushErr>1?'s':''} : ils seront renvoyés à la prochaine ouverture.`:'';
 }
 (function(){
   const box=document.getElementById('syncBox');if(!box)return;
