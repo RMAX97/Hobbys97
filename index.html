@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<!-- sur iPhone : le son suit le bouton silencieux du téléphone -->
+<script>try{if(navigator.audioSession)navigator.audioSession.type="ambient"}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#008080">
 <title>Hobbys97</title>
@@ -1178,10 +1180,9 @@ async function makeShareData() {
   const ls = {};
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (/^(videotheque\.collection\.v1|videotheque\.theme|h97-manga-v1|mcc2-collection-|mcc2-custom-)/.test(k)) ls[k] = localStorage.getItem(k);
+    if (/^(videotheque\.collection\.v1|videotheque\.theme|h97-manga-v2|mcc2-collection-|mcc2-custom-)/.test(k)) ls[k] = localStorage.getItem(k);
   }
-  if (ls["h97-manga-v1"]) { try { const d = JSON.parse(ls["h97-manga-v1"]); delete d.mcUser; ls["h97-manga-v1"] = JSON.stringify(d); } catch {} }
-  const vinyls = await idbAll("mes-vinyles", "records", { keyPath: "id" });
+    const vinyls = await idbAll("mes-vinyles", "records", { keyPath: "id" });
   const raw = await idbAll("videotheque-img", "img", undefined, true), filmsImg = {};
   for (const k in raw) { const v = raw[k]; if (v instanceof Blob) { const u = await blobToUrl(v); if (u) filmsImg[k] = u; } else if (typeof v === "string") filmsImg[k] = v; }
   const data = { saved: Date.now(), ls, vinyls, filmsImg };
@@ -2789,7 +2790,7 @@ function settingsHtml() {
     <button class="tab" role="tab" data-tab="bg" aria-selected="true">Background</button>
     <button class="tab" role="tab" data-tab="vin" aria-selected="false">Vinyls</button>
     <button class="tab" role="tab" data-tab="fil" aria-selected="false">Films</button>
-    <button class="tab" role="tab" data-tab="man" aria-selected="false">Mangas</button>
+    
     <button class="tab" role="tab" data-tab="acc" aria-selected="false">Account</button>
   </div>
   <div class="tabpane" data-pane="bg">
