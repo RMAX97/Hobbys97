@@ -1263,6 +1263,7 @@ async function applyRemote(id,r){
   f.st=r.t;lastSig[f.id]=sigOf(f);return true;
 }
 function fbLoad(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+window.h97Ready=window.h97Ready||function(){try{if(parent!==window)parent.postMessage({h97:"ready"},"*")}catch(e){}};
 async function cloudInit(){
   try{
     if(!window.firebase||!window.firebase.firestore){await fbLoad(FB_JS+'firebase-app-compat.js');await Promise.all([fbLoad(FB_JS+'firebase-auth-compat.js'),fbLoad(FB_JS+'firebase-firestore-compat.js')])}
@@ -1271,7 +1272,7 @@ async function cloudInit(){
     fbs.auth.onAuthStateChanged(async user=>{
       fbs.user=user;if(fbs.unsub){fbs.unsub();fbs.unsub=null}
       syncUI();
-      if(!user)return;
+      if(!user)return h97Ready();
       fbs.col=fbs.db.collection('data/users/'+user.uid+'/films/items');
       await new Promise(r=>{const wait=()=>imgReady?r():setTimeout(wait,200);wait()});
       fbs.unsub=fbs.col.onSnapshot(async qs=>{
@@ -1280,10 +1281,10 @@ async function cloudInit(){
         applying=false;
         if(changed){try{localStorage.setItem(STORE,JSON.stringify({v:1,saved:Date.now(),films}))}catch(e){}try{render()}catch(e){}
           films.forEach(f=>{if(f.cv)for(const k in f.cv){const th=f.th&&f.th[k];if(!th||th.s!==thSig(f.cv[k]))queueThumb(f,k)}})}
-        cloudQueue();
-      },e=>console.warn('sync',e));
+        cloudQueue();h97Ready();
+      },e=>{console.warn('sync',e);h97Ready()});
     });
-  }catch(e){console.warn('firebase',e)}
+  }catch(e){console.warn('firebase',e);h97Ready()}
 }
 function syncUI(){
   const box=document.getElementById('syncBox');if(!box)return;
@@ -1320,5 +1321,6 @@ cloudInit();
   check();
 })();
 </script>
+<script>if("serviceWorker"in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});</script>
 </body>
 </html>

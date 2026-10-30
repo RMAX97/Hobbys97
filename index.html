@@ -69,7 +69,7 @@ button{font:inherit;color:inherit}
 .menubar u{text-decoration:underline}
 .wbody{position:relative;flex:1;box-shadow:var(--sunken);padding:2px;background:#fff;min-height:0}
 .wbody iframe{display:block;width:100%;height:100%;border:0;background:#fff}
-.wbody .loading{position:absolute;inset:2px;display:grid;place-items:center;color:var(--shadow);pointer-events:none}
+.wbody .loading{position:absolute;inset:2px;z-index:2;display:grid;place-items:center;margin:0;color:var(--shadow);cursor:var(--wait)}
 .grip{position:absolute;right:2px;bottom:2px;width:14px;height:14px;touch-action:none;
   background:linear-gradient(135deg,transparent 0 45%,var(--white) 45% 52%,var(--shadow) 52% 60%,transparent 60% 66%,var(--white) 66% 73%,var(--shadow) 73% 81%,transparent 81%)}
 .win.max .grip{display:none}
@@ -839,7 +839,7 @@ function openApp(id, opts = {}) {
   else if (a.page === "cd") body = cdHtml();
   else if (a.page === "calc") body = calcHtml();
   else body = `<div class="menubar" aria-hidden="true"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>H</u>elp</span></div>
-       <div class="wbody"><p class="loading">Ouverture de ${a.label}…</p><iframe title="${a.title}" src="${a.src}"></iframe><div class="shield"></div></div>`;
+       <div class="wbody"><p class="loading">Opening ${a.label}…</p><iframe title="${a.title}" src="${a.src}"></iframe><div class="shield"></div></div>`;
   el.innerHTML = `
     <header class="tbar"><img data-icon="${a.icon}" alt=""><b>${a.title}</b>
       ${a.dialog ? "" : TBTN}
@@ -863,6 +863,7 @@ function openApp(id, opts = {}) {
     Object.assign(el.style, { width: w + "px", height: h + "px", left: Math.round((W - w) / 2 - 39 + o) + "px", top: 12 + o + "px" });
     if (small()) el.classList.add("max");
     el.querySelector("iframe").addEventListener("load", e => { const l = el.querySelector(".loading"); if (l) l.remove(); skinFrame(e.target); });
+    frameBusy(el);
   }
   const task = document.createElement("button");
   task.className = "task"; task.type = "button"; task.innerHTML = `<img data-icon="${a.icon}" alt=""><span>${a.title}</span>`;
@@ -898,18 +899,20 @@ function openApp(id, opts = {}) {
 function skinFrame(f) {
   let d; try { d = f.contentDocument; } catch { return; }
   if (!d || !d.documentElement || d.getElementById("h97-cursors")) return;
-  const cs = getComputedStyle(document.documentElement), CUR = cs.getPropertyValue("--cur").trim(), HAND = cs.getPropertyValue("--hand").trim();
+  const cs = getComputedStyle(document.documentElement), CUR = cs.getPropertyValue("--cur").trim(), HAND = cs.getPropertyValue("--hand").trim(), WAIT = cs.getPropertyValue("--wait").trim();
   const st = d.createElement("style"); st.id = "h97-cursors";
   st.textContent = `html{cursor:${CUR};touch-action:manipulation}*{cursor:inherit}
     input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=button]):not([type=submit]):not([type=file]),textarea,[contenteditable="true"]{cursor:text}
-    button:not([disabled]),a[href],select,label,summary,[role=button],[role=tab],[role=switch],input[type=checkbox],input[type=radio],input[type=range]{cursor:${HAND}}`;
+    button:not([disabled]),a[href],select,label,summary,[role=button],[role=tab],[role=switch],input[type=checkbox],input[type=radio],input[type=range]{cursor:${HAND}}
+    [data-h97hand]{cursor:${HAND}!important}
+    html.h97busy,html.h97busy *{cursor:${WAIT}!important}`;
   (d.head || d.documentElement).appendChild(st);
   // les éléments que le site rend cliquables avec « cursor: pointer » prennent la main
   const seen = new WeakSet();
   d.addEventListener("mouseover", e => {
     const t = e.target; if (!t || t.nodeType !== 1 || seen.has(t)) return;
     seen.add(t);
-    try { if (d.defaultView.getComputedStyle(t).cursor === "pointer") t.style.setProperty("cursor", HAND, "important"); } catch {}
+    try { if (d.defaultView.getComputedStyle(t).cursor === "pointer") t.setAttribute("data-h97hand", ""); } catch {}
   }, true);
 }
 function focusWin(id) {
@@ -925,6 +928,7 @@ function toggleMax(id) { if (!small()) wins[id].el.classList.toggle("max"); }
 function closeWin(id) {
   const w = wins[id]; if (!w) return;
   if (w.el._cd) w.el._cd.stop();   // fermer le CD Player coupe la musique
+  if (w.el._busyEnd) w.el._busyEnd();
   w.el.remove(); w.task.remove(); delete wins[id]; }
 
 function dragify(el, id) {
@@ -3111,7 +3115,19 @@ function netActivity(on) {
     netTimer = setInterval(() => { netFrame ^= 1; i.src = ICON[netFrame ? "net1" : "net2"]; }, 320);
   } else if (!netBusy && netTimer) { clearInterval(netTimer); netTimer = null; setNet(); }
 }
-function reloadApp(id) { const w = wins[id]; if (w) { const f = w.el.querySelector("iframe"); f.src = f.src; } }
+function reloadApp(id) { const w = wins[id]; if (w) { const f = w.el.querySelector("iframe"); frameBusy(w.el); f.src = f.src; } }
+/* sablier pendant qu’une collection se relie à sa base de données : la page prévient quand c’est fini (message « ready ») */
+function frameBusy(el) {
+  const f = el.querySelector("iframe"); if (!f || el._busyEnd) return;
+  let loaded = false, ready = false;
+  const mark = on => { try { f.contentDocument.documentElement.classList.toggle("h97busy", on); } catch {} };
+  const end = () => { if (!el._busyEnd) return; el._busyEnd = null; clearTimeout(t); removeEventListener("message", onMsg); f.removeEventListener("load", onLoad); mark(false); netActivity(false); };
+  const onMsg = e => { if (e.source === f.contentWindow && e.data && e.data.h97 === "ready") { ready = true; if (loaded) end(); } };
+  const onLoad = () => { loaded = true; mark(true); if (ready) end(); };
+  el._busyEnd = end; netActivity(true);
+  addEventListener("message", onMsg); f.addEventListener("load", onLoad);
+  const t = setTimeout(end, 15000);
+}
 
 /* Le site de vinyles peut aussi se connecter de lui-même : on suit la session partagée. */
 addEventListener("storage", e => { if (e.key === "videotheque.tmdbkey") syncKeys(); });
@@ -3134,6 +3150,10 @@ loadSongs().then(() => { if (wins.docs) renderDocs(wins.docs.el); if (wins.cd) w
   document.addEventListener("dblclick", e => { if (e.target.closest && e.target.closest(".felt,.ms")) e.preventDefault(); });
   document.addEventListener("gesturestart", e => { if (e.target.closest && e.target.closest(".felt,.ms")) e.preventDefault(); });
 })();
+</script>
+<script>
+/* version hors ligne : le site et les images déjà vues restent disponibles sans connexion */
+if ("serviceWorker" in navigator && location.protocol === "https:") { navigator.serviceWorker.register("sw.js").catch(() => {}); try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch {} }
 </script>
 </body>
 </html>

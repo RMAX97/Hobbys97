@@ -302,15 +302,66 @@ const cache = (() => {
   return { get: k => tx("readonly", s => s.get(k)).catch(() => null), put: (k, v) => tx("readwrite", s => s.put(v, k)).catch(() => {}) };
 })();
 const WEEK = 7 * 864e5;
+/* Fiche d’une série : on affiche d’abord ce qui est déjà enregistré (copie dans la collection, synchronisée
+   entre les appareils, ou cache de cet appareil) ; Mangacollec ne sert qu’à rafraîchir en arrière-plan.
+   Ainsi la collection reste consultable hors ligne, sur mobile, et même quand Mangacollec ne répond pas. */
+const pick = (o, ks) => { const r = {}; ks.forEach(k => { if (o && o[k] !== undefined && o[k] !== null) r[k] = o[k]; }); return r; };
+function snapOf(d, s) {
+  const keepEd = new Set([s && s.ed, ...Object.keys((s && s.own) || {})].filter(Boolean));
+  return {
+    series: (d.series || []).slice(0, 1).map(x => pick(x, ["id", "title", "kinds_ids"])),
+    editions: (d.editions || []).map(e => pick(e, ["id", "title", "publisher_id", "parent_edition_id", "volumes_count", "not_finished", "commercial_stop", "follow_editions_count"])),
+    volumes: (d.volumes || []).filter(v => keepEd.has(v.edition_id)).map(v => pick(v, ["id", "edition_id", "number", "title", "image_url", "release_date", "isbn"])),
+    publishers: (d.publishers || []).map(p => pick(p, ["id", "title"])),
+    authors: (d.authors || []).map(a => pick(a, ["id", "first_name", "name"])),
+    tasks: (d.tasks || []).map(t => pick(t, ["author_id", "job_id"])),
+    jobs: (d.jobs || []).map(j => pick(j, ["id", "title"])),
+    kinds: (d.kinds || []).map(k => pick(k, ["id", "title"]))
+  };
+}
+function keepSnap(sid, d, quiet) {
+  const s = DB.series[sid]; if (!s || s.del || !d || !d.series) return;
+  const sn = snapOf(d, s);
+  // on ne remplace pas une copie complète par une plus pauvre (ex. fiche partielle venue d’un import)
+  if (s.snap && s.snap.volumes && s.snap.volumes.length > sn.volumes.length && sn.volumes.every(v => s.snap.volumes.some(w => w.id === v.id))) return;
+  if (JSON.stringify(s.snap) === JSON.stringify(sn)) return;
+  s.snap = sn; touch(sid); if (!quiet) save();
+}
+const bestOf = (c, s) => {
+  const a = c && c.d, b = s && s.snap;
+  if (!a) return b || null; if (!b) return a;
+  // la copie synchronisée peut connaître des tomes que le cache de cet appareil n’a pas encore
+  const ids = new Set((a.volumes || []).map(v => v.id)), extra = (b.volumes || []).filter(v => !ids.has(v.id));
+  return extra.length ? { ...a, volumes: [...(a.volumes || []), ...extra] } : a;
+};
+const refreshing = new Set();
+function refreshSeries(sid) {
+  if (refreshing.has(sid) || !navigator.onLine) return; refreshing.add(sid);
+  api("/v2/series/" + sid).then(async d => { await cache.put("s:" + sid, { at: Date.now(), d }); keepSnap(sid, d); }).catch(() => {}).finally(() => refreshing.delete(sid));
+}
 async function seriesDetail(sid, force) {
-  const c = await cache.get("s:" + sid);
-  if (c && !force && Date.now() - c.at < WEEK) return c.d;
-  try { const d = await api("/v2/series/" + sid); await cache.put("s:" + sid, { at: Date.now(), d }); return d; }
-  catch (e) { if (c) return c.d; throw e; }
+  const s = DB.series[sid], c = await cache.get("s:" + sid), local = bestOf(c, s);
+  if (local && !force) {
+    if (c) keepSnap(sid, c.d);
+    if (!c || Date.now() - c.at > WEEK) refreshSeries(sid);
+    return local;
+  }
+  const d = await api("/v2/series/" + sid); await cache.put("s:" + sid, { at: Date.now(), d }); keepSnap(sid, d); return d;
+}
+/* au démarrage : chaque série déjà vue sur cet appareil est recopiée dans la collection (puis synchronisée) */
+async function snapAll() {
+  let n = 0;
+  for (const [sid, s] of Object.entries(DB.series)) {
+    if (s.del) continue;
+    const c = await cache.get("s:" + sid);
+    if (c && c.d) { const before = JSON.stringify(s.snap); keepSnap(sid, c.d, true); if (JSON.stringify(s.snap) !== before) n++; }
+  }
+  if (n) save();
 }
 async function volumeDetail(vid) {
   const c = await cache.get("v:" + vid);
   if (c && Date.now() - c.at < WEEK) return c.d;
+  if (c && !navigator.onLine) return c.d;
   try { const d = (await api("/v2/volumes/" + vid)).volumes[0]; await cache.put("v:" + vid, { at: Date.now(), d }); return d; }
   catch (e) { return c ? c.d : null; }
 }
@@ -373,11 +424,14 @@ function drawHome() {
 }
 
 let cur = null; // { sid, d (fiche), vols (tomes de l’édition affichée) }
+const busy = on => document.documentElement.classList.toggle("h97busy", on);
 async function openSeries(sid, keepScroll) {
   view = { name: "series", sid }; drawTree(); closeSide();
   const s = DB.series[sid];
   main.innerHTML = `<button class="btn backbtn" type="button" data-go="home">◄ Toutes les séries</button><div class="empty">Chargement de « ${esc(s ? s.title : "")} »…</div>`;
-  let d; try { d = await seriesDetail(sid); } catch (e) { main.innerHTML = `<button class="btn backbtn" type="button" data-go="home">◄ Toutes les séries</button><div class="empty">Impossible de joindre Mangacollec pour le moment.</div>`; return; }
+  let d; busy(true);
+  try { d = await seriesDetail(sid); } catch (e) { busy(false); if (view.sid !== sid) return; main.innerHTML = `<button class="btn backbtn" type="button" data-go="home">◄ Toutes les séries</button><div class="empty">Les tomes de « ${esc(s ? s.title : "")} » ne sont pas encore enregistrés${navigator.onLine ? ", et Mangacollec ne répond pas" : " et tu es hors ligne"}.<br>${s ? `${ownCount(s)} tome${ownCount(s) > 1 ? "s" : ""} dans ta collection.` : ""}<br>Ouvre cette série une fois sur un appareil où elle s’affiche : elle sera ensuite disponible partout, même hors ligne.</div>`; return; }
+  busy(false);
   if (view.sid !== sid) return;
   const ser = d.series[0];
   if (!s) return;
@@ -607,6 +661,10 @@ async function runImport({ user, token }) {
     if (!S.ed || !(S.own[S.ed] || []).length) S.ed = best[0];
     const first = (S.own[S.ed] || []).map(id => vols[id]).filter(Boolean).sort((a, b) => a.number - b.number)[0];
     if (first && !S.img) S.img = first.image_url || ""; S.edName = edName(eds[S.ed]);
+    if (!S.snap) {
+      const myVols = Object.values(vols).filter(v => eds[v.edition_id] && eds[v.edition_id].series_id == sid);
+      S.snap = snapOf({ series: [ser[sid]], editions: Object.values(eds).filter(e => e.series_id == sid), volumes: myVols, publishers: data.publishers || [], authors: data.authors || [], tasks: data.tasks || [], jobs: data.jobs || [], kinds: data.kinds || [] }, S);
+    }
   });
   save(); drawTree(); if (view.name === "home") drawHome();
   say(`Import terminé : ${seriesN.size} série${seriesN.size > 1 ? "s" : ""}, ${added} nouveau${added > 1 ? "x" : ""} tome${added > 1 ? "s" : ""}.`, "ok");
@@ -669,6 +727,7 @@ const setSt = (on, txt) => { const st = $("#syncSt"); st.classList.toggle("on", 
 function fbLoad(src) { return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
 let fbReadyP = null;
 function fbReady() { return fbReadyP || (fbReadyP = (async () => { for (let i = 0; i < 100 && !fb.auth; i++) await new Promise(r => setTimeout(r, 100)); if (!fb.auth) { fbReadyP = null; throw new Error("nofb"); } })()); }
+window.h97Ready=window.h97Ready||function(){try{if(parent!==window)parent.postMessage({h97:"ready"},"*")}catch(e){}};
 async function cloudInit() {
   try {
     if (!window.firebase || !window.firebase.firestore) { await fbLoad(FB_JS + "firebase-app-compat.js"); await Promise.all([fbLoad(FB_JS + "firebase-auth-compat.js"), fbLoad(FB_JS + "firebase-firestore-compat.js")]); }
@@ -677,7 +736,7 @@ async function cloudInit() {
     fb.auth.onAuthStateChanged(user => {
       fb.user = user; if (fb.unsub) { fb.unsub(); fb.unsub = null; }
       $("#fbOut").hidden = !!user; $("#fbIn").hidden = !user; $("#fbWho").textContent = user ? (user.email || "ton compte") : "";
-      if (!user) { setSt(false, "Enregistré sur cet appareil"); return; }
+      if (!user) { setSt(false, "Enregistré sur cet appareil"); h97Ready(); snapOnce(); return; }
       setSt(true, "Synchronisé en ligne");
       fb.col = db.collection("data/users/" + user.uid + "/manga/items");
       fb.unsub = fb.col.onSnapshot(qs => {
@@ -690,11 +749,13 @@ async function cloudInit() {
         });
         applying = false;
         if (changed) { try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch {} drawTree(); if (view.name === "home") drawHome(); else if (cur && DB.series[cur.sid] && !DB.series[cur.sid].del) drawSeries(true); }
-        cloudQueue();
-      }, () => setSt(false, "Pas de connexion au serveur"));
+        cloudQueue(); h97Ready(); snapOnce();
+      }, () => { setSt(false, "Pas de connexion au serveur"); h97Ready(); snapOnce(); });
     });
-  } catch { setSt(false, "Enregistré sur cet appareil"); }
+  } catch { setSt(false, "Enregistré sur cet appareil"); h97Ready(); snapOnce(); }
 }
+/* une fois la collection à jour avec le compte, on recopie les fiches déjà en cache (jamais avant, pour ne pas écraser un changement fait ailleurs) */
+let snapDone = false; const snapOnce = () => { if (!snapDone) { snapDone = true; snapAll(); } };
 const fbMsg = (t, k = "") => { const m = $("#fbMsg"); m.className = "msg " + k; m.textContent = t; };
 const fbErr = e => ({ "auth/invalid-credential": "E-mail ou mot de passe incorrect.", "auth/wrong-password": "E-mail ou mot de passe incorrect.", "auth/operation-not-allowed": "Ce mode de connexion n’est pas activé dans Firebase.", "auth/unauthorized-domain": "Ce site n’est pas dans les domaines autorisés de Firebase.", "auth/popup-blocked": "Autorise les fenêtres pop-up pour ce site." })[e && e.code] || (e && e.message) || "Erreur";
 $("#fbGoogle").onclick = async () => { if (!fb.auth) return; fbMsg(""); try { await fb.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); } catch (e) { if (e.code !== "auth/popup-closed-by-user") fbMsg(fbErr(e), "err"); } };
@@ -702,6 +763,7 @@ $("#fbLogin").onclick = async () => { if (!fb.auth) return; fbMsg("Connexion…"
 $("#fbLogout").onclick = () => fb.auth && fb.auth.signOut();
 
 drawTree(); drawHome(); cloudInit();
+if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
 /* import lancé depuis les réglages du bureau Hobbys97 */
 if (location.hash === "#import") {
   history.replaceState(null, "", location.pathname);

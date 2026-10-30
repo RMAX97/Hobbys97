@@ -2440,7 +2440,9 @@ busy: ["Synchro…", "Synchronisation en cours"], pending: ["Synchro…", "Modif
 ok: ["Synchronisé", "Ta collection est à jour sur tous tes appareils"], offline: ["Hors ligne", "Hors ligne : tes modifications seront envoyées au retour de la connexion"],
 error: ["Erreur", "Erreur de synchronisation : clique pour voir le détail"]
 };
+window.h97Ready=window.h97Ready||function(){try{if(parent!==window)parent.postMessage({h97:"ready"},"*")}catch(e){}};
 function setSyncState(st, err) {
+if (st !== "busy" && st !== "pending") h97Ready();
 sync.state = st; if (err !== undefined) sync.err = err; else if (st === "ok") sync.err = "";
 const b = $("#syncBtn"), [lbl, tip] = SYNC_LABELS[st] || SYNC_LABELS.off;
 b.dataset.state = st; b.title = tip; b.setAttribute("aria-label", tip); $("#syncLbl").textContent = lbl;
@@ -5320,5 +5322,6 @@ new MutationObserver(clean).observe(document.body,{childList:true,subtree:true})
   check();
 })();
 </script>
+<script>if("serviceWorker"in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});</script>
 </body>
 </html>

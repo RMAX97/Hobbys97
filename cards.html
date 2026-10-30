@@ -1632,6 +1632,7 @@ const FIREBASE_CONFIG = {
 const FB_SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
 let fbAuth = null, fbUser = null;
 function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+window.h97Ready=window.h97Ready||function(){try{if(parent!==window)parent.postMessage({h97:"ready"},"*")}catch(e){}};
 async function connectFirebase(){
   try{
     if(!window.firebase || !window.firebase.firestore){
@@ -1642,10 +1643,10 @@ async function connectFirebase(){
     fbAuth = firebase.auth();
     fbAuth.onAuthStateChanged(async user=>{
       fbUser = user; fbRefreshUI();
-      if(user){ await attachCloud(firebase.firestore(), user.uid); }
-      else { cloudUnsubs.forEach(u=>{ try{u()}catch(e){} }); cloudUnsubs = []; cloud = null; setSaveStatus('local'); }
+      if(user){ await attachCloud(firebase.firestore(), user.uid); h97Ready(); }
+      else { cloudUnsubs.forEach(u=>{ try{u()}catch(e){} }); cloudUnsubs = []; cloud = null; setSaveStatus('local'); h97Ready(); }
     });
-  }catch(e){ setSaveStatus('local'); const b=document.getElementById('fbAccountBtn'); if(b) b.disabled = true; }
+  }catch(e){ setSaveStatus('local'); const b=document.getElementById('fbAccountBtn'); if(b) b.disabled = true; h97Ready(); }
 }
 function fbRefreshUI(){
   const b = document.getElementById('fbAccountBtn'); if(b) b.textContent = fbUser ? 'Mon compte' : 'Se connecter';
@@ -2046,5 +2047,6 @@ connectCloud();
   document.addEventListener('touchcancel',clear,{passive:true});
 })();
 </script>
+<script>if("serviceWorker"in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});</script>
 </body>
 </html>
