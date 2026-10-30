@@ -1136,7 +1136,7 @@ document.addEventListener('click',e=>{if(e.target.closest('[data-open-settings]'
 
 /* ---------- Ajout ---------- */
 let aT,aCtl;
-function openAdd(){$('#addResults').innerHTML=getKey()?'<p class="hint">Tapez un titre pour chercher dans la base TMDB.</p>':keyMessage(new Error('nokey'));$('#dAdd').showModal();setTimeout(()=>$('#addQ').focus(),50)}
+function openAdd(){$('#addQ').value='';$('#addResults').innerHTML=getKey()?'<p class="hint">Tapez un titre pour chercher dans la base TMDB.</p>':keyMessage(new Error('nokey'));$('#dAdd').showModal();setTimeout(()=>$('#addQ').focus(),50)}
 $('#openAdd').onclick=openAdd;
 $('#addQ').oninput=e=>{clearTimeout(aT);const q=e.target.value.trim();aT=setTimeout(()=>searchAdd(q),350)};
 async function searchAdd(q){
