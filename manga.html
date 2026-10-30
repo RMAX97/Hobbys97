@@ -188,8 +188,9 @@ legend{padding:0 3px}
 .arrange{background:#fff;box-shadow:var(--sunken);padding:8px;margin-top:6px}
 .arow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 2px;border-bottom:1px solid #dcdcdc}
 .arow.hid{opacity:.6}.arow .ath,.arow .ph{width:30px;height:44px;object-fit:cover;flex:none;font-size:0}
-.ainfo{flex:1 1 200px;min-width:0;display:flex;flex-direction:column}.ainfo b{font-weight:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ainfo small{color:#555}
+.ainfo{flex:1 1 200px;min-width:0;display:flex;flex-direction:column;gap:2px}.ainfo input{width:100%}.ainfo small{color:#555}
 .arow input[type=number]{width:58px}.arow select{max-width:190px}
+.row[hidden]{display:none!important}
 .edren{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:0 0 8px}.edren input{flex:1;min-width:140px}
 </style>
 </head>
@@ -212,7 +213,22 @@ legend{padding:0 3px}
 <div class="ov" id="ovVol"><div class="win volwin" role="dialog" aria-modal="true" aria-labelledby="volTitle">
   <div class="titlebar"><span id="volTitle">Propriétés du tome</span><button class="x" type="button" data-close aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></div>
   <div class="wbody" id="volBody"></div>
-  <div class="wfoot"><span class="navv"><button class="btn" type="button" id="vPrev">◄ Précédent</button><button class="btn" type="button" id="vNext">Suivant ►</button></span><button class="btn" type="button" id="vCover">Changer la couverture…</button><button class="btn default" type="button" data-close>OK</button></div>
+  <div class="wfoot"><span class="navv"><button class="btn" type="button" id="vPrev">◄ Précédent</button><button class="btn" type="button" id="vNext">Suivant ►</button></span><button class="btn" type="button" id="vEdit">Modifier…</button><button class="btn" type="button" id="vCover">Changer la couverture…</button><button class="btn default" type="button" data-close>OK</button></div>
+</div></div>
+
+<!-- modifier un tome -->
+<div class="ov" id="ovFix"><div class="win" role="dialog" aria-modal="true" aria-labelledby="fixTitle" style="width:min(460px,100%)">
+  <div class="titlebar"><span id="fixTitle">Modifier le tome</span><button class="x" type="button" data-close aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></div>
+  <div class="wbody">
+    <div class="row"><label for="fxT">Titre</label><input type="text" id="fxT" placeholder="Titre du tome (facultatif)"></div>
+    <div class="row"><label for="fxN">Numéro</label><input type="number" id="fxN" step="any" min="0" style="width:90px;flex:none"></div>
+    <div class="row"><label for="fxE">Édition</label><select id="fxE"></select></div>
+    <div class="row" id="fxNewRow" hidden><label for="fxNew">Nom de l’édition</label><input type="text" id="fxNew" placeholder="ex. Édition prestige"></div>
+    <div class="row"><label for="fxR">Renommer l’édition</label><input type="text" id="fxR"></div>
+    <label class="chk"><input type="checkbox" id="fxH"> Masquer ce tome</label>
+    <p class="hint" id="fxOrig" style="margin:8px 0 0"></p>
+  </div>
+  <div class="wfoot"><button class="btn" type="button" id="fxReset" style="margin-right:auto">Rétablir</button><button class="btn default" type="button" id="fxOk">OK</button><button class="btn" type="button" data-close>Annuler</button></div>
 </div></div>
 
 <!-- couverture -->
@@ -385,7 +401,7 @@ const withExtra = (sid, d, edId) => volsOf(d, edId);
 function viewOf(d, s) {
   const fix = (s && s.fix) || {}, names = (s && s.edNames) || {};
   const vols = [], hidden = [];
-  d.volumes.forEach(v => { const f = fix[v.id]; const w = f ? { ...v, edition_id: f.ed || v.edition_id, number: f.n != null ? f.n : v.number, fixed: true } : v; (f && f.hide ? hidden : vols).push(w); });
+  d.volumes.forEach(v => { const f = fix[v.id]; const w = f ? { ...v, edition_id: f.ed || v.edition_id, number: f.n != null ? f.n : v.number, title: f.t != null ? f.t : v.title, ft: f.t != null ? f.t : v.ft, fixed: true } : v; (f && f.hide ? hidden : vols).push(w); });
   const eds = d.editions.map(e => ({ ...e, title: names[e.id] || e.title }));
   Object.values(fix).forEach(f => { if (f.ed && !eds.some(e => e.id === f.ed)) eds.push({ id: f.ed, title: names[f.ed] || f.ed, publisher_id: "p", follow_editions_count: 0 }); });
   eds.forEach(e => { e.volumes_count = vols.filter(v => v.edition_id === e.id).length; });
@@ -521,7 +537,7 @@ function drawSeries(keepScroll) {
 function arrangeHTML(sid, d, s, vols) {
   const eds = d.editions, hid = d.hidden || [];
   const opts = cur => eds.map(e => `<option value="${esc(e.id)}"${e.id === cur ? " selected" : ""}>${esc(edName(e))}</option>`).join("") + `<option value="__new">Nouvelle édition…</option><option value="__hide">Masquer ce tome</option>`;
-  const row = (v, hidden) => `<div class="arow${hidden ? " hid" : ""}">${imgTag(coverOf(sid, v), "", "ath")}<div class="ainfo"><b>${esc(v.ft || ("Tome " + numTxt(v.number)))}</b><small>${fmtDate(v.release_date)}${v.isbn ? " · " + esc(v.isbn) : ""}${v.fixed ? " · <i>modifié</i>" : ""}</small></div>
+  const row = (v, hidden) => `<div class="arow${hidden ? " hid" : ""}">${imgTag(coverOf(sid, v), "", "ath")}<div class="ainfo"><input type="text" data-fixt="${v.id}" value="${esc(v.title || "")}" placeholder="Titre du tome (facultatif)" aria-label="Titre du tome"><small>${fmtDate(v.release_date)}${v.isbn ? " · " + esc(v.isbn) : ""}${v.fixed ? " · <i>modifié</i>" : ""}</small></div>
     <label>Tome <input type="number" step="any" min="0" data-fixn="${v.id}" value="${v.number == null ? "" : v.number}"></label>
     ${hidden ? `<button class="btn" type="button" data-unhide="${v.id}">Réafficher</button>` : `<select data-fix="${v.id}" aria-label="Édition du tome">${opts(v.edition_id)}</select>`}
     ${v.fixed || hidden ? `<button class="btn" type="button" data-reset="${v.id}" title="Revenir au rangement de Scrinis">↺</button>` : ""}</div>`;
@@ -530,15 +546,22 @@ function arrangeHTML(sid, d, s, vols) {
     ${vols.map(v => row(v, false)).join("") || `<p class="hint">Aucun tome dans cette édition.</p>`}
     ${hid.length ? `<p class="hint" style="margin:10px 0 4px">Tomes masqués (${hid.length})</p>${hid.map(v => row(v, true)).join("")}` : ""}</div>`;
 }
+function setVolFix(sid, vid, patch) {
+  const s = DB.series[sid]; s.fix = s.fix || {};
+  const f = { ...(s.fix[vid] || {}), ...patch };
+  Object.keys(f).forEach(k => { if (f[k] == null || f[k] === false) delete f[k]; });
+  if (Object.keys(f).length) s.fix[vid] = f; else delete s.fix[vid];
+  applyView(); touch(sid); save(); drawSeries(true); drawTree();
+}
+const newEdition = (s, name) => { const id = "u-" + norm(name).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 30) + "-" + Date.now().toString(36).slice(-4); s.edNames = s.edNames || {}; s.edNames[id] = name; return id; };
 function bindArrange(sid, s) {
-  const setFix = (vid, patch) => { s.fix = s.fix || {}; const f = { ...(s.fix[vid] || {}), ...patch }; Object.keys(f).forEach(k => { if (f[k] == null || f[k] === false) delete f[k]; }); if (Object.keys(f).length) s.fix[vid] = f; else delete s.fix[vid]; applyView(); touch(sid); save(); drawSeries(true); drawTree(); };
+  const setFix = (vid, patch) => setVolFix(sid, vid, patch);
   main.querySelectorAll("[data-fix]").forEach(sel => sel.onchange = () => {
     const vid = sel.dataset.fix, v = sel.value;
     if (v === "__hide") return setFix(vid, { hide: true });
     if (v === "__new") {
       const name = (prompt("Nom de la nouvelle édition :", "") || "").trim(); if (!name) { drawSeries(true); return; }
-      const id = "u-" + norm(name).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 30) + "-" + Date.now().toString(36).slice(-4);
-      s.edNames = s.edNames || {}; s.edNames[id] = name; return setFix(vid, { ed: id });
+      return setFix(vid, { ed: newEdition(s, name) });
     }
     const orig = cur.snap.volumes.find(x => x.id === vid);
     setFix(vid, { ed: orig && orig.edition_id === v ? null : v });
@@ -546,6 +569,10 @@ function bindArrange(sid, s) {
   main.querySelectorAll("[data-fixn]").forEach(inp => inp.onchange = () => {
     const vid = inp.dataset.fixn, orig = cur.snap.volumes.find(x => x.id === vid), n = inp.value === "" ? null : +inp.value;
     setFix(vid, { n: orig && orig.number === n ? null : n });
+  });
+  main.querySelectorAll("[data-fixt]").forEach(inp => inp.onchange = () => {
+    const vid = inp.dataset.fixt, orig = cur.snap.volumes.find(x => x.id === vid), t = inp.value.trim();
+    setFix(vid, { t: orig && (orig.title || "") === t ? null : t });
   });
   main.querySelectorAll("[data-unhide]").forEach(b => b.onclick = () => setFix(b.dataset.unhide, { hide: null }));
   main.querySelectorAll("[data-reset]").forEach(b => b.onclick = () => { delete s.fix[b.dataset.reset]; applyView(); touch(sid); save(); drawSeries(true); drawTree(); });
@@ -626,6 +653,36 @@ function bindVol(v) {
 }
 $("#vPrev").onclick = () => { const i = cur.vols.findIndex(x => x.id === curVol); if (i > 0) openVolume(cur.vols[i - 1].id); };
 $("#vNext").onclick = () => { const i = cur.vols.findIndex(x => x.id === curVol); if (i >= 0 && i < cur.vols.length - 1) openVolume(cur.vols[i + 1].id); };
+
+/* modifier un tome depuis sa fiche : titre, numéro, édition, nom de l’édition, masquer */
+$("#vEdit").onclick = () => {
+  const { sid, d } = cur, s = DB.series[sid], v = d.volumes.find(x => x.id === curVol) || (cur.vols || []).find(x => x.id === curVol); if (!v) return;
+  const orig = cur.snap.volumes.find(x => x.id === v.id) || v, oe = cur.snap.editions.find(e => e.id === orig.edition_id);
+  $("#fixTitle").textContent = `Modifier – Tome ${numTxt(v.number)}`;
+  $("#fxT").value = v.title || ""; $("#fxN").value = v.number == null ? "" : v.number;
+  $("#fxE").innerHTML = d.editions.map(e => `<option value="${esc(e.id)}"${e.id === v.edition_id ? " selected" : ""}>${esc(edName(e))}</option>`).join("") + `<option value="__new">Nouvelle édition…</option>`;
+  $("#fxNewRow").hidden = true; $("#fxNew").value = "";
+  $("#fxR").value = edName(d.editions.find(e => e.id === v.edition_id));
+  $("#fxH").checked = false;
+  $("#fxOrig").textContent = `Chez Scrinis : ${orig.ft || "Tome " + numTxt(orig.number)} · ${edName(oe)}`;
+  $("#fxReset").disabled = !(s.fix && s.fix[v.id]);
+  openOv("#ovFix");
+};
+$("#fxE").onchange = () => { const isNew = $("#fxE").value === "__new"; $("#fxNewRow").hidden = !isNew; $("#fxR").closest(".row").hidden = isNew; if (isNew) setTimeout(() => $("#fxNew").focus(), 30); else $("#fxR").value = edName(cur.d.editions.find(e => e.id === $("#fxE").value)); };
+$("#fxOk").onclick = () => {
+  const sid = cur.sid, s = DB.series[sid], vid = curVol, orig = cur.snap.volumes.find(x => x.id === vid) || {};
+  let ed = $("#fxE").value;
+  if (ed === "__new") { const name = $("#fxNew").value.trim(); if (!name) { $("#fxNew").focus(); return; } ed = newEdition(s, name); }
+  else { const rn = $("#fxR").value.trim(), e = cur.d.editions.find(x => x.id === ed), base = (cur.snap.editions.find(x => x.id === ed) || {}).title; s.edNames = s.edNames || {}; if (rn && rn !== base) s.edNames[ed] = rn; else if (!rn || rn === base) delete s.edNames[ed]; }
+  const t = $("#fxT").value.trim(), n = $("#fxN").value === "" ? null : +$("#fxN").value;
+  const hide = $("#fxH").checked;
+  setVolFix(sid, vid, { t: (orig.title || "") === t ? null : t, n: orig.number === n ? null : n, ed: orig.edition_id === ed ? null : ed, hide: hide || null });
+  closeOv("#ovFix");
+  if (hide) { closeOv("#ovVol"); return; }
+  if (DB.series[sid].ed !== ed && cur.d.editions.some(e => e.id === ed)) { const own = (DB.series[sid].own || {})[DB.series[sid].ed] || []; if (!own.length) { DB.series[sid].ed = ed; save(); drawSeries(true); drawTree(); } }
+  openVolume(vid);
+};
+$("#fxReset").onclick = () => { const s = DB.series[cur.sid]; if (s.fix) delete s.fix[curVol]; applyView(); touch(cur.sid); save(); drawSeries(true); drawTree(); closeOv("#ovFix"); openVolume(curVol); };
 
 /* couverture : Scrinis, couvertures des autres éditions, image perso */
 let covPick = null;
