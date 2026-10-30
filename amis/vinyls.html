@@ -844,6 +844,8 @@ $("#wgrid").innerHTML = [...groups].map(([name, rs]) =>
 } else $("#wgrid").innerHTML = `<div class="grid">${list.map(wallCard).join("")}</div>`;
 }
 function setTab(t, focus) {
+// en revenant sur la recherche depuis un autre onglet, on repart d’une recherche vide
+if (t === "search" && tab !== "search" && view !== "artist" && $("#q").value) { $("#q").value = ""; onQuery(); }
 tab = t;
 document.querySelectorAll("[data-go]").forEach(b => b.dataset.go === t ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"));
 $("#searchBox").hidden = t !== "search";

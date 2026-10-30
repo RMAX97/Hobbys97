@@ -812,7 +812,7 @@ document.addEventListener("click", e => {
   const v = e.target.closest("[data-vid]"); if (v && !arrange) return openVolume(v.dataset.vid);
   const a = e.target.closest("[data-act]"); if (a) { if (a.dataset.act === "add") openAdd(); else openOv("#ovSet"); }
 });
-const openAdd = () => { openOv("#ovAdd"); setTimeout(() => $("#addQ").focus(), 50); };
+const openAdd = () => { clearTimeout(addT); $("#addQ").value = ""; $("#addRes").innerHTML = `<p class="hint" style="margin:6px">Tape au moins trois lettres.</p>`; $("#addRes")._res = null; openOv("#ovAdd"); setTimeout(() => $("#addQ").focus(), 50); };
 $("#addBtn").onclick = openAdd; $("#setBtn").onclick = () => openOv("#ovSet");
 const side = $("#side"), scrim = $("#scrim");
 const closeSide = () => { side.classList.remove("open"); scrim.classList.remove("open"); };
