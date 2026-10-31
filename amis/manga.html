@@ -20,10 +20,10 @@
   window.firebase = { apps: [{}], initializeApp: noop, app: function () { return {}; }, auth: auth, firestore: function () { return {}; } };
 })();
 </script>
-<style>#addBtn,#setBtn,#addVol,#arrBtn,#vEdit,[data-act],#rmSeries,#vCover,#edMove,#showAll,#syncSt,label.chk:has(#ownChk){display:none!important}</style>
+<style>#addBtn,#setBtn,#addVol,#arrBtn,#vEdit,#addTome,#serEdit,#mineSer,[data-act],#rmSeries,#vCover,#edMove,#showAll,#syncSt,label.chk:has(#ownChk){display:none!important}</style>
 <script>
 (function () {
-  var BLOCK = "#addBtn,#setBtn,#addVol,#arrBtn,#vEdit,[data-act],#rmSeries,#vCover,#edMove,#showAll,#ownChk";
+  var BLOCK = "#addBtn,#setBtn,#addVol,#arrBtn,#vEdit,#addTome,#serEdit,#mineSer,[data-act],#rmSeries,#vCover,#edMove,#showAll,#ownChk";
   ["click", "pointerdown", "change", "submit", "dragstart", "drop", "contextmenu"].forEach(function (t) {
     document.addEventListener(t, function (e) {
       var el = e.target && e.target.closest && e.target.closest(BLOCK);
@@ -38,7 +38,9 @@
 function go(){fix(document);new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(function(n){if(n.nodeType===1)fix(n.parentNode||n);});});}).observe(document.documentElement,{childList:true,subtree:true});}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go();})();
 </script>
-<style>body{overflow-x:hidden}</style>
+<style>body{overflow-x:hidden}.myeds{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:6px}.myeds .btn{min-width:0;padding:2px 8px}.myeds .btn.on{box-shadow:var(--sunken);background:var(--light,#dfdfdf)}
+.mnres small.have{flex-basis:100%;padding-left:36px;color:#000080}
+</style>
 <!-- sur iPhone : le son suit le bouton silencieux du téléphone -->
 <script>try{if(navigator.audioSession)navigator.audioSession.type="ambient"}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -258,6 +260,41 @@ legend{padding:0 3px}
   <div class="wfoot"><span class="navv"><button class="btn" type="button" id="vPrev">◄ Précédent</button><button class="btn" type="button" id="vNext">Suivant ►</button></span><button class="btn" type="button" id="vEdit">Modifier…</button><button class="btn" type="button" id="vCover">Changer la couverture…</button><button class="btn default" type="button" data-close>OK</button></div>
 </div></div>
 
+<!-- tome ajouté à la main -->
+<div class="ov" id="ovTome"><div class="win" role="dialog" aria-modal="true" aria-labelledby="tmTitle" style="width:min(480px,100%)">
+  <div class="titlebar"><span id="tmTitle">Ajouter un tome</span><button class="x" type="button" data-close aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></div>
+  <div class="wbody">
+    <p class="hint" style="margin:0 0 8px">Pour un tome absent du catalogue : remplis sa fiche toi-même. Seul le numéro est obligatoire.</p>
+    <div class="row"><label for="tmN">Numéro</label><input type="number" id="tmN" step="any" min="0" style="width:90px;flex:none"></div>
+    <div class="row"><label for="tmT">Titre</label><input type="text" id="tmT" placeholder="facultatif"></div>
+    <div class="row"><label for="tmE">Édition</label><select id="tmE"></select></div>
+    <div class="row" id="tmNewRow" hidden><label for="tmNew">Nom de l’édition</label><input type="text" id="tmNew" placeholder="ex. Édition prestige"></div>
+    <div class="row"><label for="tmD">Sortie en France</label><input type="date" id="tmD"></div>
+    <div class="row"><label for="tmI">ISBN</label><input type="text" id="tmI" inputmode="numeric" placeholder="facultatif"></div>
+    <div class="row"><label for="tmP">Pages</label><input type="number" id="tmP" min="0" style="width:90px;flex:none"></div>
+    <div class="row"><label for="tmU">Couverture (lien)</label><input type="url" id="tmU" placeholder="https://…"></div>
+    <div class="row"><label for="tmF">ou une image</label><input type="file" id="tmF" accept="image/*"></div>
+    <label class="chk" id="tmOwnRow"><input type="checkbox" id="tmOwn" checked> Je possède ce tome</label>
+    <p class="msg" id="tmMsg"></p>
+  </div>
+  <div class="wfoot"><button class="btn" type="button" id="tmDel" style="margin-right:auto" hidden>Supprimer ce tome</button><button class="btn default" type="button" id="tmOk">OK</button><button class="btn" type="button" data-close>Annuler</button></div>
+</div></div>
+
+<!-- série ajoutée à la main -->
+<div class="ov" id="ovSer"><div class="win" role="dialog" aria-modal="true" aria-labelledby="srTitleBar" style="width:min(480px,100%)">
+  <div class="titlebar"><span id="srTitleBar">Série non référencée</span><button class="x" type="button" data-close aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></div>
+  <div class="wbody">
+    <p class="hint" style="margin:0 0 8px">Pour une série absente du catalogue : remplis sa fiche, puis ajoute ses tomes un par un.</p>
+    <div class="row"><label for="srT">Titre</label><input type="text" id="srT"></div>
+    <div class="row"><label for="srA">Auteur(s)</label><input type="text" id="srA" placeholder="séparés par des virgules"></div>
+    <div class="row"><label for="srP">Éditeur</label><input type="text" id="srP"></div>
+    <div class="row"><label for="srG">Genres</label><input type="text" id="srG" placeholder="ex. Action, Aventure"></div>
+    <div class="row" id="srERow"><label for="srE">Édition</label><input type="text" id="srE"></div>
+    <p class="msg" id="srMsg"></p>
+  </div>
+  <div class="wfoot"><button class="btn default" type="button" id="srOk">OK</button><button class="btn" type="button" data-close>Annuler</button></div>
+</div></div>
+
 <!-- modifier un tome -->
 <div class="ov" id="ovFix"><div class="win" role="dialog" aria-modal="true" aria-labelledby="fixTitle" style="width:min(460px,100%)">
   <div class="titlebar"><span id="fixTitle">Modifier le tome</span><button class="x" type="button" data-close aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></div>
@@ -296,14 +333,14 @@ legend{padding:0 3px}
     <input type="search" id="addQ" name="manga-recherche" placeholder="Titre de la série ou ISBN…" style="width:100%" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" inputmode="search" data-1p-ignore data-lpignore="true" data-form-type="other">
     <div class="results" id="addRes"><p class="hint" style="margin:6px">Tape au moins trois lettres.</p></div>
   </div>
-  <div class="wfoot"><small class="hint" style="margin-right:auto;align-self:center">Données <a href="https://scrin.is" target="_blank" rel="noopener">Scrinis</a></small><button class="btn" type="button" data-close>Fermer</button></div>
+  <div class="wfoot"><small class="hint" style="margin-right:auto;align-self:center">Données <a href="https://scrin.is" target="_blank" rel="noopener">Scrinis</a></small><button class="btn" type="button" id="mineSer">Série non référencée…</button><button class="btn" type="button" data-close>Fermer</button></div>
 </div></div>
 
 <!-- choix d’édition -->
 <div class="ov" id="ovEd"><div class="win" role="dialog" aria-modal="true" aria-labelledby="edTitle" style="width:min(460px,100%)">
   <div class="titlebar"><span id="edTitle">Changer d’édition</span><button class="x" type="button" data-close aria-label="Fermer"><svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg></button></div>
   <div class="wbody"><p id="edText" style="margin:0;line-height:1.5"></p></div>
-  <div class="wfoot"><button class="btn default" type="button" id="edMove">Déplacer mes tomes</button><button class="btn" type="button" id="edView">Juste afficher</button><button class="btn" type="button" data-close>Annuler</button></div>
+  <div class="wfoot"><button class="btn default" type="button" id="edView">Ajouter cette édition</button><button class="btn" type="button" id="edMove">Déplacer mes tomes</button><button class="btn" type="button" data-close>Annuler</button></div>
 </div></div>
 
 <!-- réglages -->
@@ -428,6 +465,7 @@ async function fetchSeries(id) { return toD(await sc("/series/" + encodeURICompo
 const refreshing = new Set();
 async function seriesDetail(sid, force) {
   const s = DB.series[sid];
+  if (isMineSeries(sid)) { if (s && s.snap) return s.snap; throw new Error("notfound"); }
   if (s && s.snap && !force && (s.snap.ver === 2 || !navigator.onLine)) {
     if (Date.now() - (s.snap.at || 0) > 2 * WEEK && navigator.onLine && !refreshing.has(sid)) {
       refreshing.add(sid);
@@ -446,7 +484,9 @@ function viewOf(d, s) {
   const fix = (s && s.fix) || {}, names = (s && s.edNames) || {};
   const vols = [], hidden = [];
   d.volumes.forEach(v => { const f = fix[v.id]; const w = f ? { ...v, edition_id: f.ed || v.edition_id, number: f.n != null ? f.n : v.number, title: f.t != null ? f.t : v.title, ft: f.t != null ? f.t : v.ft, fixed: true } : v; (f && f.hide ? hidden : vols).push(w); });
+  ((s && s.xv) || []).forEach(v => vols.push({ ...v, custom: true }));
   const eds = d.editions.map(e => ({ ...e, title: names[e.id] || e.title }));
+  ((s && s.xv) || []).forEach(v => { if (!eds.some(e => e.id === v.edition_id)) eds.push({ id: v.edition_id, title: names[v.edition_id] || v.edition_id, publisher_id: "p", follow_editions_count: 0 }); });
   Object.values(fix).forEach(f => { if (f.ed && !eds.some(e => e.id === f.ed)) eds.push({ id: f.ed, title: names[f.ed] || f.ed, publisher_id: "p", follow_editions_count: 0 }); });
   eds.forEach(e => { e.volumes_count = vols.filter(v => v.edition_id === e.id).length; });
   return { ...d, volumes: vols, hidden, editions: eds.filter(e => e.volumes_count || (s && s.ed === e.id)) };
@@ -468,23 +508,34 @@ let DB = (() => { try { return JSON.parse(H97LS.getItem(KEY)) || null; } catch {
 const save = () => { try { H97LS.setItem(KEY, JSON.stringify(DB)); } catch {} cloudQueue(); };
 const touch = sid => { const s = DB.series[sid]; if (s) s.t = Date.now(); };
 const ownedIds = s => s && s.own && s.ed && s.own[s.ed] ? s.own[s.ed] : [];
-const ownCount = s => ownedIds(s).length;
+/* une série peut avoir des tomes dans plusieurs éditions : le total compte toutes les éditions */
+const ownCount = s => Object.values((s && s.own) || {}).reduce((n, a) => n + (a ? a.length : 0), 0);
+const ownEds = s => Object.entries((s && s.own) || {}).filter(([, a]) => a && a.length);
+let hintEd = false;
 
 /* ---------------- affichage ---------------- */
 const main = $("#main");
 let view = { name: "home" }, showMissing = false, homeQ = "", homeSort = "title";
 const ICO_BOOK = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" shape-rendering="crispEdges"><path d="M3 1h10v14H3z" fill="#000"/><path d="M4 2h8v12H4z" fill="#f4f0e4"/><path d="M4 2h2v12H4z" fill="#c0392b"/><path d="M7 4h4v3H7z" fill="#2850c8"/><path d="M7 9h4v1H7zM7 11h3v1H7z" fill="#808080"/></svg>');
 const ICO_HOME = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" shape-rendering="crispEdges"><path d="M1 3h6l1 1h7v10H1z" fill="#000"/><path d="M2 5h12v8H2z" fill="#f0c840"/><path d="M2 5h12v1H2z" fill="#fff2b0"/></svg>');
+/* auteurs d’une série ; le tri se fait sur le nom de famille (« Eiichirô Oda » → « Oda ») */
+const authorsOf = s => ((s && s.snap && s.snap.authors) || []).map(a => a.name).filter(Boolean);
+const authorKey = s => { const a = authorsOf(s)[0]; if (!a) return "\uffff"; const w = a.trim().split(/\s+/); return norm(w.length > 1 ? w[w.length - 1] + " " + w.slice(0, -1).join(" ") : a); };
+/* date de sortie du premier tome (le plus ancien tome connu de la série, toutes éditions) */
+const firstDate = s => { let m = ""; [...((s && s.snap && s.snap.volumes) || []), ...((s && s.xv) || [])].forEach(v => { const d = v.release_date; if (d && (!m || d < m)) m = d; }); return m || "9999"; };
 function seriesSorted() {
   const list = Object.entries(DB.series).filter(([, s]) => !s.del);
   const q = norm(homeQ);
-  return list.filter(([, s]) => !q || norm(s.title).includes(q)).sort((a, b) =>
+  return list.filter(([, s]) => !q || norm(s.title).includes(q) || authorsOf(s).some(a => norm(a).includes(q))).sort((a, b) =>
+    homeSort === "author" ? authorKey(a[1]).localeCompare(authorKey(b[1]), "fr") || firstDate(a[1]).localeCompare(firstDate(b[1])) || a[1].title.localeCompare(b[1].title, "fr", { sensitivity: "base" }) :
     homeSort === "count" ? ownCount(b[1]) - ownCount(a[1]) || a[1].title.localeCompare(b[1].title, "fr") :
     homeSort === "added" ? (b[1].added || 0) - (a[1].added || 0) : a[1].title.localeCompare(b[1].title, "fr", { sensitivity: "base" }));
 }
 function coverOf(sid, vol) {
   const s = DB.series[sid], c = s && s.cov && s.cov[vol.id];
-  return c ? c.u : scImg(vol.image_url);
+  // une couverture d’une autre édition est une adresse Scrinis (« /cdn/covers/… ») : elle passe par le même chemin que les autres
+  if (c) return /^data:/.test(c.u) || (c.k === "url" && /^https?:/.test(c.u)) ? c.u : scImg(c.u);
+  return scImg(vol.image_url);
 }
 function imgTag(u, alt, cls = "cover") { return u ? `<img class="${cls}" src="${esc(u)}" alt="${esc(alt)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=&quot;ph&quot;>${esc(alt).replace(/'/g, "&#39;")}</span>'">` : `<span class="ph">${esc(alt)}</span>`; }
 
@@ -499,10 +550,10 @@ function drawHome() {
   const list = seriesSorted(), all = Object.values(DB.series).filter(s => !s.del);
   const tomes = all.reduce((n, s) => n + ownCount(s), 0);
   main.innerHTML = `<div class="hero"><h1>Ma Mangathèque</h1><p>${all.length} série${all.length > 1 ? "s" : ""} · ${tomes} tome${tomes > 1 ? "s" : ""}</p></div>
-    <div class="toolbar"><input type="search" id="hq" name="manga-filtre" placeholder="Rechercher une série" value="${esc(homeQ)}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-1p-ignore data-lpignore="true" data-form-type="other">
-      <select id="hs" aria-label="Trier"><option value="title">Titre</option><option value="count">Nombre de tomes</option><option value="added">Ajout récent</option></select>
+    <div class="toolbar"><input type="search" id="hq" name="manga-filtre" placeholder="Rechercher une série ou un auteur" value="${esc(homeQ)}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-1p-ignore data-lpignore="true" data-form-type="other">
+      <select id="hs" aria-label="Trier"><option value="title">Titre</option><option value="author">Auteur</option><option value="count">Nombre de tomes</option><option value="added">Ajout récent</option></select>
       <button class="btn" type="button" data-act="add">+ Ajouter une série</button><span class="cnt">${list.length} série${list.length > 1 ? "s" : ""}</span></div>
-    ${all.length ? `<div class="grid">${list.map(([sid, s]) => `<button class="tile" type="button" data-sid="${sid}">${imgTag(s.img, s.title)}<b>${esc(s.title)}</b><small>${ownCount(s)} tome${ownCount(s) > 1 ? "s" : ""}${s.edName ? " · " + esc(s.edName) : ""}</small></button>`).join("")}</div>` :
+    ${all.length ? `<div class="grid">${list.map(([sid, s]) => `<button class="tile" type="button" data-sid="${sid}">${imgTag(s.img, s.title)}<b>${esc(s.title)}</b>${homeSort === "author" ? `<small class="au">${esc(authorsOf(s).join(", ") || "Auteur inconnu")}</small>` : ""}<small>${ownEds(s).length > 1 ? ownEds(s).length + " éditions · " : ""}${ownCount(s)} tome${ownCount(s) > 1 ? "s" : ""}${s.edName ? " · " + esc(s.edName) : ""}</small></button>`).join("")}</div>` :
       `<div class="empty">Cette mangathèque est vide pour le moment.<br><button class="btn default" type="button" data-act="add">+ Ajouter une série</button></div>`}`;
   $("#hs").value = homeSort;
   $("#hq").oninput = e => { homeQ = e.target.value; const pos = e.target.selectionStart; drawHome(); const i = $("#hq"); i.focus(); i.setSelectionRange(pos, pos); };
@@ -511,8 +562,9 @@ function drawHome() {
 
 let cur = null, arrange = false; // { sid, snap (fiche Scrinis), d (fiche avec tes corrections), vols (tomes de l’édition affichée) }
 const busy = on => document.documentElement.classList.toggle("h97busy", on);
-async function openSeries(sid, keepScroll) {
+async function openSeries(sid, keepScroll, again) {
   if (!cur || cur.sid !== sid) arrange = false;
+  hintEd = !!again;
   view = { name: "series", sid }; drawTree(); closeSide();
   const s = DB.series[sid];
   main.innerHTML = `<button class="btn backbtn" type="button" data-go="home">◄ Toutes les séries</button><div class="empty">Chargement de « ${esc(s ? s.title : "")} »…</div>`;
@@ -560,19 +612,27 @@ function drawSeries(keepScroll) {
         ${kinds.length ? `<dt>Genres</dt><dd>${esc(kinds.join(", "))}</dd>` : ""}
         <dt>Tomes</dt><dd>${own.size} sur ${vols.length}${ed && ed.not_finished ? " (en cours)" : ed && ed.commercial_stop ? " (arrêt de commercialisation)" : ""}</dd></dl>
       <div class="edrow"><label for="edSel">Édition :</label><select id="edSel">${eds.map(e => { const p = d.publishers.find(x => x.id === e.publisher_id); const n = (s.own && s.own[e.id] || []).length; return `<option value="${e.id}"${e.id === s.ed ? " selected" : ""}>${esc(edName(e))}${p ? " · " + esc(p.title) : ""} · ${e.volumes_count} t.${n ? " · " + n + " possédé" + (n > 1 ? "s" : "") : ""}</option>`; }).join("")}</select></div>
+      ${(() => { const mine = ownEds(s); return mine.length > 1 || hintEd ? `<div class="myeds">${mine.length ? `<span>Mes éditions :</span>${mine.map(([e, a]) => { const E = d.editions.find(x => x.id === e); return `<button class="btn${e === s.ed ? " on" : ""}" type="button" data-myed="${esc(e)}">${esc(edName(E) || e)} · ${a.length}</button>`; }).join("")}` : ""}</div>` : ""; })()}
+      ${hintEd ? `<p class="msg">Cette série est déjà dans ta collection. Choisis une autre édition dans la liste pour y cocher tes tomes : tes tomes actuels restent dans leur édition.</p>` : ""}
       <div class="bar" title="${own.size} / ${vols.length}"><i style="width:${vols.length ? Math.round(own.size / vols.length * 100) : 0}%"></i></div>
     </div></div>
     <div class="toolbar"><label class="chk" style="margin:0"><input type="checkbox" id="missChk"${showMissing ? " checked" : ""}> Afficher aussi les tomes que je n’ai pas</label>
       <button class="btn" type="button" id="arrBtn" style="margin-left:auto"${arrange ? ' aria-pressed="true"' : ""}>${arrange ? "Terminer le rangement" : "Ranger les tomes…"}</button>
+      <button class="btn" type="button" id="addTome">+ Ajouter un tome…</button>
+      ${isMineSeries(sid) ? `<button class="btn" type="button" id="serEdit">Modifier la série…</button>` : ""}
       <button class="btn" type="button" id="rmSeries">Retirer la série</button></div>
     ${arrange ? arrangeHTML(sid, d, s, vols) : ""}
     ${arrange ? "" : shown.length ? `<div class="grid">${shown.map(v => `<button class="tile${own.has(v.id) ? "" : " miss"}" type="button" data-vid="${v.id}">${imgTag(coverOf(sid, v), "Tome " + v.number)}<b>Tome ${numTxt(v.number)}${v.title ? " · " + esc(v.title) : ""}</b><small>${own.has(v.id) ? fmtDate(v.release_date) : "Pas dans ma collection"}</small><span class="own" role="checkbox" tabindex="0" aria-checked="${own.has(v.id)}" aria-label="Je possède le tome ${v.number}" data-own="${v.id}" title="Je possède ce tome"><i></i></span></button>`).join("")}</div>`
       : `<div class="empty">Aucun tome de cette édition dans ta collection.<br><button class="btn" type="button" id="showAll">Afficher les tomes pour les cocher</button></div>`}`;
   if (keepScroll) scrollTo(0, y);
-  $("#edSel").onchange = e => askEdition(e.target.value);
+  $("#edSel").onchange = e => { hintEd = false; askEdition(e.target.value); };
+  main.querySelectorAll("[data-myed]").forEach(b => b.onclick = () => { s.ed = b.dataset.myed; hintEd = false; touch(sid); save(); drawSeries(); drawTree(); });
+  if (hintEd) setTimeout(() => { const sel = $("#edSel"); if (sel) sel.focus(); }, 50);
   $("#missChk").onchange = e => { showMissing = e.target.checked; drawSeries(true); };
   const sa = $("#showAll"); if (sa) sa.onclick = () => { showMissing = true; drawSeries(true); };
   $("#arrBtn").onclick = () => { arrange = !arrange; drawSeries(true); };
+  $("#addTome").onclick = () => openTomeForm();
+  if ($("#serEdit")) $("#serEdit").onclick = () => openSeriesForm(sid);
   if (arrange) bindArrange(sid, s);
   $("#rmSeries").onclick = () => { if (!confirm(`Retirer « ${ser.title} » de ta mangathèque ?`)) return; DB.series[sid] = { title: ser.title, del: true, t: Date.now() }; save(); go("home"); };
 }
@@ -627,9 +687,9 @@ function bindArrange(sid, s) {
 let edPending = null;
 function askEdition(newEd) {
   const { sid, d } = cur, s = DB.series[sid], n = ownedIds(s).length, ne = d.editions.find(e => e.id === newEd);
-  if (!n) { s.ed = newEd; touch(sid); save(); drawSeries(); drawTree(); return; }
+  if (!n || (s.own && s.own[newEd] && s.own[newEd].length)) { s.ed = newEd; touch(sid); save(); drawSeries(); drawTree(); return; }
   edPending = newEd;
-  $("#edText").innerHTML = `Tu possèdes <b>${n} tome${n > 1 ? "s" : ""}</b> dans l’édition actuelle.<br><br><b>Déplacer mes tomes</b> : tes tomes passent dans « ${esc(edName(ne))} » (mêmes numéros).<br><b>Juste afficher</b> : tu regardes cette édition sans rien changer.`;
+  $("#edText").innerHTML = `Tu possèdes <b>${n} tome${n > 1 ? "s" : ""}</b> dans l’édition actuelle.<br><br><b>Ajouter cette édition</b> : tu gardes tes tomes actuels et tu coches en plus ceux que tu as dans « ${esc(edName(ne))} ». Une série peut avoir des tomes dans plusieurs éditions.<br><b>Déplacer mes tomes</b> : tes tomes passent dans « ${esc(edName(ne))} » (mêmes numéros), si tu t’étais trompé d’édition.`;
   openOv("#ovEd");
 }
 $("#edMove").onclick = () => {
@@ -640,15 +700,18 @@ $("#edMove").onclick = () => {
   s.own = s.own || {}; delete s.own[s.ed]; s.own[edPending] = [...new Set([...(s.own[edPending] || []), ...moved])]; s.ed = edPending;
   touch(sid); save(); closeOv("#ovEd"); drawSeries(); drawTree();
 };
-$("#edView").onclick = () => { const s = DB.series[cur.sid]; s.ed = edPending; touch(cur.sid); save(); closeOv("#ovEd"); drawSeries(); drawTree(); };
+$("#edView").onclick = () => { const s = DB.series[cur.sid]; s.ed = edPending; touch(cur.sid); save(); closeOv("#ovEd"); showMissing = true; drawSeries(); drawTree(); };
 document.querySelectorAll("#ovEd [data-close]").forEach(b => b.addEventListener("click", () => { const sel = $("#edSel"); if (sel) sel.value = DB.series[cur.sid].ed; }));
 
 /* cocher un tome directement dans la grille de la série */
 function toggleOwn(vid, el) {
   const { sid, d } = cur, s = DB.series[sid], v = d.volumes.find(x => x.id === vid) || (cur.vols || []).find(x => x.id === vid); if (!v) return;
   s.own = s.own || {}; const set = new Set(s.own[v.edition_id] || []);
+  const edsBefore = ownEds(s).length;
   const on = !set.has(vid); on ? set.add(vid) : set.delete(vid); s.own[v.edition_id] = [...set];
   touch(sid); save(); drawTree();
+  // une édition apparaît ou disparaît de « Mes éditions » : on redessine l’en-tête
+  if (ownEds(s).length !== edsBefore && view.name === "series") { hintEd = false; drawSeries(true); return; }
   const tile = el.closest(".tile"); el.setAttribute("aria-checked", String(on)); tile.classList.toggle("miss", !on);
   tile.querySelector("small").textContent = on ? fmtDate(v.release_date) : "Pas dans ma collection";
   const n = ownedIds(s).length, tot = cur.vols.length, bar = main.querySelector(".bar i"); if (bar) bar.style.width = (tot ? Math.round(n / tot * 100) : 0) + "%";
@@ -701,6 +764,7 @@ $("#vNext").onclick = () => { const i = cur.vols.findIndex(x => x.id === curVol)
 /* modifier un tome depuis sa fiche : titre, numéro, édition, nom de l’édition, masquer */
 $("#vEdit").onclick = () => {
   const { sid, d } = cur, s = DB.series[sid], v = d.volumes.find(x => x.id === curVol) || (cur.vols || []).find(x => x.id === curVol); if (!v) return;
+  if (v.custom) return openTomeForm(v.id);
   const orig = cur.snap.volumes.find(x => x.id === v.id) || v, oe = cur.snap.editions.find(e => e.id === orig.edition_id);
   $("#fixTitle").textContent = `Modifier – Tome ${numTxt(v.number)}`;
   $("#fxT").value = v.title || ""; $("#fxN").value = v.number == null ? "" : v.number;
@@ -728,6 +792,94 @@ $("#fxOk").onclick = () => {
 };
 $("#fxReset").onclick = () => { const s = DB.series[cur.sid]; if (s.fix) delete s.fix[curVol]; applyView(); touch(cur.sid); save(); drawSeries(true); drawTree(); closeOv("#ovFix"); openVolume(curVol); };
 
+/* ---------------- tomes et séries non référencés : fiches remplies à la main ----------------
+   Les tomes perso sont rangés dans s.xv (synchronisés avec le reste) ; une série perso a un identifiant « u… »
+   et sa fiche (s.snap) n’est jamais remplacée par Scrinis. */
+const isMineSeries = sid => /^u/.test(sid);
+const rid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+let tomeEdit = null; // id du tome perso modifié (null = nouveau tome)
+function openTomeForm(vid) {
+  const { sid, d } = cur, s = DB.series[sid];
+  const v = vid ? (s.xv || []).find(x => x.id === vid) : null; tomeEdit = v ? v.id : null;
+  const c = v && s.cov && s.cov[v.id];
+  const next = (cur.vols || []).reduce((m, x) => Math.max(m, +x.number || 0), 0) + 1;
+  $("#tmTitle").textContent = v ? `Modifier le tome ${numTxt(v.number)}` : "Ajouter un tome";
+  $("#tmN").value = v ? (v.number ?? "") : next;
+  $("#tmT").value = v ? v.title || "" : "";
+  $("#tmE").innerHTML = d.editions.map(e => `<option value="${esc(e.id)}"${e.id === (v ? v.edition_id : s.ed) ? " selected" : ""}>${esc(edName(e))}</option>`).join("") + `<option value="__new">Nouvelle édition…</option>`;
+  $("#tmNewRow").hidden = true; $("#tmNew").value = "";
+  $("#tmD").value = v ? v.release_date || "" : ""; $("#tmI").value = v ? v.isbn || "" : ""; $("#tmP").value = v ? v.nb_pages || "" : "";
+  $("#tmU").value = c && c.k === "url" ? c.u : ""; $("#tmF").value = ""; tomeImg = null;
+  $("#tmOwn").checked = v ? ownedIds(s).includes(v.id) || Object.values(s.own || {}).some(a => a.includes(v.id)) : true;
+  $("#tmOwnRow").hidden = !!v; $("#tmDel").hidden = !v; $("#tmMsg").textContent = "";
+  openOv("#ovTome"); setTimeout(() => $(v ? "#tmT" : "#tmN").focus(), 50);
+}
+let tomeImg = null;
+$("#tmE").onchange = () => { const n = $("#tmE").value === "__new"; $("#tmNewRow").hidden = !n; if (n) setTimeout(() => $("#tmNew").focus(), 30); };
+$("#tmF").onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try { const bmp = await createImageBitmap(f), k = Math.min(1, 500 / bmp.width), c = document.createElement("canvas"); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k); c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height); tomeImg = c.toDataURL("image/jpeg", .82); $("#tmMsg").className = "msg ok"; $("#tmMsg").textContent = "Image prête."; }
+  catch { $("#tmMsg").className = "msg err"; $("#tmMsg").textContent = "Cette image ne peut pas être lue."; }
+};
+$("#tmOk").onclick = () => {
+  const sid = cur.sid, s = DB.series[sid];
+  const n = $("#tmN").value === "" ? null : +$("#tmN").value;
+  if (n == null || isNaN(n)) { $("#tmMsg").className = "msg err"; $("#tmMsg").textContent = "Indique le numéro du tome."; $("#tmN").focus(); return; }
+  let ed = $("#tmE").value;
+  if (ed === "__new") { const name = $("#tmNew").value.trim(); if (!name) { $("#tmNew").focus(); return; } ed = newEdition(s, name); }
+  const u = $("#tmU").value.trim();
+  if (u && !/^https?:\/\//.test(u)) { $("#tmMsg").className = "msg err"; $("#tmMsg").textContent = "Le lien de l’image doit commencer par https://"; return; }
+  s.xv = s.xv || [];
+  let v = tomeEdit ? s.xv.find(x => x.id === tomeEdit) : null;
+  const oldEd = v && v.edition_id;
+  if (!v) { v = { id: "x" + rid(), custom: true }; s.xv.push(v); }
+  Object.assign(v, { edition_id: ed, number: n, title: $("#tmT").value.trim(), ft: $("#tmT").value.trim(), release_date: $("#tmD").value || "", isbn: $("#tmI").value.replace(/[\s-]/g, ""), nb_pages: +$("#tmP").value || null, image_url: "" });
+  s.cov = s.cov || {};
+  if (tomeImg) s.cov[v.id] = { k: "file", u: tomeImg }; else if (u) s.cov[v.id] = { k: "url", u };
+  s.own = s.own || {};
+  if (oldEd && oldEd !== ed && s.own[oldEd] && s.own[oldEd].includes(v.id)) { s.own[oldEd] = s.own[oldEd].filter(x => x !== v.id); (s.own[ed] = s.own[ed] || []).push(v.id); }
+  if (!tomeEdit && $("#tmOwn").checked) { (s.own[ed] = s.own[ed] || []).push(v.id); }
+  s.ed = ed; touch(sid); save(); closeOv("#ovTome"); drawSeries(true); drawTree();
+  if (tomeEdit && $("#ovVol").classList.contains("open")) openVolume(v.id);
+};
+$("#tmDel").onclick = () => {
+  const sid = cur.sid, s = DB.series[sid], v = (s.xv || []).find(x => x.id === tomeEdit); if (!v) return;
+  if (!confirm(`Supprimer le tome ${numTxt(v.number)} que tu as ajouté ?`)) return;
+  s.xv = s.xv.filter(x => x.id !== v.id); Object.keys(s.own || {}).forEach(e => { s.own[e] = s.own[e].filter(x => x !== v.id); }); if (s.cov) delete s.cov[v.id];
+  touch(sid); save(); closeOv("#ovTome"); closeOv("#ovVol"); drawSeries(true); drawTree();
+};
+/* série perso */
+let serEdit = null;
+function openSeriesForm(sid) {
+  serEdit = sid || null; const s = sid && DB.series[sid], d = s && s.snap;
+  $("#srTitleBar").textContent = sid ? "Modifier la série" : "Série non référencée";
+  $("#srT").value = s ? s.title : ($("#addQ").value || "").trim();
+  $("#srA").value = d ? d.authors.map(a => a.name).join(", ") : "";
+  $("#srP").value = d && d.publishers[0] ? d.publishers[0].title : "";
+  $("#srG").value = d ? d.kinds.map(k => k.title).join(", ") : "";
+  $("#srE").value = d ? edName(d.editions.find(e => e.id === s.ed) || d.editions[0]) : "Édition standard";
+  $("#srERow").hidden = !!sid; $("#srMsg").textContent = "";
+  closeOv("#ovAdd"); openOv("#ovSer"); setTimeout(() => $("#srT").focus(), 50);
+}
+$("#srOk").onclick = () => {
+  const title = $("#srT").value.trim(); if (!title) { $("#srMsg").className = "msg err"; $("#srMsg").textContent = "Indique le titre de la série."; $("#srT").focus(); return; }
+  const list = v => v.split(",").map(x => x.trim()).filter(Boolean);
+  const authors = list($("#srA").value), genres = list($("#srG").value);
+  const sid = serEdit || "u" + rid(), s = DB.series[sid] || (DB.series[sid] = { own: {}, added: Date.now(), t: Date.now(), xv: [] });
+  const old = s.snap || {};
+  s.title = title;
+  s.snap = { sc: null, ver: 2, at: Date.now(), mine: true, series: [{ id: sid, title, kinds_ids: genres.map((g, i) => "g" + i) }],
+    editions: old.editions || [{ id: "std", title: $("#srE").value.trim() || "Édition standard", publisher_id: "p", volumes_count: 0 }],
+    volumes: [], publishers: [{ id: "p", title: $("#srP").value.trim() }],
+    authors: authors.map((a, i) => ({ id: "a" + i, name: a })), tasks: authors.map((a, i) => ({ author_id: "a" + i, job_id: "au" })),
+    jobs: [{ id: "au", title: "Auteur" }], kinds: genres.map((g, i) => ({ id: "g" + i, title: g })), cover: "" };
+  if (!s.ed) s.ed = s.snap.editions[0].id;
+  touch(sid); save(); drawTree(); closeOv("#ovSer");
+  if (serEdit && cur && cur.sid === sid) { cur.snap = s.snap; drawSeries(true); } else { showMissing = true; openSeries(sid).then(() => { if (!(s.xv || []).length) openTomeForm(); }); }
+};
+
+$("#mineSer").onclick = () => openSeriesForm();
+
 /* couverture : Scrinis, couvertures des autres éditions, image perso */
 let covPick = null;
 $("#vCover").onclick = () => {
@@ -738,7 +890,7 @@ $("#vCover").onclick = () => {
   covPick = curC ? { ...curC } : { k: "mc", u: v.image_url };
   if (curC && (curC.k === "url" || curC.k === "file") && !opts.some(o => o.u === curC.u)) opts.push({ k: curC.k, u: curC.u, l: "Mon image" });
   $("#covTitle").textContent = `Couverture – ${ser.title} ${numTxt(v.number)}`;
-  $("#covs").innerHTML = opts.length ? opts.map((o, i) => `<button class="co${o.u === covPick.u ? " on" : ""}" type="button" data-i="${i}"><img src="${esc(scImg(o.u, 200))}" alt="" referrerpolicy="no-referrer"><span>${esc(o.l)}</span></button>`).join("") : `<p class="hint" style="margin:6px">Pas de couverture sur Mangacollec pour ce tome.</p>`;
+  $("#covs").innerHTML = opts.length ? opts.map((o, i) => `<button class="co${o.u === covPick.u ? " on" : ""}" type="button" data-i="${i}"><img src="${esc(scImg(o.u, 200))}" alt="" referrerpolicy="no-referrer"><span>${esc(o.l)}</span></button>`).join("") : `<p class="hint" style="margin:6px">Pas de couverture sur Scrinis pour ce tome.</p>`;
   $("#covs").onclick = e => { const b = e.target.closest(".co"); if (!b) return; covPick = { k: opts[+b.dataset.i].k, u: opts[+b.dataset.i].u }; $("#covs").querySelectorAll(".co").forEach(x => x.classList.toggle("on", x === b)); };
   $("#covUrl").value = ""; $("#covFile").value = ""; $("#covMsg").textContent = "";
   openOv("#ovCov");
@@ -784,7 +936,7 @@ async function searchSeries(q) {
       searchCache.set(key, res);
     }
     if (norm(($("#addQ").value || "").trim()) !== q && !key.startsWith("isbn:")) return;
-    box.innerHTML = res.length ? res.map((r, i) => { const have = DB.series["sc" + r.id] && !DB.series["sc" + r.id].del; return `<button type="button" data-add="${i}" class="mnres">${imgTag(scImg(r.cover, 80), "", "mnth")}<span>${esc(r.title)}${have ? " ✓" : ""}</span><small>${esc(r.publisher || "Éditeur inconnu")}${r.count ? ` · ${r.count} tome${r.count > 1 ? "s" : ""}` : ""}${r.year ? " · " + r.year : ""}${r.isbnVol ? ` · tome ${numTxt(r.isbnVol.n)}` : ""}</small></button>`; }).join("")
+    box.innerHTML = res.length ? res.map((r, i) => { const have = DB.series["sc" + r.id] && !DB.series["sc" + r.id].del; return `<button type="button" data-add="${i}" class="mnres">${imgTag(scImg(r.cover, 80), "", "mnth")}<span>${esc(r.title)}${have ? " ✓" : ""}</span>${have && !r.isbnVol ? `<small class="have">Déjà dans ta collection : ajoute une autre édition</small>` : ""}<small>${esc(r.publisher || "Éditeur inconnu")}${r.count ? ` · ${r.count} tome${r.count > 1 ? "s" : ""}` : ""}${r.year ? " · " + r.year : ""}${r.isbnVol ? ` · tome ${numTxt(r.isbnVol.n)}` : ""}</small></button>`; }).join("")
       : `<p class="hint" style="margin:6px">Aucune série trouvée.</p>`;
     box._res = res;
   } catch (e) { box.innerHTML = `<p class="hint" style="margin:6px">${esc(e.message === "notfound" ? "Aucun tome ne correspond à cet ISBN." : scMsg(e))}</p>`; }
@@ -798,6 +950,7 @@ $("#addRes").onclick = async e => {
   try {
     const d = await fetchSeries(r.id), sid = "sc" + d.sc;
     let s = DB.series[sid];
+    const again = !!(s && !s.del && ownCount(s) && !r.isbnVol);
     if (!s || s.del) s = DB.series[sid] = { title: d.series[0].title, own: {}, added: Date.now(), t: Date.now(), img: scImg(d.cover), edName: "" };
     s.snap = d; s.title = d.series[0].title;
     if (!s.ed || !d.editions.some(x => x.id === s.ed)) s.ed = pickEdition(d, s);
@@ -807,7 +960,7 @@ $("#addRes").onclick = async e => {
       if (v) { s.ed = v.edition_id; s.own = s.own || {}; const set = new Set(s.own[v.edition_id] || []); set.add(v.id); s.own[v.edition_id] = [...set]; }
     }
     touch(sid); save(); drawTree();
-    closeOv("#ovAdd"); showMissing = !r.isbnVol; openSeries(sid);
+    closeOv("#ovAdd"); showMissing = !r.isbnVol; openSeries(sid, false, again);
   } catch (x) { b.disabled = false; $("#addRes").insertAdjacentHTML("afterbegin", `<p class="msg err" style="margin:6px">${esc(scMsg(x))}</p>`); }
   finally { busy(false); }
 };
