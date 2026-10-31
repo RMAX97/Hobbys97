@@ -8,7 +8,8 @@
 function go(){fix(document);new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(function(n){if(n.nodeType===1)fix(n.parentNode||n);});});}).observe(document.documentElement,{childList:true,subtree:true});}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go();})();
 </script>
-<style>body{overflow-x:hidden}</style>
+<style>body{overflow-x:hidden}.copyadd{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap}.copyadd .seg button{font-size:12.5px}
+</style>
 <!-- sur iPhone : le son suit le bouton silencieux du téléphone -->
 <script>try{if(navigator.audioSession)navigator.audioSession.type="ambient"}catch(e){}</script>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem("videotheque.theme")||"light"}catch(e){document.documentElement.dataset.theme="light"}</script>
@@ -690,17 +691,20 @@ const LANGS={fr:'Français',en:'Anglais',null:'Sans texte',xx:'Sans texte',es:'E
 
 const $=s=>document.querySelector(s);
 const fkey=f=>f.f==='dvd'?'dvd':'br'; // le 4K reprend la jaquette Blu-ray
+/* un même film peut exister en plusieurs exemplaires (ex. DVD + Blu-ray) : chaque exemplaire garde l'identifiant TMDB du film dans « tm » */
+const tmId=f=>f.tm||f.id;
+function addCopy(base,fmt){let n=2;while(films.some(x=>String(x.id)===`${tmId(base)}-${n}`))n++;const c={id:`${tmId(base)}-${n}`,tm:tmId(base),t:base.t,o:base.o||'',y:base.y||null,d:base.d||[],g:base.g||[],p:base.p||'',r:base.r||0,s:base.s||'',f:fmt,added:Date.now()};films.push(c);save();renderAll();return c}
 const FMT={dvd:'DVD',bluray:'Blu-ray','4k':'4K Ultra HD'};
 const fcls=f=>f.f==='4k'?'bluray uhd':f.f;
 const NEXTFMT={dvd:'bluray',bluray:'4k','4k':'dvd'};
 function fullOf(f){
   if(f.full===false) return null;
-  const c=(f.cv&&f.cv[fkey(f)])||(COVERS[f.id]&&COVERS[f.id][fkey(f)]);
+  const c=(f.cv&&f.cv[fkey(f)])||(COVERS[tmId(f)]&&COVERS[tmId(f)][fkey(f)]);
   if(!c) return null;
   if(/^idb:/.test(c[0])){const u=IMGURL[c[0].slice(4)];return u?{u,a:c[1],b:c[2]}:null}
   return {u:/^(data:|https?:)/.test(c[0])?c[0]:CP+c[0],a:c[1],b:c[2]};
 }
-const hasFull=f=>!!((f.cv&&f.cv[fkey(f)])||(COVERS[f.id]&&COVERS[f.id][fkey(f)]));
+const hasFull=f=>!!((f.cv&&f.cv[fkey(f)])||(COVERS[tmId(f)]&&COVERS[tmId(f)][fkey(f)]));
 /* Découpe d'une partie de la jaquette intégrale (de s à e, en fraction de la largeur) */
 function slice(u,s,e){const w=Math.max(e-s,.001);return `background-image:url('${esc(u)}');background-size:${100/w}% 100%;background-position:${w>=1?0:s/(1-w)*100}% 0`}
 const src=(p,size)=>/^(data:|https?:)/.test(p||'')?p:IMG+size+p;
@@ -758,7 +762,7 @@ function caseInner(f,size='w342',path){
 }
 function renderStats(){
   const b=films.filter(f=>f.f==='bluray').length, k=films.filter(f=>f.f==='4k').length;
-  $('#stats').innerHTML=`<span><b>${films.length}</b>films</span><span><b>${films.length-b-k}</b>DVD</span><span class="br"><b>${b}</b>Blu-ray</span><span class="uhd"><b>${k}</b>4K</span>`;
+  $('#stats').innerHTML=`<span><b>${new Set(films.map(tmId)).size}</b>films</span><span><b>${films.length-b-k}</b>DVD</span><span class="br"><b>${b}</b>Blu-ray</span><span class="uhd"><b>${k}</b>4K</span>`;
 }
 function renderGenres(){
   const c={}; films.forEach(f=>(f.g||[]).forEach(g=>c[g]=(c[g]||0)+1));
@@ -916,7 +920,8 @@ function openDetail(id,fromEl){
           <dt>Jaquette</dt><dd id="covPick"></dd>
         </dl>
         <div class="panefoot">
-          <div class="links">${f.s?`<a href="https://letterboxd.com/film/${esc(f.s)}/" target="_blank" rel="noopener">Letterboxd</a>`:''}<a href="https://www.themoviedb.org/movie/${f.id}?language=fr-FR" target="_blank" rel="noopener">TMDB</a></div>
+          <div class="links">${f.s?`<a href="https://letterboxd.com/film/${esc(f.s)}/" target="_blank" rel="noopener">Letterboxd</a>`:''}<a href="https://www.themoviedb.org/movie/${tmId(f)}?language=fr-FR" target="_blank" rel="noopener">TMDB</a></div>
+          <span class="copyadd" id="copyAdd"><button class="btn" id="copyBtn" type="button">+ Autre exemplaire</button></span>
           <button class="btn danger" id="rmFilm">Retirer de la vidéothèque</button>
         </div>
       </section>
@@ -925,7 +930,8 @@ function openDetail(id,fromEl){
   $('#flipBtn').onclick=()=>$('#tilt')._flip();
   $('.facts').onclick=e=>{const b=e.target.closest('.lnk');if(!b)return;const k=b.dataset.k;filterBy(k,k==='year'?+b.dataset.v:b.dataset.v)};
   $('#detailFmt').onclick=e=>{const b=e.target.closest('button');if(!b||f.f===b.dataset.v)return;f.f=b.dataset.v;save();$('#detailFmt').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));rebuildBox(f);render()};
-  $('#rmFilm').onclick=()=>{if(!confirm(`Retirer « ${f.t} » de la vidéothèque ?`))return;const i=films.indexOf(f);films.splice(i,1);{const g=getGone();g[f.id]={t:Date.now()};setGone(g)}save();$('#dDetail').close();renderAll();toast(`« ${f.t} » retiré.`,'Annuler',()=>{films.splice(i,0,f);{const g=getGone();delete g[f.id];setGone(g)}save();renderAll()})};
+  $('#copyBtn').onclick=()=>{const o=films.filter(x=>tmId(x)===tmId(f));$('#copyAdd').innerHTML=`<span class="seg fmt">${['dvd','bluray','4k'].map(k=>`<button type="button" data-cf="${k}">+ ${FMT[k].replace(' Ultra HD','')}</button>`).join('')}</span>`;$('#copyAdd').onclick=e=>{const b=e.target.closest('[data-cf]');if(!b)return;const c=addCopy(f,b.dataset.cf);toast(`Exemplaire ${FMT[c.f]} de « ${c.t} » ajouté.`,'Voir',()=>openDetail(c.id));$('#copyAdd').innerHTML=`<span class="hint">${o.length+1} exemplaires</span>`}};
+$('#rmFilm').onclick=()=>{if(!confirm(`Retirer « ${f.t} » de la vidéothèque ?`))return;const i=films.indexOf(f);films.splice(i,1);{const g=getGone();g[f.id]={t:Date.now()};setGone(g)}save();$('#dDetail').close();renderAll();toast(`« ${f.t} » retiré.`,'Annuler',()=>{films.splice(i,0,f);{const g=getGone();delete g[f.id];setGone(g)}save();renderAll()})};
   $('#chgPoster').onclick=()=>openPosters(f);
   const dlg=$('#dDetail');
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1101,7 +1107,7 @@ async function openPosters(f){
   if(!$('#dDetail').open){document.documentElement.style.overflow='hidden';$('#dDetail').showModal()}
   $('#dDetail').scrollTop=0;
   let data;
-  try{data=await tmdb(`/movie/${f.id}/images`)}catch(err){$('#pk').innerHTML=`<span class="label" style="display:block;margin-top:26px">Jaquettes TMDB</span>`+keyMessage(err);return}
+  try{data=await tmdb(`/movie/${tmId(f)}/images`)}catch(err){$('#pk').innerHTML=`<span class="label" style="display:block;margin-top:26px">Jaquettes TMDB</span>`+keyMessage(err);return}
   let posters=(data.posters||[]);
   if(f.p&&!posters.some(p=>p.file_path===f.p)) posters.unshift({file_path:f.p,iso_639_1:'mine'});
   const rank=l=>l==='mine'?-1:l==='fr'?0:l==null?1:l==='en'?2:3;
@@ -1155,16 +1161,18 @@ async function searchAdd(q){
   const res=(data.results||[]).slice(0,20);
   if(!res.length){box.innerHTML=`<p class="hint">Aucun film trouvé pour « ${esc(q)} ». Essayez le titre original.</p>`;return}
   box.innerHTML=res.map(r=>{
-    const y=(r.release_date||'').slice(0,4);const owned=films.some(f=>f.id===r.id);
+    const y=(r.release_date||'').slice(0,4);const mine=films.filter(f=>tmId(f)===r.id),owned=mine.length>0;
     const alt=r.original_title&&r.original_title!==r.title?` <span class="m">(${esc(r.original_title)})</span>`:'';
     return `<div class="res"><div>${r.poster_path?`<img src="${IMG}w92${r.poster_path}" alt="" loading="lazy">`:'<span class="ph" style="display:block"></span>'}</div>
       <div><div class="t">${esc(r.title)}${alt}</div><div class="m">${y||'Date inconnue'}</div></div>
-      <div class="add" data-id="${r.id}">${owned?'<span class="owned">Déjà dans la vidéothèque</span>':'<button data-f="dvd">+ DVD</button><button class="b" data-f="bluray">+ Blu-ray</button><button class="k" data-f="4k">+ 4K</button>'}</div></div>`;
+      <div class="add" data-id="${r.id}">${owned?`<span class="owned">Déjà en ${[...new Set(mine.map(f=>FMT[f.f]))].join(' + ')} · autre exemplaire :</span>`:''}<button data-f="dvd">+ DVD</button><button class="b" data-f="bluray">+ Blu-ray</button><button class="k" data-f="4k">+ 4K</button></div></div>`;
   }).join('');
 }
 $('#addResults').addEventListener('click',async e=>{
   const b=e.target.closest('.add button');if(!b)return;
   const wrap=b.parentElement,id=+wrap.dataset.id;
+  const base=films.find(x=>tmId(x)===id);
+  if(base){const c=addCopy(base,b.dataset.f);wrap.innerHTML=`<span class="owned">Exemplaire ${FMT[c.f]} ajouté</span>`;toast(`« ${c.t} » ajouté en ${FMT[c.f]}.`);return}
   wrap.innerHTML='<span class="owned">Ajout…</span>';
   try{
     const m=await tmdb(`/movie/${id}`,{language:'fr-FR',append_to_response:'credits'});
@@ -1239,7 +1247,7 @@ function syncState(f){
   const cv={};if(f.cv)for(const k in f.cv){const c=f.cv[k];cv[k]={s:c[3]||null,a:c[1],b:c[2],id:c[4]||null}}
   const st={f:f.f||'dvd',p:f.p||null,full:f.full===false?false:true,cv};
   // un film ajouté à la main (absent de la liste Letterboxd) voyage avec sa fiche, pour exister aussi sur les autres appareils
-  if(SEEDP[f.id]===undefined)st.m={t:f.t||'',o:f.o||'',y:f.y||null,d:f.d||[],g:f.g||[],r:f.r||0,s:f.s||'',added:f.added||null};
+  if(SEEDP[f.id]===undefined)st.m={t:f.t||'',o:f.o||'',y:f.y||null,d:f.d||[],g:f.g||[],r:f.r||0,s:f.s||'',added:f.added||null,tm:f.tm||null,p:f.p||''};
   return st;
 }
 /* films retirés : gardés en mémoire pour prévenir les autres appareils */
@@ -1306,7 +1314,7 @@ async function applyRemote(id,r){
   if(!f){
     // film ajouté sur un autre appareil
     if(!r.m||(getGone()[id]&&getGone()[id].t>=r.t))return false;
-    f={id:/^\d+$/.test(id)?+id:id,t:r.m.t,o:r.m.o||'',y:r.m.y||null,d:r.m.d||[],g:r.m.g||[],p:'',r:r.m.r||0,s:r.m.s||'',f:'dvd',added:r.m.added||r.t};
+    f={id:/^\d+$/.test(id)?+id:id,t:r.m.t,o:r.m.o||'',y:r.m.y||null,d:r.m.d||[],g:r.m.g||[],p:r.m.p||'',r:r.m.r||0,s:r.m.s||'',f:'dvd',added:r.m.added||r.t};if(r.m.tm)f.tm=r.m.tm;
     films.push(f);
   }else if(dirty(f)||!(r.t>(f.st||0)))return false;
   f.f=r.f||'dvd';if(r.p)f.p=r.p;if(r.full===false)f.full=false;else delete f.full;
