@@ -488,10 +488,16 @@ const main = $("#main");
 let view = { name: "home" }, showMissing = false, homeQ = "", homeSort = "title";
 const ICO_BOOK = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" shape-rendering="crispEdges"><path d="M3 1h10v14H3z" fill="#000"/><path d="M4 2h8v12H4z" fill="#f4f0e4"/><path d="M4 2h2v12H4z" fill="#c0392b"/><path d="M7 4h4v3H7z" fill="#2850c8"/><path d="M7 9h4v1H7zM7 11h3v1H7z" fill="#808080"/></svg>');
 const ICO_HOME = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" shape-rendering="crispEdges"><path d="M1 3h6l1 1h7v10H1z" fill="#000"/><path d="M2 5h12v8H2z" fill="#f0c840"/><path d="M2 5h12v1H2z" fill="#fff2b0"/></svg>');
+/* auteurs d’une série ; le tri se fait sur le nom de famille (« Eiichirô Oda » → « Oda ») */
+const authorsOf = s => ((s && s.snap && s.snap.authors) || []).map(a => a.name).filter(Boolean);
+const authorKey = s => { const a = authorsOf(s)[0]; if (!a) return "\uffff"; const w = a.trim().split(/\s+/); return norm(w.length > 1 ? w[w.length - 1] + " " + w.slice(0, -1).join(" ") : a); };
+/* date de sortie du premier tome (le plus ancien tome connu de la série, toutes éditions) */
+const firstDate = s => { let m = ""; [...((s && s.snap && s.snap.volumes) || []), ...((s && s.xv) || [])].forEach(v => { const d = v.release_date; if (d && (!m || d < m)) m = d; }); return m || "9999"; };
 function seriesSorted() {
   const list = Object.entries(DB.series).filter(([, s]) => !s.del);
   const q = norm(homeQ);
-  return list.filter(([, s]) => !q || norm(s.title).includes(q)).sort((a, b) =>
+  return list.filter(([, s]) => !q || norm(s.title).includes(q) || authorsOf(s).some(a => norm(a).includes(q))).sort((a, b) =>
+    homeSort === "author" ? authorKey(a[1]).localeCompare(authorKey(b[1]), "fr") || firstDate(a[1]).localeCompare(firstDate(b[1])) || a[1].title.localeCompare(b[1].title, "fr", { sensitivity: "base" }) :
     homeSort === "count" ? ownCount(b[1]) - ownCount(a[1]) || a[1].title.localeCompare(b[1].title, "fr") :
     homeSort === "added" ? (b[1].added || 0) - (a[1].added || 0) : a[1].title.localeCompare(b[1].title, "fr", { sensitivity: "base" }));
 }
@@ -514,10 +520,10 @@ function drawHome() {
   const list = seriesSorted(), all = Object.values(DB.series).filter(s => !s.del);
   const tomes = all.reduce((n, s) => n + ownCount(s), 0);
   main.innerHTML = `<div class="hero"><h1>Ma Mangathèque</h1><p>${all.length} série${all.length > 1 ? "s" : ""} · ${tomes} tome${tomes > 1 ? "s" : ""}</p></div>
-    <div class="toolbar"><input type="search" id="hq" name="manga-filtre" placeholder="Rechercher une série" value="${esc(homeQ)}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-1p-ignore data-lpignore="true" data-form-type="other">
-      <select id="hs" aria-label="Trier"><option value="title">Titre</option><option value="count">Nombre de tomes</option><option value="added">Ajout récent</option></select>
+    <div class="toolbar"><input type="search" id="hq" name="manga-filtre" placeholder="Rechercher une série ou un auteur" value="${esc(homeQ)}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-1p-ignore data-lpignore="true" data-form-type="other">
+      <select id="hs" aria-label="Trier"><option value="title">Titre</option><option value="author">Auteur</option><option value="count">Nombre de tomes</option><option value="added">Ajout récent</option></select>
       <button class="btn" type="button" data-act="add">+ Ajouter une série</button><span class="cnt">${list.length} série${list.length > 1 ? "s" : ""}</span></div>
-    ${all.length ? `<div class="grid">${list.map(([sid, s]) => `<button class="tile" type="button" data-sid="${sid}">${imgTag(s.img, s.title)}<b>${esc(s.title)}</b><small>${ownEds(s).length > 1 ? ownEds(s).length + " éditions · " : ""}${ownCount(s)} tome${ownCount(s) > 1 ? "s" : ""}${s.edName ? " · " + esc(s.edName) : ""}</small></button>`).join("")}</div>` :
+    ${all.length ? `<div class="grid">${list.map(([sid, s]) => `<button class="tile" type="button" data-sid="${sid}">${imgTag(s.img, s.title)}<b>${esc(s.title)}</b>${homeSort === "author" ? `<small class="au">${esc(authorsOf(s).join(", ") || "Auteur inconnu")}</small>` : ""}<small>${ownEds(s).length > 1 ? ownEds(s).length + " éditions · " : ""}${ownCount(s)} tome${ownCount(s) > 1 ? "s" : ""}${s.edName ? " · " + esc(s.edName) : ""}</small></button>`).join("")}</div>` :
       `<div class="empty">Ta mangathèque est vide.<br>Ajoute une série par son titre, ou par l’ISBN d’un de ses tomes.<br><button class="btn default" type="button" data-act="add">+ Ajouter une série</button></div>`}`;
   $("#hs").value = homeSort;
   $("#hq").oninput = e => { homeQ = e.target.value; const pos = e.target.selectionStart; drawHome(); const i = $("#hq"); i.focus(); i.setSelectionRange(pos, pos); };

@@ -9,6 +9,7 @@ function go(){fix(document);new MutationObserver(function(ms){ms.forEach(functio
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go();})();
 </script>
 <style>body{overflow-x:hidden}.copyadd{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap}.copyadd .seg button{font-size:12.5px}
+.footbtns{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:nowrap;width:100%}.footbtns .btn{white-space:nowrap}.footbtns #rmFilm{gap:.28em}@media (max-width:520px){.footbtns .lg{display:none}}.footbtns .copyadd{margin-left:auto}
 </style>
 <!-- sur iPhone : le son suit le bouton silencieux du téléphone -->
 <script>try{if(navigator.audioSession)navigator.audioSession.type="ambient"}catch(e){}</script>
@@ -921,8 +922,8 @@ function openDetail(id,fromEl){
         </dl>
         <div class="panefoot">
           <div class="links">${f.s?`<a href="https://letterboxd.com/film/${esc(f.s)}/" target="_blank" rel="noopener">Letterboxd</a>`:''}<a href="https://www.themoviedb.org/movie/${tmId(f)}?language=fr-FR" target="_blank" rel="noopener">TMDB</a></div>
-          <span class="copyadd" id="copyAdd"><button class="btn" id="copyBtn" type="button">+ Autre exemplaire</button></span>
-          <button class="btn danger" id="rmFilm">Retirer de la vidéothèque</button>
+          <div class="footbtns"><button class="btn danger" id="rmFilm">Retirer<span class="lg">de la vidéothèque</span></button>
+          <span class="copyadd" id="copyAdd"><button class="btn" id="copyBtn" type="button">+ Autre exemplaire</button></span></div>
         </div>
       </section>
     </div></div>`;
