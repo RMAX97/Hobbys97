@@ -459,7 +459,9 @@ function seriesSorted() {
 }
 function coverOf(sid, vol) {
   const s = DB.series[sid], c = s && s.cov && s.cov[vol.id];
-  return c ? c.u : scImg(vol.image_url);
+  // une couverture d’une autre édition est une adresse Scrinis (« /cdn/covers/… ») : elle passe par le même chemin que les autres
+  if (c) return /^data:/.test(c.u) || (c.k === "url" && /^https?:/.test(c.u)) ? c.u : scImg(c.u);
+  return scImg(vol.image_url);
 }
 function imgTag(u, alt, cls = "cover") { return u ? `<img class="${cls}" src="${esc(u)}" alt="${esc(alt)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=&quot;ph&quot;>${esc(alt).replace(/'/g, "&#39;")}</span>'">` : `<span class="ph">${esc(alt)}</span>`; }
 
@@ -721,7 +723,7 @@ $("#vCover").onclick = () => {
   covPick = curC ? { ...curC } : { k: "mc", u: v.image_url };
   if (curC && (curC.k === "url" || curC.k === "file") && !opts.some(o => o.u === curC.u)) opts.push({ k: curC.k, u: curC.u, l: "Mon image" });
   $("#covTitle").textContent = `Couverture – ${ser.title} ${numTxt(v.number)}`;
-  $("#covs").innerHTML = opts.length ? opts.map((o, i) => `<button class="co${o.u === covPick.u ? " on" : ""}" type="button" data-i="${i}"><img src="${esc(scImg(o.u, 200))}" alt="" referrerpolicy="no-referrer"><span>${esc(o.l)}</span></button>`).join("") : `<p class="hint" style="margin:6px">Pas de couverture sur Mangacollec pour ce tome.</p>`;
+  $("#covs").innerHTML = opts.length ? opts.map((o, i) => `<button class="co${o.u === covPick.u ? " on" : ""}" type="button" data-i="${i}"><img src="${esc(scImg(o.u, 200))}" alt="" referrerpolicy="no-referrer"><span>${esc(o.l)}</span></button>`).join("") : `<p class="hint" style="margin:6px">Pas de couverture sur Scrinis pour ce tome.</p>`;
   $("#covs").onclick = e => { const b = e.target.closest(".co"); if (!b) return; covPick = { k: opts[+b.dataset.i].k, u: opts[+b.dataset.i].u }; $("#covs").querySelectorAll(".co").forEach(x => x.classList.toggle("on", x === b)); };
   $("#covUrl").value = ""; $("#covFile").value = ""; $("#covMsg").textContent = "";
   openOv("#ovCov");
